@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+
+    {% include 'bootstrap_link.html' %}
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'css/login.css' %}">
+    <title>Property Valuation</title>
+</head>
+<body>
+    {% if error %}  
+<script>  
+    swal("Error!", "{{ error }}", "error");  
+</script>  
+{% endif %}
+    <div class="bg">
+        <div class="login-container">
+            <div class="logo"><img src="{% static 'img/logo.png' %}" alt="logo" height="120" width="180"></div>
+            <form action="" method="post" class="mx-1 mx-md-4">{% csrf_token %}
+
+		
+                <i class="fa fa-user"></i><input type="email" name="email" autocomplete="email" class="login-text" placeholder="Enter Username" required><br>
+                <i class="fa fa-key"></i><input type="password" name="password" class="login-text" placeholder="Password" required>
+		<div class="concent"><input type="checkbox" value="" name="agree" id="checked" /><span style="font-size: 14px;">  I agree all statements in <a href="#!">Terms of service</a></span>
+                      <!--<label class="form-check-label" for="form2Example3">
+                        
+                      </label>--></div>
+                
+		<button type="submit" id="submit" disabled>Login</button>
+        <a class="float-end" href="{% url 'password_reset' %}">Forgot Password?</a>
+            </form>
+        </div>
+    </div>
+<script>
+        // Initially disable the submit button
+        document.getElementById('submit').disabled = true;
+
+        // Listen to changes in the checkbox
+        document.getElementById('checked').addEventListener('change', function() {
+            // Enable the submit button only when checkbox is checked
+            document.getElementById('submit').disabled = !this.checked;
+        });
+    </script>
+
+</body>
+</html>

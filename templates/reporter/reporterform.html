@@ -1,0 +1,935 @@
+
+{% extends "sidebar.html" %}
+{% include 'bootstrap_link.html' %}
+{% block title %}Reporter Form{% endblock %}
+{% load static %}
+
+{% block content %}
+
+  <div class="testbox col-md-8 offset-md-2">
+        
+      <form action="" method="post" enctype="multipart/form-data">{% csrf_token %}
+        <div class="banner">
+            {% if recptreport %}
+            <h1>Update Reporter Form</h1>
+            {% else %}
+            <h1>Reporter Report Form</h1>
+            {% endif %}
+        </div>
+        <div class="step" id="step1" style="height: 70vh; overflow-x: hidden;overflow-y: auto;">
+                <div class="row">
+                <div class="item col-sm-6">
+                    <label for="appno">Loan Application Number</label>
+                    <input id="appno" name="appno" type="text" class="form-control" placeholder="Enter Application Number" readonly
+                    {% if requestreceived %}
+                    value="{{requestreceived.applicationnumber}}"
+                    {% else %}
+                    value="{{recptreport.applicationnumber}}"
+                    {% endif %}/>
+                </div>
+                <div class="item col-sm-6">
+                  <label for="inspdate">Date of inspection</label>
+                  <input id="inspdate" name = "inspdate" type="date" class="form-control" placeholder="Enter date" 
+                  {% if recptreport %}
+                  value="{{appdd}}"
+                  {% endif %}/>
+                  <i class="fas fa-calendar-alt"></i>
+              </div>
+            </div>
+                <div class="row">
+                  <div class="col-sm-6">
+                  <label for="custname">Customer name</label>
+                  <input id="custname" name="custname" type="text" class="form-control" placeholder="Enter name"
+                  {% if requestreceived %}
+                  value="{{requestreceived.name}}"
+                  {% else %}
+                  value="{{recptreport.name}}"
+                  {% endif %}/>
+                </div>
+                <div class="col-sm-6">
+                <label for="dname">Document holder name</label>
+                    <input id="dname" name="dname" type="text" class="form-control" placeholder="Enter name"
+                    {% if requestreceived %}
+                    value="{{requestreceived.name}}"
+                    {% else %}
+                    value="{{recptreport.name}}"
+                    {% endif %}/>
+                  </div>
+              
+                </div>
+                <div class="radioinput" >
+                  <p>Type of property:</p>
+                  <input type="radio" id="res" name="propertytype" value="Residential" {% if recptreport.propertytype == 'Residential' %}checked{% endif %}>
+                  <label for="res">Residential</label>&nbsp;&nbsp;
+                  <input type="radio" id="com" name="propertytype" value="Commercial" {% if recptreport.propertytype == 'Commercial' %}checked{% endif %}>
+                  <label for="com">Commercial</label>&nbsp;&nbsp;
+                  <input type="radio" id="rescumcom" name="propertytype" value="Residential cum commercial" {% if recptreport.propertytype == 'Residential cum commercial' %}checked{% endif %}>
+                  <label for="rescumcom">Residential cum commercial</label>&nbsp;&nbsp;
+                  <input type="radio" id="indust" name="propertytype" value="Industrial" {% if recptreport.propertytype == 'Industrial' %}checked{% endif %}>
+                  <label for="indust">Industrial</label>&nbsp;&nbsp;
+                  <input type="radio" id="vacant" name="propertytype" value="Vacant plot" {% if recptreport.propertytype == 'Vacant plot' %}checked{% endif %}>
+                  <label for="vacant">Vacant plot</label>
+                  
+                </div>
+                <div class="item">
+                  <p>Property Address</p>
+                  <input type="text" name="add1" placeholder="Street address"
+                  {% if requestreceived %}
+                value="{{requestreceived.add1}}"
+                {% else %}
+                value="{{recptreport.add1}}"
+                {% endif %}/>
+                  <input type="text" name="add2" placeholder="Street address line 2" 
+                  {% if requestreceived %}
+                value="{{requestreceived.add2}}"
+                {% else %}
+                value="{{recptreport.add2}}"
+                {% endif %}/>
+                <div class="city-item">
+                  <input type="text" name="city" placeholder="City" 
+                  {% if requestreceived %}
+                  value="{{requestreceived.city}}"
+                  {% else %}
+                  value="{{recptreport.city}}"
+                  {% endif %}/>
+                  <input type="text" name="region" placeholder="State" 
+                  {% if requestreceived %}
+                value="{{requestreceived.region}}"
+                {% else %}
+                value="{{recptreport.region}}"
+                {% endif %}/>
+                <input type="text" name="zip" placeholder="Postal / Zip code" 
+                {% if requestreceived %}
+                value="{{requestreceived.zip}}"
+                {% else %}
+                value="{{recptreport.zip}}"
+                {% endif %}/>
+                    <select name="country" >
+                      <option value="">
+                        {% if recptreport %} "{{recptreport.country}}" {% else %} Country {% endif %}</option>
+                      <option value="India" selected>India</option>
+                      
+                    </select>
+                </div>
+              </div>
+              <div class="item">
+                <label for="landmark">Landmark</label>
+                <input id="landmark" name="landmark" type="text" class="form-control" placeholder="Enter Landmark"
+                {% if recptreport %}
+                value="{{recptreport.landmark}}"
+                {% endif %}/>
+              </div>
+              <div class="item">
+                <p>Legal Address of Property ( House No./ Survey no./ khasra No.)</p>
+                <input type="text" name="ladd1" placeholder="Street address"
+                {% if recptreport %}
+              value="{{recptreport.ladd1}}"
+              {% endif %}/>
+                <input type="text" name="ladd2" placeholder="Street address line 2" 
+                {% if recptreport %}
+              value="{{recptreport.ladd2}}"
+              {% endif %}/>
+              <div class="city-item">
+                <input type="text" name="lcity" placeholder="City" 
+                {% if recptreport %}
+                value="{{recptreport.lcity}}"
+                {% endif %}/>
+                <input type="text" name="lregion" placeholder="State" 
+                {% if recptreport %}
+              value="{{recptreport.lregion}}"
+              {% endif %}/>
+              <input type="text" name="lzip" placeholder="Postal / Zip code" 
+              {% if recptreport %}
+              {% else %}
+              value="{{recptreport.lzip}}"
+              {% endif %}/>
+                  <select name="lcountry" >
+                    <option value="">
+                      {% if recptreport %} "{{recptreport.country}}" {% else %} Country {% endif %}</option>
+                    <option value="India" selected>India</option>
+                    
+                  </select>
+              </div>
+            </div>
+            <p>SURROUNDING LOCALITY DETAILS </p>
+            <div class="row">
+              <div class="item col-sm-4">
+                  <label for="ward">Ward No./ Municipal land No.</label>
+                  <input id="ward" name="ward" type="text" class="form-control" placeholder="Ward No./ Municipal land No."
+                  {% if recptreport %}
+                  value="{{recptreport.wardlandno}}"
+                  {% endif %}/>
+              </div>
+              <div class="item col-sm-4">
+                <label for="aroadwidth">Approach Road Width</label>
+                <input id="aroadwidth" name = "aroadwidth" type="text" placeholder="Approach Road Width" class="form-control" 
+                {% if recptreport %}
+                value="{{recptreport.approachroadwidth}}"
+                {% endif %}/>
+                
+            </div>
+            <div class="item col-sm-4">
+              <label for="plotds">Plot Demarcated at site</label>
+              <select id="plotds" name="plotds">
+                <option value="">Plot Demarcated at site</option>
+                <option value="True" {% if recptreport.plotdem %} selected {% endif %}>Yes</option>
+                <option value="False" {% if not recptreport.plotdem %} selected {% endif %}>No</option>
+                
+              </select>
+            </div>
+          </div>
+          <div class="row">
+            <div class="item col-sm-4">
+              <label for="vicinity">Vicinity</label>
+              <select id="vicinity" name="vicinity" >
+                <option value="Vicinity" {% if recptreport.vicinity == 'Vicinity' %} selected {% endif %}>Vicinity</option>
+                <option value="slum" {% if recptreport.vicinity == 'slum' %} selected {% endif %}>Slum</option>
+                <option value="residential" {% if recptreport.vicinity == 'residential' %} selected {% endif %}>Residential</option>
+                <option value="Commercial" {% if recptreport.vicinity == 'Commercial' %} selected {% endif %}>Commercial</option>
+                <option value="mixed" {% if recptreport.vicinity == 'mixed' %} selected {% endif %}>Mixed</option>
+                <option value="industrial" {% if recptreport.vicinity == 'industrial' %} selected {% endif %}>Industrial</option>
+              </select>  
+          </div>
+          <div class="item col-sm-4">
+            <label for="proplocation">Property Location</label>
+            <select id="proplocation" name="proplocation" >
+              <option value="">Property Location</option>
+              <option value="cbd" {% if recptreport.propertylocation == 'cbd' %} selected {% endif %}>Central Business District</option>
+              <option value="primelocation" {% if recptreport.propertylocation == 'primelocation' %} selected {% endif %}>Prime Location</option>
+              <option value="secondarybusiness" {% if recptreport.propertylocation == 'secondarybusiness' %} selected {% endif %}>Secondary Business</option>
+              <option value="district" {% if recptreport.propertylocation == 'district' %} selected {% endif %}>District</option>
+              <option value="outskirts" {% if recptreport.propertylocation == 'outskirts' %} selected {% endif %}>Outskirts</option>
+            </select>
+          </div>
+          <div class="item col-sm-4">
+            <label for="propident">Property  Identification</label>
+            <select id="propident" name="propident" >
+              <option value="">Property  Identification</option>
+              <option value="easy" {% if recptreport.propertyidentification == 'easy' %} selected {% endif %}>Easy to Identify</option>
+              <option value="bydoc" {% if recptreport.propertyidentification == 'bydoc' %} selected {% endif %}>Identification by documents</option>
+              <option value="adddoc" {% if recptreport.propertyidentification == 'adddoc' %} selected {% endif %}>Additional documents required for Identification</option>
+              <option value="difficult" {% if recptreport.propertyidentification == 'difficult' %} selected {% endif %}>Difficult to identify</option>
+              
+            </select>
+          </div>
+        </div>
+        
+        <div class="row">
+          <div class="col-sm-4">
+            <p>Connectivity/Infrastructure Development</p>
+          </div>
+          <div class="col-sm-8">
+            <p>Landmark Details (Nearest in Km.)</p>
+          </div>
+        </div>
+        <div class="row">
+          <div class="col-sm-3">
+            <label for="connectivity">Connectivity/Infrastructure</label>
+            <select id="connectivity" name="connectivity" >
+              <option value="">Select Connectivity/Infrastructure</option>
+              <option value="excellent" {% if recptreport.connectivityinfrastructure == 'excellent' %} selected {% endif %}>Excellent</option>
+              <option value="vgood" {% if recptreport.connectivityinfrastructure == 'vgood' %} selected {% endif %}>Very Good</option>
+              <option value="good" {% if recptreport.connectivityinfrastructure == 'good' %} selected {% endif %}>Good</option>
+              <option value="average" {% if recptreport.connectivityinfrastructure == 'average' %} selected {% endif %}>Average</option>
+            </select>  
+          </div>
+          <div class="col-sm-2">
+            <label for="rly">Railway Station</label>
+                  <input id="rly" name = "rly" type="text" placeholder="Nearest Railway Station in km" class="form-control" 
+                  {% if recptreport %}
+                    value="{{recptreport.railwaystation}}"
+                  {% endif %}/>
+          </div>
+          <div class="col-sm-2">
+            <label for="bus">Bus Stop</label>
+                  <input id="bus" name = "bus" type="text" placeholder="Nearest Bus Stop in km" class="form-control"
+                  {% if recptreport %}
+                  value="{{recptreport.busstop}}"
+                  {% endif %}/>
+          </div>
+          <div class="col-sm-2">
+            <label for="hosp">Hospital</label>
+                  <input id="hosp" name = "hosp" type="text" placeholder="Nearest Hospital in km" class="form-control"
+                  {% if recptreport %}
+                  value="{{recptreport.hospital}}"/>
+                  {% endif %}
+          </div>
+          <div class="col-sm-3">
+          <label for="nlandmark">Landmark</label>
+                <input id="nlandmark" name = "nlandmark" type="text" placeholder="nearesh Landmark" class="form-control" 
+                {% if recptreport %}
+                value="{{recptreport.nearestlandmark}}"
+                {% endif %}/>
+          </div> 
+        </div>
+      <div>
+        <button class="btn-btn-sm float-end" type="button" onclick="nextStep(2)">Next</button>
+      </div>
+      </div>  
+    </div>
+        <div class="step" id="step2" style="display:none; height: 70vh; overflow-y: auto;overflow-x: hidden;">
+          <p>PROPERTY DETAILS </p>
+              <div class="row">
+                <div class="item col-sm-4">
+                    <label for="usagetype">Type of Usage of entire property</label>
+                    <input id="usagetype" name="usagetype" type="text" class="form-control" placeholder="Type of Usage of entire property"
+                    {% if recptreport %}
+                    value="{{recptreport.typeusageproperty}}"
+                    
+                    {% endif %}/>
+                </div>
+                <div class="item col-sm-4">
+                  <label for="addaminity">Additional Amenities</label>
+                  <input id="addaminity" name = "addaminity" type="text" placeholder="Garden/ Swimming Pool/Not Applicable" class="form-control" 
+                  {% if recptreport %}
+                  value="{{recptreport.additionalamenities}}"
+                  {% endif %}/>
+                  
+              </div>
+              <div class="item col-sm-4">
+                <label for="lsp">Legal status of Property</label>
+                <select id="lsp" name="lsp">
+                  <option value="">Legal status of Property</option>
+                  <option value="freehold" {% if recptreport.legalstatusproperty == 'freehold' %} selected {% endif %}>Freehold</option>
+                  <option value="less30" {% if recptreport.legalstatusproperty == 'less30' %} selected {% endif %}>Lease hold > 30 yrs.</option>
+                  <option value="less1530" {% if recptreport.legalstatusproperty == 'less1530' %} selected {% endif %}>Lease hold 15-30 yrs.</option>
+                  <option value="less15" {% if recptreport.legalstatusproperty == 'less15' %} selected {% endif %}>Lease hold < 15 yrs.</option>
+                </select>
+              </div>
+            </div>
+            <p>SUBJECT PROPERTY DETAILS </p>
+              <div class="row">
+                <div class="item col-sm-3">
+                  <label for="permissiontype">Type of Premises</label>
+                  <select id="permissiontype" name="permissiontype">
+                    <option value="">Select Type of Premises</option>
+                    <option value="Residentialflat" {% if recptreport.typepremises == 'Residentialflat' %} selected {% endif %}>Residential flat</option>
+                    <option value="Gala" {% if recptreport.typepremises == 'Gala' %} selected {% endif %}>Gala</option>
+                    <option value="Shop" {% if recptreport.typepremises == 'Shop' %} selected {% endif %}>Shop</option>
+                    <option value="Bungalow" {% if recptreport.typepremises == 'Bungalow' %} selected {% endif %}>Bungalow</option>
+                    <option value="Rowhouse" {% if recptreport.typepremises == 'Rowhouse' %} selected {% endif %}>Row House</option>
+                    <option value="office" {% if recptreport.typepremises == 'office' %} selected {% endif %}>office</option>
+                    <option value="chawl" {% if recptreport.typepremises == 'chawl' %} selected {% endif %}>Chawl</option>
+                    <option value="Openplaot" {% if recptreport.typepremises == 'Openplaot' %} selected {% endif %}>Open Plot</option>
+                    <option value="Duplexflat" {% if recptreport.typepremises == 'Duplexflat' %} selected {% endif %}>Duplex Flat</option>
+                    <option value="penthouse" {% if recptreport.typepremises == 'penthouse' %} selected {% endif %}>Pent House</option>
+                    <option value="factory" {% if recptreport.typepremises == 'factory' %} selected {% endif %}>Factory</option>
+                    </select>
+                </div>
+                <div class="item col-sm-3">
+                  <label for="taxation">Taxation/Maintance cost</label>
+                  <select id="taxation" name="taxation">
+                    <option value="">Property Taxation/Maintance cost</option>
+                    <option value="low" {% if recptreport.taxationmaintancecost == 'low' %} selected {% endif %}>Low</option>
+                    <option value="average" {% if recptreport.taxationmaintancecost == 'average' %} selected {% endif %}>Average</option>
+                    <option value="High" {% if recptreport.taxationmaintancecost == 'High' %} selected {% endif %}>High</option>
+                    <option value="Veryhigh" {% if recptreport.taxationmaintancecost == 'Veryhigh' %} selected {% endif %}>Very High</option>
+                  </select>
+                </div>
+                <div class="item col-sm-3">
+                  <label for="rentedpotential">Renting Potential :</label>
+                  <select id="rentedpotential" name="rentedpotential">
+                    <option value="">Select Renting Potential</option>
+                    <option value="Excellent" {% if recptreport.rentingpotential == 'Excellent' %} selected {% endif %}>Excellent</option>
+                    <option value="Verygood" {% if recptreport.rentingpotential == 'Verygood' %} selected {% endif %}>Very Good</option>
+                    <option value="good" {% if recptreport.rentingpotential == 'good' %} selected {% endif %}>Good</option>
+                    <option value="average" {% if recptreport.rentingpotential == 'average' %} selected {% endif %}>Average</option>
+                  </select>
+                </div>
+                <div class="item col-sm-3">
+                  <label for="mktrental">Market Rentals</label>
+                  <input id="mktrental" name = "mktrental" type="text" placeholder="/Sqft/month(Rs.)" class="form-control" 
+                  {% if recptreport %}
+                  value="{{recptreport.marketrentals}}"
+                  {% endif %}/>
+                </div>
+              </div>
+              <div class="row">
+                
+                <div class="item col-sm-4">
+                  <label for="occupiedby">Occupied by </label>
+                  <input id="occupiedby" name = "occupiedby" type="text" placeholder="Name of Occupant / is property vacant." class="form-control" 
+                  {% if recptreport %}
+                  value="{{recptreport.occupiedby}}"
+                  {% endif %}/>
+                </div>
+                <div class="item col-sm-4">
+                <label for="rentedproperty">Is property rented?</label>
+                <select id="rentedproperty" name="rentedproperty">
+                  <option value="">Select</option>
+                  <option value="True" {% if recptreport.ispropertyrented == 'True' %} selected {% endif %}>Yes</option>
+                  <option value="False" {% if recptreport.ispropertyrented == 'False' %} selected {% endif %}>No</option>
+                  
+                </select>
+              </div>
+                <div class="item col-sm-4">
+                  <label for="roadwidth">If rented list of occupants</label>
+                  <input id="roadwidth" name = "roadwidth" type="text" placeholder="list of occupants separated by," class="form-control" 
+                  {% if recptreport %}
+                  value="{{recptreport.listofoccupants}}"
+                  {% endif %}/>
+                </div>
+            </div>
+            <div class="row">
+              <p>Boundary Details As per Document</p>  
+              <div class="item col-sm-3">
+                <label for="eastboundary">East</label>
+                <input id="eastboundary" name="eastboundary" type="text" class="form-control" placeholder="East boundry"
+                {% if recptreport %}
+                value="{{recptreport.perdcboundryeast}}"
+                {% endif %}/>
+            </div>
+
+            <div class="item col-sm-3">
+              <label for="westboundary">West</label>
+              <input id="westboundary" name="westboundary" type="text" class="form-control" placeholder="West boundry"
+              {% if recptreport %}
+              value="{{recptreport.perdcboundrywset}}"
+              {% endif %}/>
+          </div>
+
+          <div class="item col-sm-3">
+            <label for="northboundary">North</label>
+            <input id="northboundary" name="northboundary" type="text" class="form-control" placeholder="North boundry"
+            {% if recptreport %}
+            value="{{recptreport.perdcboundrynorth}}"
+            {% endif %}/>
+          </div>
+
+        <div class="item col-sm-3">
+          <label for="southboundar">South</label>
+          <input id="southboundary" name="southboundar" type="text" class="form-control" placeholder="South boundry"
+          {% if recptreport %}
+          value="{{recptreport.perdcboundrysouth}}"
+          {% endif %}/>
+        </div>
+      </div>
+      <div class="row">
+        <p>Boundary Details As Per Site</p>  
+        <div class="item col-sm-3">
+          <label for="seastboundary">East</label>
+          <input id="seastboundary" name="seastboundary" type="text" class="form-control" placeholder="East boundry"
+          {% if recptreport %}
+          value="{{recptreport.perstboundryeast}}"
+          {% endif %}/>
+      </div>
+
+      <div class="item col-sm-3">
+        <label for="swestboundary">West</label>
+        <input id="swestboundary" name="swestboundary" type="text" class="form-control" placeholder="West boundry"
+        {% if recptreport %}
+        value="{{recptreport.perstboundrywest}}"
+        {% endif %}/>
+    </div>
+
+    <div class="item col-sm-3">
+      <label for="snorthboundary">North</label>
+      <input id="snorthboundary" name="snorthboundary" type="text" class="form-control" placeholder="North boundry"
+      {% if recptreport %}
+      value="{{recptreport.perstboundrynorth}}"
+      {% endif %}/>
+    </div>
+
+    <div class="item col-sm-3">
+    <label for="ssouthboundary">South</label>
+    <input id="ssouthboundary" name="ssouthboundary" type="text" class="form-control" placeholder="South boundry"
+    {% if recptreport %}
+    value="{{recptreport.perstboundrysouth}}"
+    {% endif %}/>
+    </div>
+    </div>
+    <div class="row">
+    <p>STRUCTURAL DETAILS</p>  
+    <div class="item col-sm-3">
+    <label for="structtype">Type of Structure</label>
+        <select id="structtype" name="structtype">
+          <option value="">Select</option>
+          <option value="rcc" {% if recptreport.typestructure == 'rcc' %} selected {% endif %}>RCC</option>
+          <option value="loadbearing" {% if recptreport.typestructure == 'loadbearing' %} selected {% endif %}>Load Bearing</option>
+          <option value="steelstructure" {% if recptreport.typestructure == 'steelstructure' %} selected {% endif %}>Steel Structure</option>
+          <option value="Compositestructure" {% if recptreport.typestructure == 'Compositestructure' %} selected {% endif %}>Composite structure</option>
+          <option value="industrailshed" {% if recptreport.typestructure == 'industrailshed' %} selected {% endif %}>Industrial Shed</option>
+          <option value="structurewithaccsheet" {% if recptreport.typestructure == 'structurewithaccsheet' %} selected {% endif %}>Structure with A/C sheet</option>
+          <option value="gisheet" {% if recptreport.typestructure == 'gisheet' %} selected {% endif %}>G/I SHEET</option>
+        </select>
+    </div>
+
+    <div class="item col-sm-3">
+    <label for="nofloor">No. of Floors</label>
+    <input id="nofloor" name="nofloor" type="text" class="form-control" placeholder="No. of Floors"
+    {% if recptreport %}
+    value="{{recptreport.nofloors}}"
+    {% endif %}/>
+    </div>
+
+    <div class="item col-sm-3">
+    <label for="wingsno">No. of Wings</label>
+    <input id="wingsno" name="wingsno" type="text" class="form-control" placeholder="No. of Wings"
+    {% if recptreport %}
+    value="{{recptreport.nowings}}"
+    {% endif %}/>
+    </div>
+
+    <div class="item col-sm-3">
+    <label for="flunitno">No. of units on each floor</label>
+    <input id="flunitno" name="flunitno" type="text" class="form-control" placeholder="No. of units on each floor"
+    {% if recptreport %}
+    value="{{recptreport.nouniteachfloor}}"
+    {% endif %}/>
+    </div>
+    </div>
+
+    <div class="row">
+
+    <div class="item col-sm-3">
+    <label for="wingliftno">No. of lifts in each wing</label>
+    <input id="wingliftno" name="wingliftno" type="text" class="form-control" placeholder="No. of lifts in each wing"
+    {% if recptreport %}
+    value="{{recptreport.nolifteachwing}}"
+    {% endif %}/>
+    </div>
+
+    <div class="item col-sm-3">
+    <label for="propertyage">Age of the Property</label>
+    <input id="propertyage" name="propertyage" type="text" class="form-control" placeholder="Age of the Property"
+    {% if recptreport %}
+    value="{{recptreport.ageproperty}}"
+    {% endif %}/>
+    </div>
+
+    <div class="item col-sm-3">
+    <label for="estfutlife">Estimated Future Life</label>
+    <input id="estfutlife" name="estfutlife" type="text" class="form-control" placeholder="Estimated Future Life"
+    {% if recptreport %}
+    value="{{recptreport.futurelife}}"
+    {% endif %}/>
+    </div>
+
+    <div class="item col-sm-3">
+    <label for="exteriors">Exteriors</label>
+    <input id="exteriors" name="exteriors" type="text" class="form-control" placeholder="Exteriors"
+    {% if recptreport %}
+    value="{{recptreport.exterior}}"
+    {% endif %}/>
+    </div>
+    </div>
+    <div class="row">
+    <div class="item col">
+    <label for="propcomsition">Internal Composition of property</label>
+    <input id="propcomsition" name="propcomsition" type="text" class="form-control" placeholder="Internal Composition of property"
+    {% if recptreport %}
+    value="{{recptreport.internalcomposition}}"
+    {% endif %}/>
+    </div>
+    </div>
+    <div class="row">
+
+    <div class="item col-sm-3">
+    <label for="constqualty">Quality of Construction </label>
+            <select id="constqualty" name="constqualty">
+              <option value="">Appearance & Maintenance of Building.</option>
+              <option value="Verygood" {% if recptreport.constructionquality == 'Verygood' %} selected {% endif %}>Very Good</option>
+              <option value="good" {% if recptreport.constructionquality == 'good' %} selected {% endif %}>Good</option>
+              <option value="average" {% if recptreport.constructionquality == 'average' %} selected {% endif %}>Average</option>
+              <option value="poor" {% if recptreport.constructionquality == 'poor' %} selected {% endif %}>Poore</option>
+            </select>
+    </div>
+
+    <div class="item col-sm-3">
+    <label for="clmstruct">Beam & Column Structure.</label>
+          <select id="clmstruct" name="clmstruct">
+            <option value="">Select</option>
+            <option value="yes" {% if recptreport.beamcolumnstru == 'yes' %} selected {% endif %}>Yes</option>
+            <option value="no" {% if recptreport.beamcolumnstru == 'no' %} selected {% endif %}>No</option>           
+          </select>
+    </div>
+    <div class="item col-sm-3">
+    <label for="commremarks">Common Areas Remarks</label>
+    <input id="commremarks" name="commremarks" type="text" class="form-control" placeholder="Common Areas Remarks"
+    {% if recptreport %}
+    value="{{recptreport.commonarearemark}}"
+    {% endif %}/>
+    </div>
+
+    <div class="item col-sm-3">
+    <label for="otherobsr"> Other Observations</label>
+    <input id="otherobsr" name="otherobsr" type="text" class="form-control" placeholder=" Other Observations"
+    {% if recptreport %}
+    value="{{recptreport.otherobservation}}"
+    {% endif %}/>
+    </div>
+    </div>
+    <button class="btn-btn-sm float-end" type="button" onclick="nextStep(3)">Next</button>
+    <button class="btn-btn-sm float-end" type="button" onclick="nextStep(1)">Back</button>
+  </div>
+        <div class="step" id="step3" style="display:none; height: 70vh; overflow-y: auto;overflow-x: hidden;">
+          <div class="row">
+            <p>Interiors</p>
+            <div class="item col-sm-3">
+              
+              <input id="interrfinish" name="interrfinish" type="text" class="form-control" placeholder="Flooring & finishing."
+              {% if recptreport %}
+              value="{{recptreport.floornfinish}}"
+              {% endif %}/>
+          </div>
+          
+          <div class="item col-sm-3">
+            
+            <input id="roofterr" name="roofterr" type="text" class="form-control" placeholder="Roofing and terracing"
+            {% if recptreport %}
+            value="{{recptreport.roofingnterracing}}"
+            {% endif %}/>
+          </div>
+          
+          <div class="item col-sm-3">
+          
+          <input id="nolifts" name="nolifts" type="text" class="form-control" placeholder="No. Of lifts"
+          {% if recptreport %}
+          value="{{recptreport.nooflifts}}"
+          {% endif %}/>
+          </div>
+          
+          <div class="item col-sm-3">
+          
+          <input id="qltfix" name="qltfix" type="text" class="form-control" placeholder="Quality of fixtures and fittings."
+          {% if recptreport %}
+          value="{{recptreport.qualityfixing}}"
+          {% endif %}/>
+          </div>
+          </div>
+          <div class="row">
+          <h6>Plan Approvals</h6>
+          <div class="item col-sm-5">
+            <label for="consancplan">Construction as per approved/ sanctioned  plans</label>
+                <select id="consancplan" name="consancplan">
+                  <option value="">Select</option>
+                  <option value="yes" {% if recptreport.constasperaprove == 'yes' %} selected {% endif %}>Yes</option>
+                  <option value="no" {% if recptreport.constasperaprove == 'no' %} selected {% endif %}>No</option>
+                </select>
+          </div>
+          <div class="item col-sm-7">
+          <label for="apvnodate">Details of approved plan  with approval no and date </label>
+          <input id="apvnodate" name="apvnodate" type="text" class="form-control" placeholder="if approved approval no and date"
+          {% if recptreport %}
+          value="{{recptreport.aprnodate}}"
+          {% endif %}/>
+          </div>
+          </div>
+          <div class="row">
+            <div class="item col-sm-4">
+              <label for="consperdate">Construction permission Number and date.</label>
+              <input id="consperdate" name="consperdate" type="text" class="form-control" placeholder="Permission no. and date"
+              {% if recptreport %}
+              value="{{recptreport.constnodate}}"
+              {% endif %}/>
+              </div>
+            <div class="item col-sm-8">
+            <label for="violrisk">Violations Observed if Any Or is there any risk of Demolition in case of violation. </label>
+            <input id="violrisk" name="violrisk" type="text" class="form-control" placeholder="if any provide details"
+            {% if recptreport %}
+            value="{{recptreport.violationifany}}"
+            {% endif %}/>
+            </div>
+            
+            </div>      
+          <div class="row">
+            <div class="item col-sm-8">
+              <label for="lclbilaw">If plans not available then is the structure confirming to the local byelaws.</label>
+              <input id="lclbilaw" name="lclbilaw" type="text" class="form-control" placeholder="Enter available structure by laws"
+              {% if recptreport %}
+              value="{{recptreport.confirmlocalbilaws}}"
+              {% endif %}/>
+              </div>
+            <div class="item col-sm-4">
+            <label for="docverified">Other Documents Verified</label>
+            <input id="docverified" name="docverified" type="text" class="form-control" placeholder="if any provide details"
+            {% if recptreport %}
+            value="{{recptreport.otherverifieddoc}}"
+            {% endif %}/>
+            </div>
+            
+            </div> 
+            <div class="row">
+              <h6>Valuation (Individual Apartments / flats)</h6>
+              <div class="item col-sm-4">
+                <label for="cafw">Carpet Area (Sqft)-Floor-wise</label>
+                <input id="cafw" name="cafw" type="text" class="form-control" placeholder="Enter Carpet area Apartment--Floor-wise"
+                {% if recptreport %}
+                value="{{recptreport.carpetareaflwise}}"
+                {% endif %}/>
+                </div>
+              <div class="item col-sm-8">
+              <label for="apbuaflw">Approved BUA / SBUA (Sqft) in Apartment--Floor-wise</label>
+              <input id="apbuaflw" name="apbuaflw" type="text" class="form-control" placeholder="enter approved flat -Floor-wise"
+              {% if recptreport %}
+              value="{{recptreport.aprovbuaflwise}}"
+              {% endif %}/>
+              </div>
+              
+              
+              </div>
+              <div class="row">
+                <div class="item col-sm-4">
+                  <label for="cgarate">Current Govt Approved rates </label>
+                  <input id="cgarate" name="cgarate" type="text" class="form-control" placeholder="Enter Government approved rate"
+                  {% if recptreport %}
+                  value="{{recptreport.govtapprovalrate}}"
+                  {% endif %}/>
+                  </div>
+                <div class="item col-sm-8">
+                  <label for="recmdrate">Recommended Rate and basis for recommendation.e</label>
+                  <input id="recmdrate" name="recmdrate" type="text" class="form-control" placeholder="Enter recommendation rate"
+                  {% if recptreport %}
+                  value="{{recptreport.recomendrate}}"
+                  {% endif %}/>
+                  </div>
+                
+                </div> 
+                <div class="row">
+                  <h6>Final Market value.</h6>
+                  <div class="item col-sm-4">
+                    <label for="fmvrsinfig">Rs. in figure</label>
+                    <input id="fmvrsinfig" name="fmvrsinfig" type="text" class="form-control" placeholder="Enter market value amount in figures"
+                    {% if recptreport %}
+                    value="{{recptreport.mktvalueinfig}}"
+                    {% endif %}/>
+                    </div>
+                  <div class="item col-sm-8">
+                    <label for="fmvrsinwords">Rs. in wordfs</label>
+                    <input id="fmvrsinwords" name="fmvrsinwords" type="text" class="form-control" placeholder="Enter amount in words"
+                    {% if recptreport %}
+                    value="{{recptreport.mktvalueinwords}}"
+                    {% endif %}/>
+                    </div>
+                  
+                  
+                  </div>
+                  <div class="row">
+                    
+                    <div class="item col-sm-12">
+                      <label for="fslless">Forced Sale 20 % Less</label>
+                      <input id="fslless" name="fslless" type="text" class="form-control" placeholder="Enter forced sale 20% less"
+                      {% if recptreport %}
+                      value="{{recptreport.forcessalesless}}"
+                      {% endif %}/>
+                      </div>
+              <div class="row">
+                <h6>Forced sale value</h6>
+                <div class="item col-sm-4">
+                  <label for="fsratepsqf">Area x rate per Sqft </label>
+                  <input id="fsratepsqf" name="fsratepsqf" type="text" class="form-control" placeholder=""
+                  {% if recptreport %}
+                  value="{{recptreport.arearatepsft}}"
+                  {% endif %}/>
+                  </div>
+                  <div class="item col-sm-3">
+                    <label for="amountinfig">Rs. In figures</label>
+                    <input id="amountinfig" name="amountinfig" type="text" class="form-control" placeholder="Enter amount in figures"
+                    {% if recptreport %}
+                    value="{{recptreport.areavalueinfig}}"
+                    {% endif %}/>
+                    </div>
+                    <div class="item col-sm-5">
+                      <label for="amountinwrods">Rs. In words</label>
+                      <input id="amountinwrods" name="amountinwrods" type="text" class="form-control" placeholder="Enter amount in words"
+                      {% if recptreport %}
+                      value="{{recptreport.areavalueinwords}}"
+                      {% endif %}/>
+                      </div>
+              </div>
+              <div class="row">
+                <div class="item col-sm-4">
+                  <label for="landarea">Land Area</label>
+                  <input id="landarea" name="landarea" type="text" class="form-control" placeholder="Enter land area"
+                  {% if recptreport %}
+                  value="{{recptreport.landarea}}"
+                  {% endif %}/>
+                  </div>
+                  <div class="item col-sm-8">
+                    <label for="fgarate">Rs. In figures Current Government Approved Rates for land.</label>
+                    <input id="fgarate" name="fgarate" type="text" class="form-control" placeholder="Enter Government approved rate"
+                    {% if recptreport %}
+                    value="{{recptreport.govtaprovelandrate}}"
+                    {% endif %}/>
+                    </div>
+                    
+              </div>
+              <div class="row"></div>
+                <div class="item col-sm-6">
+                  <label for="recomndrate">Recommended Rate and Basis for recommendation</label>
+                  <input id="recomndrate" name="recomndrate" type="text" class="form-control" placeholder="Enter Recommended rate"
+                  {% if recptreport %}
+                  value="{{recptreport.recommendedlandrate}}"
+                  {% endif %}/>
+                  </div>
+                  <div class="item col-sm-6">
+                    <label for="landrate">Land value--Land area x Rate per Sqft.</label>
+                    <input id="landrate" name="landrate" type="landrate" class="form-control" placeholder="Enter land rate per square feet"
+                    {% if recptreport %}
+                    value="{{recptreport.landvalue}}"
+                    {% endif %}/>
+                    </div>
+                    
+              </div>
+              <div class="row">
+                <div class="item col-sm-6">
+                  <label for="actbua">Actual Bua of the premises(Sqft)</label>
+                  <input id="actbua" name="actbua" type="text" class="form-control" placeholder="Enter Actual bua of the premises"
+                  {% if recptreport %}
+                  value="{{recptreport.actualbua}}"
+                  {% endif %}/>
+                  </div>
+                  <div class="item col-sm-6">
+                    <label for="buaasapprov">Bua as per the Approvals(Sqft)</label>
+                    <input id="buaasapprov" name="buaasapprov" type="text" class="form-control" placeholder=""
+                    {% if recptreport %}
+                    value="{{recptreport.asperpermissionbua}}"
+                    {% endif %}/>
+                    </div>
+                    
+              </div>
+              <div class="row">
+                <div class="item col-sm-6">
+                  <label for="costameniti">Construction cost as per the Amenities provided. Per Sqft</label>
+                  <input id="costameniti" name="costameniti" type="text" class="form-control" placeholder="Enter cost as per Amenities"
+                  {% if recptreport %}
+                  value="{{recptreport.constcostperaminity}}"
+                  {% endif %}/>
+                  </div>
+                  <div class="item col-sm-6">
+                    <label for="aprovval">Total value of construction Approved Bua x const cost.</label>
+                    <input id="aprovval" name="aprovval" type="text" class="form-control" placeholder="Enter Approved value of construction"
+                    {% if recptreport %}
+                    value="{{recptreport.totalconstvalue}}"
+                    {% endif %}/>
+                    </div>
+                    
+              </div>
+              <div class="row">
+                <div class="item col-sm-6">
+                  <label for="depval">Depreciated value of Construction. </label>
+                  <input id="depval" name="depval" type="text" class="form-control" placeholder="Enter Depricated value of construction"
+                  {% if recptreport %}
+                  value="{{recptreport.depreciatedconstvalue}}"
+                  {% endif %}/>
+                  </div>
+              </div>
+              <div class="row">
+                <h6>Total valuation  Land value+ Depreciated constructed value</h6>
+                <div class="item col-sm-6">
+                  <label for="drpsa">Rs. In Figure</label>
+                  <input id="drpsa" name="drpsa" type="text" class="form-control" placeholder="Enter amount in number"
+                  {% if recptreport %}
+                  value="{{recptreport.landvaluedepndepconstvalueinfig}}"
+                  {% endif %}/>
+                  </div>
+                  <div class="item col-sm-6">
+                    <label for="drpsw">Rs. In words</label>
+                    <input id="drpsw" name="drpsw" type="text" class="form-control" placeholder="Enter amount in words"
+                    {% if recptreport %}
+                    value="{{recptreport.landvaluedepndepconstvalueinword}}"
+                    {% endif %}/>
+                    </div>
+                    
+              </div>
+              <div class="row">
+                <h6>Forced sale value</h6> 
+                <div class="item col-sm-4">
+                  <label for="fratepsqf">Area x rate per Sqft</label>
+                  <input id="fratepsqf" name="fratepsqf" type="text" class="form-control" placeholder="Enter rate per square feet"
+                  {% if recptreport %}
+                  value="{{recptreport.forcesalevaluepersqft}}"
+                  {% endif %}/>
+                  </div>
+                <div class="item col-sm-4">
+                  <label for="frpsa">Rs. In Figure</label>
+                  <input id="frpsa" name="frpsa" type="text" class="form-control" placeholder="Enter rupees in number"
+                  {% if recptreport %}
+                  value="{{recptreport.forcesvalueinfig}}"
+                  {% endif %}/>
+                  </div>
+                  <div class="item col-sm-4">
+                    <label for="frpsw">Rs. In words</label>
+                    <input id="frpsw" name="frpsw" type="text" class="form-control" placeholder="Enter rupees in words"
+                    {% if recptreport %}
+                    value="{{recptreport.forcesvalueinword}}"
+                    {% endif %}/>
+                    </div>
+                    
+              </div>
+              <div class="row">
+                <div class="item col-sm-6">
+                  <label for="mkt">Marketability : </label>
+                      <select id="mkt" name="mkt">
+                        <option value="">Enter Market ability</option>
+                        <option value="Excellent" {% if recptreport.marketibility == 'Excellent' %} selected {% endif %}>Excellent</option>
+                        <option value="Verygood" {% if recptreport.marketibility == 'Verygood' %} selected {% endif %}>Very Good</option>
+                        <option value="Good" {% if recptreport.marketibility == 'Good' %} selected {% endif %}>Good</option>
+                        <option value="Difficult" {% if recptreport.marketibility == 'Difficult' %} selected {% endif %}>Difficult</option>
+                      </select>
+                </div>
+                <div class="item col-sm-6">
+                  <label for="valueresult">Valuation result</label>
+                      <select id="valueresult" name="valueresult">
+                        <option value="" >Enter Valuation result</option>
+                        <option value="Positive" {% if recptreport.valuationresult == 'Positive' %} selected {% endif %}>Positive</option>
+                        <option value="Negative" {% if recptreport.valuationresult == 'Negative' %} selected {% endif %}>Negative</option>
+                        
+                      </select>
+                </div>
+                </div>
+
+            <div class="item">
+              <label for="remark">Remarks if any</label>
+              
+              <textarea id="remark" name="remark" rows="3" class="form-control" placeholder="Enter Remarks"></textarea>
+            
+          </div>
+          <div class="item">
+            <label for="necessarydocument" class="form-label">Upload necessary document</label>
+            <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <g clip-path="url(#clip0_1670_1531)">
+                <path d="M12.3568 6.4644L7.64349 11.1786C7.5639 11.2554 7.50041 11.3474 7.45674 11.4491C7.41307 11.5507 7.39008 11.6601 7.38912 11.7707C7.38815 11.8814 7.40924 11.9911 7.45114 12.0935C7.49304 12.1959 7.55492 12.289 7.63316 12.3672C7.71141 12.4455 7.80445 12.5073 7.90686 12.5492C8.00928 12.5912 8.11901 12.6122 8.22966 12.6113C8.34031 12.6103 8.44966 12.5873 8.55133 12.5436C8.653 12.5 8.74495 12.4365 8.82182 12.3569L13.536 7.64356C14.0049 7.17468 14.2683 6.53875 14.2683 5.87565C14.2683 5.21255 14.0049 4.57661 13.536 4.10773C13.0671 3.63885 12.4312 3.37544 11.7681 3.37544C11.105 3.37544 10.469 3.63885 10.0002 4.10773L5.28599 8.8219C4.89105 9.20701 4.57652 9.6667 4.36062 10.1743C4.14473 10.6819 4.03178 11.2274 4.02832 11.779C4.02487 12.3306 4.13097 12.8774 4.34049 13.3877C4.55 13.8979 4.85876 14.3615 5.24884 14.7516C5.63892 15.1416 6.10256 15.4503 6.61287 15.6597C7.12318 15.8692 7.67 15.9752 8.2216 15.9717C8.77321 15.9681 9.31862 15.8551 9.82621 15.6391C10.3338 15.4232 10.7934 15.1086 11.1785 14.7136L15.8927 10.0002L17.071 11.1786L12.3568 15.8927C11.8151 16.4344 11.172 16.8641 10.4643 17.1573C9.75649 17.4505 8.99791 17.6014 8.23182 17.6014C7.46574 17.6014 6.70716 17.4505 5.99939 17.1573C5.29162 16.8641 4.64853 16.4344 4.10682 15.8927C3.56512 15.351 3.13542 14.7079 2.84225 14.0002C2.54908 13.2924 2.39819 12.5338 2.39819 11.7677C2.39819 11.0016 2.54908 10.2431 2.84225 9.5353C3.13542 8.82753 3.56512 8.18443 4.10682 7.64273L8.82182 2.9294C9.60767 2.17041 10.6602 1.75043 11.7527 1.75992C12.8451 1.76942 13.8902 2.20762 14.6627 2.98015C15.4353 3.75269 15.8735 4.79774 15.883 5.89023C15.8925 6.98271 15.4725 8.03522 14.7135 8.82106L10.0002 13.5369C9.76794 13.7691 9.49226 13.9532 9.18887 14.0788C8.88548 14.2045 8.56032 14.2691 8.23195 14.2691C7.90357 14.269 7.57843 14.2043 7.27507 14.0786C6.97171 13.9529 6.69607 13.7687 6.46391 13.5365C6.23174 13.3043 6.04759 13.0286 5.92196 12.7252C5.79633 12.4218 5.7317 12.0966 5.73173 11.7683C5.73177 11.4399 5.79649 11.1148 5.92219 10.8114C6.04788 10.508 6.2321 10.2324 6.46432 10.0002L11.1785 5.28606L12.3568 6.4644Z" fill="#07074D"/>
+                </g>
+                <defs>
+                <clipPath id="clip0_1670_1531">
+                <rect width="20" height="20" fill="white"/>
+                </clipPath>
+                </defs>
+                </svg>
+                
+            <input class="form-control" type="file" id="necessarydocument" name="reporterFiles" multiple>
+          </div> 
+          {% if documents %}
+          {% if documents.exists %}
+              <h3>Uploaded Files:</h3>
+              <ul>
+                  {% for document in documents %}
+                  <div>
+                      {{ document.file_name }}
+                      <a href="{% url 'delete_file' document.id %}" onclick="return confirm('Are you sure you want to delete this file?');">❌</a>
+                  </div>
+                  {% endfor %}
+              </ul>
+            {% else %}
+              <p>No files are present.</p>
+            {% endif %}
+          {% endif %}
+
+          
+            <button class="btn-btn-sm float-end" type="button" onclick="nextStep(2)">Back</button>
+          {% if recptreport %}
+            <button class="float-end" type="submit" href="/">Update Application</button>
+          {% else %}
+            <button class="float-end" type="submit" href="/">Save Application</button>
+          {% endif %}
+            
+        </div>
+      </form>
+  </div>
+  
+{% endblock %}
+{% block scripts%}
+<Script type="text/javascript" src="{% static 'js/reporter.js' %}" > </Script>
+<Script type="text/javascript" src="{% static 'js/sidebartoggle.js' %}"> </Script>
+{% endblock scripts%}

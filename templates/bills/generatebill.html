@@ -1,0 +1,75 @@
+
+{% extends "sidebar.html" %}
+<!-- {% include 'bootstrap_link.html' %} -->
+{% block title %}Site Engineer{% endblock %}
+{% load static %}
+
+{% block content %}
+    
+
+    <div class="container my-3" style="display:block; background-color:#f6f6f6; padding:20px 20px 20px;">
+      <p>Reports to generate bill</p>
+      <div class="row">
+        <div class="col-md-12">
+          <div class="card">
+            <div class="card-body">
+              <!-- <a class="btn btn-success float-end" href="/api/export">Export to CSV</a> -->
+              <!-- <a class="btn btn-success " href="/reception/reception">Add Report</a> --> 
+              <a id="generateLink" class="btn btn-success btn-sm float-end" type="submit" href="{% url 'bills' 0 %}" onclick="checkselect(event)"></i>Generate</a>
+              <select id="bankSelect" class="form-select " style="width: 20%;" aria-label="Default select example" name="bank" required onchange="updateLink()">
+                <option value="0" >Select Bank to generate bill</option>
+                {% for rr in banks %}
+                <option value="{{rr.id}}">{{rr.name}} {{rr.branch}}</option>
+                {%  endfor %}
+              </select>
+              
+            <hr>
+              <table id="engineertablecomp" class="table table-hover table-striped tavle-bordered" style="font-size: 90%;">
+                <thead>
+                  <tr>
+                    <th scope="col">#</th>
+                    <th scope="col">APP.DATE</th>
+                    <th scope="col">APP.NO.</th>
+                    <th scope="col">NAME</th>
+                    <th scope="col">Bank Name</th>
+                    <th scope="col">Bank Vertical</th>
+                    <th scope="col">City</th>
+                    <th scope="col">Engineer</th>
+                    <th scope="col">reporter</th>
+                    <th scope="col">Generate Bill</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {% for reqcom in bills %}
+                  <tr {% if reqcom.receptionid.priority%}  class="table-danger" {%else%} class=""{% endif %}>
+                    <td scope="row">{{forloop.counter}}</td>
+                    <!-- <td >{{recrep.id}}</td> -->
+                    <td >{{reqcom.receptionid.applicationdate|date:"d-m-Y"}}</td>
+                    <td >{{reqcom.applicationnumber}}</td>
+                    <td >{{reqcom.name}}</td>
+                    <td >{{reqcom.bankid.name}} {{reqcom.bankid.branch}}</td>
+                    <td >{{reqcom.receptionid.bankvertical}}</td>
+                    <td >{{reqcom.city}}</td>
+                    <td >{{reqcom.receptionid.visitingpersonname}}</td>
+                    <!-- <td >{{reqcom.visitingpersonname}}</td> -->
+                    <td >{{reqcom.receptionid.reportpersonname}}</td>
+                    <!-- <td><a href="/reception/deletereceptionreport/{{recrep.id}}" class="btn btn-danger btn-sm">Delete</a></td>  -->
+                    <!-- <td><a href="/reception/updatereceptionreport/{{recrep.id}}" class="btn btn-warning btn-sm">Upload</a></td>   -->
+                      <td> <a href="{% url 'bill' reqcom.id %}"><i class="fa-solid fa-file-invoice-dollar fa-2x"></i></a></td>
+                  </tr>
+                  
+                  {% endfor %}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+{% endblock %}
+
+{% block scripts%}
+<Script type="text/javascript" src="{% static 'js/engineer.js' %}" > </Script>
+<Script type="text/javascript" src="{% static 'js/sidebartoggle.js' %}"> </Script>
+{% endblock scripts%}

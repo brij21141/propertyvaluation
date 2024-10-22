@@ -1,0 +1,65 @@
+
+{% extends "sidebar.html" %}
+{% include 'bootstrap_link.html' %}
+{% block title %}Bank Management{% endblock %}
+{% load static %}
+
+{% block content %}
+<div class="container ">
+    <div class="container-fluid">
+    <div class="container" style="display:block; background-color:#f6f6f6; padding:20px 20px 20px;">
+
+      <div class="row">
+            
+        <div class="col-md-12">
+          
+          <div class="card">
+             
+            <div class="card-body">
+                <a class="btn btn-success btn-sm float-end" href="/api/bankexport">Export to Excel</a>
+                <a class="btn btn-success btn-sm" href="/banks/0">Add Bank</a>
+                <hr>
+                <table id="banktable" class="table table-hover table-striped tavle-bordered" style="font-size: 90%;">
+                <thead>
+                  <tr>
+                    <th scope="col">#</th>
+                    <th scope="col">Bank Name</th>
+                    <th scope="col">City</th>
+                    <th scope="col">E mail</th>
+                    <th scope="col">Mobile no.</th>
+                    <th scope="col">Phone</th>
+                    <th scope="col">Action</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {% for recrep in banks %}
+                  
+                  <tr>
+                    <td scope="row">{{forloop.counter}}</td>
+                    <td >{{recrep.name}}</td>
+                    <td >{{recrep.city}}</td>
+                    <td >{{recrep.email}}</td>
+                    <td >{{recrep.contact_no}}</td>
+                    <td >{{recrep.std}}-{{recrep.landline}}</td>
+                    
+                    <td>
+                      <a href="{% url 'banks' recrep.id %}" class="btn btn-warning btn-sm"><i class="fa fa-pencil" aria-hidden="true"></i></a>
+                    </td> 
+                    </tr>
+                  {% endfor %}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+ 
+  {% endblock content %}
+  
+  
+{% block scripts%}
+<Script type="text/javascript" src="{% static 'js/datatables.js' %}" > </Script>
+<Script type="text/javascript" src="{% static 'js/sidebartoggle.js' %}"> </Script>
+{% endblock scripts%}

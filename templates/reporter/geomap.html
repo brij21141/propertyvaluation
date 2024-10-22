@@ -1,0 +1,222 @@
+
+{% extends "sidebar.html" %}
+<!-- {% include 'bootstrap_link.html' %} -->
+{% block title %}Site Engineer{% endblock %}
+{% load static %}
+
+{% block content %}
+<script src="https://polyfill.io/v3/polyfill.min.js?features=default"></script>
+<script> 
+
+  let map
+
+  function initMap(){
+      // {{ maplocations|safe}}
+      // console.log({{ maplocations|safe }});
+      var maplocations = {{ maplocations|safe }};
+      var firstLocation = maplocations[0]
+      var infoWindow = []
+       
+      map = new google.maps.Map(document.getElementById("map"),{
+          center: { lat:firstLocation.lat, lng:firstLocation.lng }, 
+          zoom: 18,
+          mapTypeId:'satellite'
+          // mapId:'satellite'
+      });
+
+      maplocations.forEach(function (maplocation){
+        // google.maps.marker.AdvancedMarkerElement
+        
+          var marker = new google.maps.Marker({
+            //  var marker = new google.maps.marker.AdvancedMarkerElement({
+              position: {lat: maplocation.lat, lng: maplocation.lng}, 
+              map: map, 
+              icon: {  
+                  url: '{% static "img/homemapicontrp.png" %}', // URL of the icon  
+                  scaledSize: new google.maps.Size(30, 30) // Scale the icon size if needed  
+              } ,
+              title: maplocation.name
+              
+          });
+          // console.log(maplocation.name)
+          var infowindow = new google.maps.InfoWindow({
+            content: '<div><strong>Name:</strong> ' + maplocation.name +   
+              '<br><strong>Address:</strong> ' + maplocation.add1 +  
+              '<br><strong>City:</strong> ' + maplocation.city +  
+              '<br><strong>Landmark:</strong> ' + maplocation.landmark +  
+             '<br><strong>Governemnt approved rate:</strong> ' + maplocation.govrate +  
+             '<br><strong>Recommended rate:</strong> ' + maplocation.recomrate +   
+             '</div>'  
+              
+          });
+          
+
+          infoWindow.push(infowindow)
+
+          marker.addListener('click', function(){
+              infoWindow.forEach(function(iw){
+                  iw.close();
+              });
+
+              infowindow.open(map, marker)
+          });
+      });
+  }
+
+
+  window.initMap = initMap
+
+</script>
+
+<div class="container-fluid">
+  
+  <div class="container my-2" style="display:block; background-color:#f6f6f6; padding:10px">
+    <div class="row d-flex">
+      <div class="col-md-4">
+    <p>Map view of user {{username}}</p>
+  </div>
+  <div class="col-md-8" style="position: relative; display: inline-block;">
+      <input id="latid" type="text" list="maplocations" placeholder="Search property" class="form-control d-flex float-end" style="width: auto;" onchange="resetMap()">
+      <!-- <a type="button" style=" position: absolute; right: 15px; top: 40%; transform: translateY(-50%);" onclick="document.getElementById('latid').value = '';">  
+        &times; 
+      </a>   -->
+      <button type="button" style="position: absolute; right: 12px; top: 20%; transform: translateY(-50%); font-size: 24px;color: gray; width: 25px; height: 25px; background: transparent; border: none; cursor: pointer;" onclick="document.getElementById('latid').value = '';">  
+        &times; <!-- X character -->  
+    </button> 
+          <datalist id="maplocations">
+            {% for location in locations %}
+            <option value="{{location.lat }}-{{location.lng }}">{{location.name}}/{{location.city}}/{{location.lat}}/{{location.lng}}</option>
+            {% endfor %}
+          </datalist>
+        </div>
+        </div>
+      <!-- {% for location in locations %}
+    {{ location}}
+    {{ location.add1}}
+    {{ location.city}}
+    {% endfor %} -->
+    <!-- <div class="row">
+      <div class="col-md-12">
+        <div class="card">
+          <div class="card-body">
+            <table id="example" class="table table-hover table-striped tavle-bordered" style="font-size: 90%;">
+              <thead>
+                <tr>
+                  <th scope="col">#</th>
+                  <th scope="col">Address</th>
+                  <th scope="col">Address kine 2</th>
+                  <th scope="col">City</th>
+                  <th scope="col">State</th>
+                  <th scope="col">Country</th>
+                  <th scope="col">Pin code</th>
+                  <th scope="col">Latitude</th>
+                  <th scope="col">Longitude</th>
+                  <th scope="col">Place ID</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for recrep in locations %}
+                <tr {% if recrep.receptionid.priority%}  class="table-danger" {%else%} class=""{% endif %}>
+                  <td scope="row">{{forloop.counter}}</td>
+                  <td >{{recrep.add1}}</td>
+                  <td >{{recrep.add2}}</td>
+                  <td >{{recrep.city}}</td>
+                  <td >{{recrep.region}}</td>
+                  <td >{{recrep.country}}</td>
+                  <td >{{recrep.zip}}</td>
+                  <td >{{recrep.lat}}</td>
+                  <td >{{recrep.lng}}</td>
+                  <td >{{recrep.placeid}}</td>
+                </tr>
+                
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div> -->
+  
+
+ <div class="linkholder">
+  <div class="mapholder"> 
+      <div id="map"> </div>
+
+      <!-- <script async
+          src="https://maps.googleapis.com/maps/api/js?key={{key}}&callback=initMap">
+      </script> -->
+      <script
+      src="https://maps.googleapis.com/maps/api/js?key={{key}}&callback=initMap&v=weekly&libraries=marker"
+      defer>
+      </script>
+
+  </div>
+  
+</div>
+</div>
+  
+</div>
+{% endblock %}
+
+{% block scripts%}
+<Script type="text/javascript" src="{% static 'js/engineer.js' %}" > </Script>
+<Script type="text/javascript" src="{% static 'js/sidebartoggle.js' %}"> </Script>
+<script>  
+        // Define the resetMap function  
+        function resetMap() {  
+          var maplocations = {{ maplocations|safe }};
+          var infoWindow = [];
+            latlng=document.getElementById("latid"); 
+            // console.log(latlng.value);
+            const parts = (latlng.value).split('-');  
+            // console.log(parts[0]); // Output: ["26.1990356", "78.2218759"]  
+            // console.log(parts[1]); // Output: ["26.1990356", "78.2218759"] 
+            lati=parseFloat(parts[0]) ;
+            lngi=parseFloat(parts[1]) ;
+            const maplocationarray = maplocations.filter(location =>location.lat === lati && location.lng === lngi );
+            const maplocation=maplocationarray[0];
+            // console.log(maplocation); 
+            map = new google.maps.Map(document.getElementById("map"),{
+            center: { lat:lati, lng:lngi }, 
+            zoom: 18,
+            mapTypeId:'satellite'
+        }); 
+        var marker = new google.maps.Marker({
+            //  var marker = new google.maps.marker.AdvancedMarkerElement({
+              position: {lat: lati, lng:lngi}, 
+              map: map, 
+              icon: {  
+                  url: '{% static "img/homemapicontrp.png" %}', // URL of the icon  
+                  scaledSize: new google.maps.Size(30, 30) // Scale the icon size if needed  
+              } ,
+              
+              title: maplocation.name
+              
+          });
+          var infowindow = new google.maps.InfoWindow({
+            content: '<div><strong>Name:</strong> ' + maplocation.name +  
+              '<br><strong>Address:</strong> ' + maplocation.add1 +  
+              '<br><strong>City:</strong> ' + maplocation.city +  
+              '<br><strong>Landmark:</strong> ' + maplocation.landmark +   
+             '<br><strong>Governemnt approved rate:</strong> ' + maplocation.govrate +  
+             '<br><strong>Recommended rate:</strong> ' + maplocation.recomrate +   
+             '</div>'  
+             
+          });
+          
+          
+          infoWindow.push(infowindow)
+
+          marker.addListener('click', function(){
+              infoWindow.forEach(function(iw){
+                  iw.close();
+              });
+
+              infowindow.open(map, marker)
+          });
+      }
+
+    </script> 
+{% endblock scripts%}
+
+    

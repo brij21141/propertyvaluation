@@ -1,0 +1,386 @@
+
+{% extends "sidebar.html" %}
+{% include 'bootstrap_link.html' %}
+{% block title %}Reception{% endblock %}
+{% load static %}
+
+{% block content %}
+<script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.1/moment.min.js"></script>
+<div class="container-fluid my-2" >
+  <div class="container my-1" style="display: block; background: #f6f6f6; padding: 20px 20px 20px;">
+  
+  <div class="container my-1">
+    <div class="row my-1">
+         <div class="col-md-3">
+          <div class="card p-3 mb-2 " >
+              <div class="mt-2">
+                  <h5 class="heading">Reception</h5>
+                  <div class="mt-2">
+                      <div class="progress" style="background-color: white;">
+                        <span class="text-center" id="totrecrep">{{totrep}}</span>
+                      </div>
+                      <div class="mt-3"> <span class="text2">Report Generated</span> </div>
+                  </div>
+              </div>
+          </div>
+      </div>
+          <div class="col-md-3">
+            <div class="card p-3 mb-2 ">
+                <!-- <div class="d-flex justify-content-between">
+                    <div class="d-flex flex-row align-items-center">
+                        <div class="icon"> <i class="bx bxl-mailchimp"></i> </div>
+                        <div class="ms-2 c-details">
+                            <h6 class="mb-0">Mailchimp</h6> <span>1 days ago</span>
+                        </div>
+                    </div>
+                    <div class="badge"> <span>Design</span> </div>
+                </div> -->
+                <div class="mt-2">
+                  
+                    <h5 class="heading">Site Engineer progress</h5>
+                    <div class="mt-2">
+                        <div class="progress">
+                            <div class="progress-bar" role="progressbar" style="width: 0%" aria-valuenow="50" aria-valuemin="0" aria-valuemax="100"></div>
+                        </div>
+                        <div class="mt-3"> <span id="engcom" class="text1"> </span> <span class="text2">completed of {{totrep}} total</span>
+                          <span class="float-end" id="engper"></span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+          <div class="card p-3 mb-2">
+              
+              <div class="mt-2">
+                
+                  <h5 class="heading">Reporter progress</h5>
+                  <div class="mt-2">
+                      <div class="progress" >
+                          <div class="progress-bara" role="progressbar" style="width: 0% ;background-color:#0d6efd;"  aria-valuenow="50" aria-valuemin="0" aria-valuemax="100"></div>
+                      </div>
+                      <div class="mt-3"> <span id="recom" class="text1"> </span> <span class="text2">completed of <span id="rtotreq"></span> total</span> 
+                      <span class="float-end" id="repper"></span>
+                      </div>
+                  </div>
+              </div>
+          </div>
+    </div>
+            
+  </div>
+  <div class="container my-2" id="globalengtablediv" style="display:none; background-color:#f6f6f6; padding:40px 20px 37px;">
+
+    <div class="row">
+      <div class="col-md-12">
+        <div class="card">
+          <div class="card-body">
+            <!-- <a class="btn btn-success btn-sm float-end" href="/api/receptiongenreportexport">Export to Excel</a> -->
+            <!-- <h6>All Task with status</h6> -->
+            
+            <!-- <a class="btn btn-success " href="/reception/reception">Add Report</a> -->
+            
+            <table id="globalsearchengineertable" class="table table-hover table-striped table-bordered " style="font-size: 90%;">
+              <thead>
+                <tr>
+                  <th scope="col">#</th>
+                  <th scope="col">APP.DATE</th>
+                  <th scope="col">APP.NO.</th>
+                  <th scope="col">NAME</th>
+                  <th scope="col">BANK NAME</th>
+                  <th scope="col">VERTICAL</th>
+                  <th scope="col">PHONE</th>
+                  <th scope="col">ASSIGNED VISITOR</th>
+                  <th scope="col">Status</th>
+                  <th scope="col">Hold reason</th>
+                  
+                </tr>
+              </thead>
+              <tbody>
+                {% for recrep in allreports %}
+                <tr {% if recrep.priority%}  class="table-danger" {%else%} class=""{% endif %}>
+                  <td scope="row">{{forloop.counter}}</th>
+                  <td >{{recrep.applicationdate|date:"d-m-Y"}}</td>
+                  <td >{{recrep.applicationnumber}}</td>
+                  <td >{{recrep.name}}</td>
+                  <td >{{recrep.bankname}}</td>
+                  <td >{{recrep.bankvertical}}</td>
+                  <td >{{recrep.phonenumber}}</td>
+                  <td >{{recrep.visitingpersonname}}</td>
+                  <td {% if recrep.engineer != "Submitted" %} class="tablred my-2 mx-1" {% else %} class="tablgreen my-2 mx-1" {% endif %}  >
+                    {% if recrep.engineer == "Submitted" %} Completed
+                    {% elif recrep.engineer is none %} Pending
+                    {% else %} {{recrep.engineer}}
+                    {% endif %}
+                    
+                  </td>
+                  <td >
+                    {% if recrep.engineerholdcause is none %} 
+                    {%else%}
+                    {{recrep.engineerholdcause}}
+                    {% endif %}
+                  </td>
+                    
+                </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+        <div class="row my-2">
+          <div class="col-md-3">
+              <div class="card text-center">
+                  <div class="card-body">
+                    <span id="comp"></span>
+                    <a href="#" id="engcomp" type="button" class="float-end" data-bs-toggle="modal" data-bs-target="#myModal"> <i class="fa-regular fa-eye fa-2x float-end"></i></a>
+                    <br><br>Completed by Engineers
+                  </div>
+                </div>
+          </div>
+          <div class="col-md-3">
+              <div class="card text-center">
+                  <div class="card-body">
+                    <span id="pend"></span>
+                    <a href="#" id="engpend" type="button" class="float-end" data-bs-toggle="modal" data-bs-target="#myModal"> <i class="fa-regular fa-eye fa-2x float-end"></i></a>
+                    <br><br>Pending by Engineers
+                  </div>
+                </div>
+          </div>
+          <div class="col-md-3">
+              <div class="card text-center">
+                  <div class="card-body">
+                    <span id="inprog"></span>
+                    <a href="#" id="enginprog" type="button" class="float-end" data-bs-toggle="modal" data-bs-target="#myModal"> <i class="fa-regular fa-eye fa-2x float-end"></i></a>
+                    <br><br>Engineers inprogress
+                  </div>
+                </div>
+          </div>
+          </div>
+      <div class="row my-3">
+        <div class="col-md-3">
+            <div class="card text-center">
+                <div class="card-body">
+                  <span id="rtot"></span>
+                  <a href="#" id="reqrecrep" type="button" class="float-end" onclick="repview(this.id)" data-bs-toggle="modal" data-bs-target="#reporterModal"> <i class="fa-regular fa-eye fa-2x float-end"></i></a>
+                  <br><br>Request Received by Reporter
+                </div>
+              </div>
+        </div>
+        <div class="col-md-2">
+            <div class="card text-center">
+                <div class="card-body">
+                  <span id="rinprog"></span>
+                  <a href="#" id="repinprog" type="button" class="float-end" onclick="repview(this.id)" data-bs-toggle="modal" data-bs-target="#reporterModal"> <i class="fa-regular fa-eye fa-2x float-end"></i></a>
+                  <br><br>Reporters inprogress
+                </div>
+              </div>
+        </div>
+        
+        <div class="col-md-2">
+            <div class="card text-center">
+                <div class="card-body">
+                  <span id="rhold"></span>
+                  <a href="#" id="rephold" type="button" class="float-end" onclick="repview(this.id)" data-bs-toggle="modal" data-bs-target="#reporterModal"> <i class="fa-regular fa-eye fa-2x float-end"></i></a>
+                  <br><br> Hold by Reporters
+                </div>
+              </div>
+        </div>
+        <div class="col-md-2">
+          <div class="card text-center">
+              <div class="card-body">
+                <span id="rpend"></span>
+                <a href="#" id="reppend" type="button" class="float-end" onclick="repview(this.id)" data-bs-toggle="modal" data-bs-target="#reporterModal"> <i class="fa-regular fa-eye fa-2x float-end"></i></a>
+                <br><br> Pending by Reporters
+              </div>
+            </div>
+      </div>
+      <div class="col-md-3">
+        <div class="card text-center">
+            <div class="card-body">
+              <span id="rcomp"></span>
+              <a href="#" id="repcomp" type="button" class="float-end" onclick="repview(this.id)" data-bs-toggle="modal" data-bs-target="#reporterModal"> <i class="fa-regular fa-eye fa-2x float-end"></i></a>
+              <br><br>Completed by Reporters
+            </div>
+          </div>
+    </div>
+    </div>
+  </div>
+  </div>
+  
+
+  <div class="container" style="display:block; background-color:#f6f6f6; padding:20px 20px 20px;">
+
+    <div class="row">
+      <div class="col-md-12">
+        <div class="card">
+          <div class="card-body">
+            
+            <a class="btn btn-success btn-sm float-end" href="/api/receptiongenreportexport">Export to Excel</a>
+            <a class="btn btn-success btn-sm" href="/reception/reception">Add Report</a>
+            <hr>
+            <table id="receptiontable" class="table table-hover table-striped table-bordered" style="font-size: 90%;">
+              <thead>
+                <tr>
+                  <th scope="col">#</th>
+                  <th scope="col">APP.DATE</th>
+                  <th scope="col">APP.NO.</th>
+                  <th scope="col">NAME</th>
+                  <th scope="col">BANK NAME</th>
+                  <th scope="col">VERTICAL</th>
+                  <!-- <th scope="col">ADDRESS</th>
+                  <th scope="col">CITY</th> -->
+                  <th scope="col">PHONE</th>
+                  <th scope="col">ASSIGNED VISITOR</th>
+                  <th scope="col">ASSIGNED REPORTER</th>
+                  <th scope="col">Action</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for recrep in recpreports %}
+                  <tr {% if recrep.priority%}  class="table-danger" {%else%} class=""{% endif %}> 
+                  <td scope="row">{{forloop.counter}}</td>
+                  <!-- <td >{{recrep.id}}</td> -->
+                  <td >{{recrep.applicationdate|date:"d-m-Y"}}</td>
+                  <td >{{recrep.applicationnumber}}</td>
+                  <td >{{recrep.name}}</td>
+                  <td >{{recrep.bankname}}</td>
+                  <td >{{recrep.bankvertical}}</td>
+                  <!-- <td >{{recrep.add1}}</td>
+                  <td >{{recrep.city}}</td> -->
+                  <td >{{recrep.phonenumber}}</td>
+                  <td >{{recrep.visitingpersonname}}</td>
+                  <td >{{recrep.reportpersonname}}</td>
+                  <td><a class="recdelete" data-url="{% url 'deletereceptionreport' recrep.id %}" href="/reception/deletereceptionreport/{{recrep.id}}" title="Delete">
+                    <i class="fa fa-trash" aria-hidden="true"></i></a>&nbsp;&nbsp;
+                    <a href="/reception/updatereceptionreport/{{recrep.id}}" class="" title="Edit">
+                      <i class="fa fa-pencil" aria-hidden="true"></i></a>&nbsp;&nbsp;
+                    <a class="priorit" data-url="{% url 'recepreportpriority' recrep.id %}" href="#"  {% if recrep.priority%}  style="color: red;" {%else%} style="color: green;"{% endif %} title="Set High Priority">
+                      <i class="fa-solid fa-gauge-high" ></i></a>
+                    
+                  </td> 
+                  </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="modal" id="myModal">
+  <div class="modal-dialog modal-dialog-scrollable modal-xl modal-dialog-centered">
+    <div class="modal-content">
+
+      <!-- Modal Header -->
+      <div class="modal-header">
+        <h4 id="modhead" class="modal-title">Completed by Engineers</h4>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+
+      <!-- Modal body for engineer -->
+      <div class="modal-body">
+        <div class="container my-2" style="display:block; background-color:#f6f6f6; padding:10px 10px 10px;">
+
+          <div class="row">
+            <div class="col-md-12">
+              <div class="card">
+                <div class="card-body">
+                  <!-- <a class="btn btn-success float-end" href="/api/export">Export to CSV</a> -->
+                  <!-- <a class="btn btn-success " href="/reception/reception">Add Report</a> -->
+                  <!-- <hr> -->
+                  <table  class="table table-hover table-striped tavle-bordered" style="font-size: 90%;">
+                    <thead>
+                      <tr>
+                        <th scope="col">#</th>
+                        <!-- <th scope="col">APP.DATE</th> -->
+                        <th scope="col">APP.NO.</th>
+                        <th scope="col">NAME</th>
+                        <th scope="col">Visit in presence</th>
+                        <th scope="col">BANK NAME</th>
+                        <th scope="col">Case type</th>
+                        <th  scope="col">Engineer</th>
+                        <!-- <th scope="col">Reporter</th> -->
+                      </tr>
+                    </thead>
+                    <tbody id="engcomptable">
+                      
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Modal footer -->
+      <div class="modal-footer">
+        <button type="button" class="btn btn-danger" data-bs-dismiss="modal">Close</button>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<div class="modal" id="reporterModal">
+  <div class="modal-dialog modal-dialog-scrollable modal-xl modal-dialog-centered">
+    <div class="modal-content">
+
+      <!-- Modal Header -->
+      <div class="modal-header">
+        <h4 id="repmodhead" class="modal-title">Completed by Reporter</h4>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+<!-- Modal body for reporter-->
+<div class="modal-body">
+  <div class="container my-2" style="display:block; background-color:#f6f6f6; padding:10px 10px 10px;">
+
+    <div class="row">
+      <div class="col-md-12">
+        <div class="card">
+          <div class="card-body">
+            <!-- <a class="btn btn-success float-end" href="/api/export">Export to CSV</a> -->
+            <!-- <a class="btn btn-success " href="/reception/reception">Add Report</a> -->
+            <!-- <hr> -->
+            <table  class="table table-hover table-striped tavle-bordered" style="font-size: 90%;">
+              <thead id="reptableheader">
+                <!-- <tr>
+                  
+                </tr> -->
+              </thead>
+              <tbody id="reptable">
+                
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Modal footer -->
+<div class="modal-footer">
+  <button type="button" class="btn btn-danger" data-bs-dismiss="modal">Close</button>
+</div>
+
+</div>
+</div>
+</div>
+
+  
+
+{% endblock %}
+{% block scripts%}
+<script type="text/javascript">
+  var apiBaseUrl = "{{ context.api_base_url }}";
+  console.log(apiBaseUrl);
+</script>
+<Script type="text/javascript" src="{% static 'js/reception.js' %}" > </Script>
+<Script type="text/javascript" src="{% static 'js/sidebartoggle.js' %}"> </Script>
+<Script type="text/javascript" src="{% static 'js/datatables.js' %}" > </Script>
+{% endblock scripts%}

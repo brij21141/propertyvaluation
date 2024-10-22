@@ -1,0 +1,237 @@
+{% include 'bootstrap_link.html' %} 
+{% load math_filters %}
+<!-- <div class="card col-md-8 offset-2"> -->
+  <style>  
+    @media print {  
+        .page-break {  
+            page-break-before: always; /* Forces a page break before this element */  
+            page-break-inside: avoid;  /* Prevents page breaks inside this element */  
+        }  
+    
+        .no-break {  
+            page-break-inside: avoid;   /* Prevents page breaking inside this element */  
+        }  
+    }  
+    </style>  
+    
+<div class="card">
+    <div class="card-body">
+      <div class="container mb-5 mt-3">
+        <div class="row d-flex align-items-baseline">
+          <div class="col-md-9">
+            <!-- <p style="color: #7e8d9f;font-size: 20px;">Invoice >> <strong>ID: #123-123</strong></p> -->
+            <a data-mdb-ripple-init class="btn btn-light text-capitalize" style="text-align: center;" data-mdb-ripple-color="dark" href="{% url 'generatebill' %}">
+              <i class="fa-solid fa-arrow-left"></i> Back</a>
+          </div>
+          <div class="col-md-3 float-end">
+            <a data-mdb-ripple-init class="btn btn-light text-capitalize border-0" data-mdb-ripple-color="dark" onclick="printbill()"><i
+                class="fas fa-print text-primary"></i> Print</a>
+            <a data-mdb-ripple-init class="btn btn-light text-capitalize" data-mdb-ripple-color="dark" href="{% url 'billinpdf' %}"><i
+                class="far fa-file-pdf text-danger"></i> Export</a>
+          </div>
+          <hr>
+        </div>
+        <div id="mn">
+        <div class="container">
+          <div class="col-md-12">
+            <div class="text-center">
+              <h2 style="margin-bottom: .1rem;" > {{company.name}} </h2>
+             <p> (B.E. (Civil) MIE,FIV)</p>
+              <h6 style="margin-bottom: .1rem; margin-top: .2rem;">ARCHITECTS, STRUCTURAL ENGINEERS VALUER</h6>
+              <p class="pt-0">{{company.website}}</p>
+            </div>
+            <hr>
+          </div>
+  
+  
+          <div class="row">
+            <div class="col-md-8">
+              <ul class="list-unstyled">
+                <li class="text-muted">To: <span style="color:#5d9fc5 ;">{{banks.name}} {{banks.branch}}</span></li>
+                <li class="text-muted">{{banks.add1}}, {{banks.city}}</li>
+                <li class="text-muted">State:<span>{{banks.state}}</span>  <span class="badge bg-warning text-black fw-bold">
+                    23</span>&nbsp;&nbsp;&nbsp; <span>Month of : </span><span> July 2024</span></li>
+                <li class="text-muted"><i class="fas fa-phone"></i>{{banks.std}}-{{banks.landline}}</li>
+                <li class="text-muted">{{banks.name}} - GSTN : {{banks.gstin}}</li><hr>
+                <li class="text-muted">{{company.name}} </li>
+                <li class="text-muted">GSTN : {{company.gstin}}</li>
+                <li class="text-muted">PAN - {{company.pan}}</li>
+                
+              </ul>
+            </div>
+            <div class="col-md-4 " >
+              <p class="fw-bold">Tax Invoice </p>
+              <ul class="list-unstyled">
+                <li class="text-muted"><i class="fas fa-circle" style="color:#84B0CA ;"></i> <span
+                    class="fw-bold">Invoice Number:</span>#123-456</li>
+                <li class="text-muted"><i class="fas fa-circle" style="color:#84B0CA ;"></i> <span
+                    class="fw-bold">Invoice Date: </span>Jun 23,2021</li>
+                <li class="text-muted"><i class="fas fa-circle" style="color:#84B0CA ;"></i> <span
+                    class="me-1 fw-bold">Reverse Charge (Y/N):</span><span class="badge bg-warning text-black fw-bold">
+                    No</span></li>
+                <li class="text-muted"><i class="fas fa-circle" style="color:#84B0CA ;"></i> <span
+                    class="me-1 fw-bold">State:</span><span>Madhya Pradesh</span>  <span class="badge bg-warning text-black fw-bold">
+                    23</span></li>
+              </ul>
+            </div>
+          </div>
+  
+          <div class="row mx-1 justify-content-center">
+            <table class="table table-striped table-bordered">
+              <thead style="background-color:#84B0CA ; text-align: center; border-top: 1px solid black;" class="text-white">
+                <tr >
+                  <th rowspan="2" style="background-color: aliceblue;">#</th>
+                  <th rowspan="2"style="background-color: aliceblue;">Description</th>
+                  <th rowspan="2"style="background-color: aliceblue;">Date</th>
+                  <th rowspan="2"style="background-color: aliceblue;">Amount</th>
+                  <th rowspan="2"style="background-color: aliceblue;">Taxable Value</th>
+                  <th colspan="2"style="background-color: aliceblue;">CGST </th>
+                  <th colspan="2"style="background-color: aliceblue;">SGST </th>
+                  <th rowspan="2"style="background-color: aliceblue;">Total </th>
+                </tr>
+                <tr><th style="background-color: aliceblue;">Rate</th><th style="background-color: aliceblue;">Amount</th>
+                    <th style="background-color: aliceblue;">Rate</th><th style="background-color: aliceblue;">Amount</th>
+                </tr>
+              </thead>
+              <tbody>
+                <!-- {% with total=110 %}  -->
+                {% for param in bills %}
+                <tr style="text-align: center; border-bottom: 1px solid black;">
+                  <th scope="row">{{forloop.counter}}</th>
+                  <!-- <td style="width: 200px;">Sh. ROHIT ISRANI at House No. 1421, part Of Survey No.2794, 2801, 2802, 2820, Ward No. 49, Mohan Nagar, Samadhiya Colony, Lashkar, Gwalior MP 474001</td>
+                    -->
+                    <td style="width: 250px; text-align: left;">{{param.name}}<br>{{param.add1}}<br>{{param.add2}}<br>{{param.city}}, {{param.region}} - {{param.zip}}</td>
+                  <td style="width: 200px;">19-07-2024</td>
+                  <td>{{param.bankid.internalrate}}</td>
+                  <td>{{param.bankid.internalrate}}</td>
+                  <td>9</td>
+                  <td>{{param.bankid.internalrate|multiply:9|divide:100}}</td>
+                  <td>9</td>
+                  <td>{{param.bankid.internalrate|multiply:9|divide:100}}</td>
+                  <td>{{param.bankid.internalrate|multiply:9|divide:100|multiply:2|sum:param.bankid.internalrate}}</td>
+                </tr>
+                
+                  <!-- {% with total=total|sum:param.bankid.internalrate %} 
+                  {% endwith %} -->
+                
+                {% endfor %}
+                <!-- {% endwith %} -->
+                
+              </tbody>
+  
+            </table>
+            <!-- <div class="page-break no-break">  
+              Content that should not be split and begins on a new page.  
+              This section needs to stay together without splitting.  
+          </div>   -->
+            <table class="table  table-bordered" style="margin-top: -15px;">
+            <tbody style="border-bottom: 1px solid black;">
+              <tr >
+                <td style="background-color:aliceblue;;">Total Invoice amount in words </td>
+                <td>Total Amount before Tax</td>
+                  <td>₹ {% calculate_total bills %}</td>
+              </tr>
+              <tr >
+                {% calculate_grandtotal bills as amt %}
+                <td rowspan="5">RUPEES:- {% convert_amount_to_words amt %} only</td>
+                <td>ADD : CGST</td>
+                  <td>₹ {% calculate_gst bills %}</td>
+                </tr>
+                <tr >
+                  <td>ADD : SGST</td>
+                  <td>₹ {% calculate_gst bills %}</td>
+              </tr>
+              
+              <tr >
+                <td>Total Tax Amount</td>
+                <td>₹ {% calculate_totalgst bills %}</td>
+              </tr>
+              <tr >  
+                <td>Total Amount After Tax</td>
+                <td>₹ {% calculate_grandtotal bills %}</td>
+              </tr>
+              <tr >
+                <td style="background-color:aliceblue;;">GST on Reverse Charge</td>
+                <td>₹ 0</td>
+              </tr>
+              
+            </tbody>
+            </table>
+            <table class="table  table-bordered" style="margin-top: -15px;">
+              <!-- <thead>
+                <th colspan="2" style="background-color: aliceblue;">SGST </th>
+                  <th rowspan="8"style="background-color: aliceblue;">Total </th>
+              </thead> -->
+              <tbody style="border-bottom: 1px solid black;">
+                <tr>
+                <td style="width: 300px;background-color:aliceblue; "><b>Bank Details</b></td>
+                
+                <td style="width: 300px;" rowspan="5" ></td>
+                <td>Ceritified that the particulars given above are true and correct
+                  </td>
+              </tr>
+              <tr>
+                <td>A/C Holder- {{company.name}}</td>
+                
+                <td  rowspan="3" style="text-align: center;">For {{company.name}}</td>
+                
+              </tr>
+              <tr>
+                <td>A/C : {{company.bankname}} - {{company.bankacno}}</td>
+                
+                
+              </tr>
+              <tr>
+                <td>Bank IFSC: {{company.ifsc}}
+                  </td>
+                
+                
+              </tr>
+              <tr>
+                <td rowspan="4" >Terms & conditions <br> <span>{{company.terms}}</span>
+                  </td>
+                
+                
+              </tr>
+              <tr><td></td><td style="text-align: center;">Authorised signatory</td>
+              
+              </tr>
+              <tr></tr>
+              
+              </tbody>
+              </table>
+          </div>
+          
+          <div class="row">
+            <div class="col-md-12">
+              <p>Thank you</p>
+            </div>
+            <!-- <div class="col-xl-2">
+              <button  type="button" data-mdb-button-init data-mdb-ripple-init class="btn btn-primary text-capitalize"
+                style="background-color:#60bdf3 ;">Pay Now</button>
+            </div> -->
+          </div>
+  
+        </div>
+        
+    </div>
+    
+      </div>
+      
+    </div>
+    <div class="sidebar-footer">
+        <p>Add. : {{company.address}}, {{company.city}}, {{company.state}} {{company.zip}}</p>
+    </div>
+  </div>
+  {% block scripts%}
+  <script type="text/javascript" >
+    function printbill(){
+        var b=document.body.innerHTML;
+        var d=document.getElementById('mn').innerHTML;
+        document.body.innerHTML=d;
+        window.print();
+        document.body.innerHTML=b;
+    }
+  </script>
+  {% endblock scripts%}
+  

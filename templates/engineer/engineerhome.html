@@ -1,0 +1,300 @@
+
+{% extends "sidebar.html" %}
+<!-- {% include 'bootstrap_link.html' %} -->
+{% block title %}Site Engineer{% endblock %}
+{% load static %}
+
+{% block content %}
+    
+<div class="container-fluid" >
+  <div class="container my-3" style="display: block; background: #f6f6f6; padding: 40px 20px 37px;">
+
+  <div class="container my-3">
+      <div class="row my-3">
+          <div class="col-md-3">
+              <div class="card text-center widget-card border-light shadow-sm" style="background-color: antiquewhite;">
+                  <div class="card-body d-flex justify-content-between">
+                    <i class="fa-solid fa-list-check fa-2x"></i>
+                    <span class="circle" id="totreq">{{totreq}}</span>
+                  </div>
+                  <div class="card-footer textcircle">Request Received</div>
+                </div>
+          </div>
+          <div class="col-md-2">
+              <div class="card text-center widget-card border-light shadow-sm" style="background-color: chocolate;">
+                  <div class="card-body d-flex justify-content-between">
+                    <i class="fa-regular fa-clock fa-2x" style="color: blue;"></i>
+                     <span id="pending" class="circle" >{{pending}}</span>
+                  </div>
+                  <div class="card-footer textcircle">Request Pending</div>
+                </div>
+          </div>
+          <div class="col-md-2">
+              <div class="card text-center widget-card border-light shadow-sm" style="background-color: aquamarine;">
+                  <div class="card-body d-flex justify-content-between">
+                    <i class="fa-solid fa-spinner fa-2x" style="color: green;"></i>
+                    <span id="inprogress" class="circle">{{inprogress}}</span>
+                  </div>
+                  <div class="card-footer textcircle">Request in Progress</div>
+                </div>
+          </div>
+          <div class="col-md-2">
+            <div class="card text-center widget-card border-light shadow-sm" style="background-color: brown;">
+                <div class="card-body d-flex justify-content-between">
+                  <i class="fa-solid fa-circle-pause fa-2x" style="color: red;"></i>
+                  <span id="hold" class="circle">{{hold}}</span>
+                </div>
+                <div class="card-footer textcircle">Request on hold</div>
+              </div>
+        </div>
+          <div class="col-md-3">
+              <div class="card text-center widget-card border-light shadow-sm" style="background-color: cornflowerblue;">
+                  <div class="card-body d-flex justify-content-between">
+                    <i class="fa-regular fa-circle-check fa-2x"></i>
+                   
+                  <span id="compreq" class="circle">{{compreq}}</span>
+                  </div>
+                  <div class="card-footer textcircle">Request Completed</div>
+                </div>
+          </div>
+      </div>
+  </div>
+  </div>
+<!-- global search table -->
+<div class="container my-2" id="globalengtablediv" style="display:none; background-color:#f6f6f6; padding:40px 20px 37px;">
+
+  <div class="row">
+    <div class="col-md-12">
+      <div class="card">
+        <div class="card-body">
+          <!-- <a class="btn btn-success btn-sm float-end" href="/api/receptiongenreportexport">Export to Excel</a> -->
+          <h6>All Task with status</h6>
+          
+          <!-- <a class="btn btn-success " href="/reception/reception">Add Report</a> -->
+          
+          <table id="globalsearchengineertable" class="table table-hover table-striped table-bordered " style="font-size: 90%;">
+            <thead>
+              <tr>
+                <th scope="col">#</th>
+                <th scope="col">APP.DATE</th>
+                <th scope="col">APP.NO.</th>
+                <th scope="col">NAME</th>
+                <th scope="col">BANK NAME</th>
+                <th scope="col">VERTICAL</th>
+                <th scope="col">PHONE</th>
+                <th scope="col">ASSIGNED VISITOR</th>
+                <th scope="col">Status</th>
+                <th scope="col">Hold reason</th>
+                <th scope="col">Action</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for recrep in allreports %}
+              <tr {% if recrep.priority%}  class="table-danger" {%else%} class=""{% endif %}>
+                <td scope="row">{{forloop.counter}}</th>
+                <td >{{recrep.applicationdate|date:"d-m-Y"}}</td>
+                <td >{{recrep.applicationnumber}}</td>
+                <td >{{recrep.name}}</td>
+                <td >{{recrep.bankname}}</td>
+                <td >{{recrep.bankvertical}}</td>
+                <td >{{recrep.phonenumber}}</td>
+                <td >{{recrep.visitingpersonname}}</td>
+                <td {% if recrep.engineer != "Submitted" %} class="tablred my-2 mx-1" {% else %} class="tablgreen my-2 mx-1" {% endif %}  >
+                  {% if recrep.engineer == "Submitted" %} Completed
+                  {% elif recrep.engineer is none %} Pending
+                  {% else %} {{recrep.engineer}}
+                  {% endif %}
+                  
+                </td>
+                <td >
+                  {% if recrep.engineerholdcause is none %} 
+                  {%else%}
+                  {{recrep.engineerholdcause}}
+                  {% endif %}
+                </td>
+                  <td>
+                    {% if recrep.engineer != "Submitted" %}
+                    <a class="btn-sm"  href="/engineer/engineer/{{recrep.id}}"><i class="fa-solid fa-circle-plus fa-2x"></i></a>&nbsp;&nbsp;
+                    
+                    <a class="engineerstatusupdate" data-url="{% url 'engreportstatus' 'S' recrep.id  %}" href="#"   title="Set Status">
+                      {% if recrep.engineer == 'InProgress' %}
+                      <i class="fa-solid fa-spinner fa-2x" style="color: green;"></i> 
+                      {% elif recrep.engineer == 'Hold' %} 
+                      <i class="fa-solid fa-circle-pause fa-2x" style="color: red;"></i>
+                       {%else%} 
+                       <i class="fa-regular fa-clock fa-2x" style="color: blue;"></i>
+                       {% endif %}
+                      </a>
+                      {% endif %}
+                  </td>
+                  
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+  <div class="container my-3" style="display:block; background-color:#f6f6f6; padding:40px 20px 37px;">
+
+    <div class="row">
+      <div class="col-md-12">
+        <div class="card">
+          <div class="card-body">
+            <a class="btn btn-success btn-sm float-end" href="/api/receptiongenreportexport">Export to Excel</a>
+            <h6>Request Received</h6>
+            <hr>
+            
+           
+            <!-- <a class="btn btn-success " href="/reception/reception">Add Report</a> -->
+            
+            <table id="engineertable" class="table table-hover table-striped table-bordered " style="font-size: 90%;">
+              <thead>
+                <tr>
+                  <th scope="col">#</th>
+                  <th scope="col">APP.DATE</th>
+                  <th scope="col">APP.NO.</th>
+                  <th scope="col">NAME</th>
+                  <th scope="col">BANK NAME</th>
+                  <th scope="col">VERTICAL</th>
+                  <!-- <th scope="col">ADDRESS</th>
+                  <th scope="col">CITY</th> -->
+                  <th scope="col">PHONE</th>
+                  <th scope="col">ASSIGNED VISITOR</th>
+                  <th scope="col">Hold reason</th>
+                  <th scope="col">Action</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for recrep in requestreceived %}
+                <tr {% if recrep.priority%}  class="table-danger" {%else%} class=""{% endif %}>
+                  <td scope="row">{{forloop.counter}}</th>
+                  <!-- <td >{{recrep.id}}</td> -->
+                  <td >{{recrep.applicationdate|date:"d-m-Y"}}</td>
+                  <td >{{recrep.applicationnumber}}</td>
+                  <td >{{recrep.name}}</td>
+                  <td >{{recrep.bankname}}</td>
+                  <td >{{recrep.bankvertical}}</td>
+                  <!-- <td >{{recrep.add1}}</td>
+                  <td >{{recrep.city}}</td> -->
+                  <td >{{recrep.phonenumber}}</td>
+                  <td >{{recrep.visitingpersonname}}</td>
+                  <td >{{recrep.engineerholdcause}}</td>
+                  <!-- <td><a href="/reception/deletereceptionreport/{{recrep.id}}" class="btn btn-danger btn-sm">Delete</a></td>  -->
+                  <!-- <td><a href="/reception/updatereceptionreport/{{recrep.id}}" class="btn btn-warning btn-sm">Upload</a></td>   -->
+                    <td><a class="btn-sm"  href="/engineer/engineer/{{recrep.id}}"><i class="fa-solid fa-circle-plus fa-2x"></i></a>&nbsp;&nbsp;
+                      <!-- <a class="btn btn-success btn-sm"  href="/engineer/engineer/{{recrep.id}}"></a> -->
+                      <a class="engineerstatusupdate" data-url="{% url 'engreportstatus' 'S' recrep.id  %}" href="#"   title="Set Status">
+                        {% if recrep.engineer == 'InProgress' %}
+                        <i class="fa-solid fa-spinner fa-2x" style="color: green;"></i> 
+                        {% elif recrep.engineer == 'Hold' %} 
+                        <i class="fa-solid fa-circle-pause fa-2x" style="color: red;"></i>
+                         {%else%} 
+                         <i class="fa-regular fa-clock fa-2x" style="color: blue;"></i>
+                         {% endif %}
+                        </a>
+                    </td>
+                </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="modal fade" id="holdcausepopup" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="exampleModalLabel">Please enter the reason of hold</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <form action="" id="modalForm" method="post">
+          
+            {% csrf_token %}
+            <div class="form-group"> 
+              <p id="urll" style="display: none;" ></p>
+              
+              <input type="number" id="urlid" name="urlid" value="" style="display: none;">
+            <textarea name="reporterholdcause" id="reporterholdcause" rows="4" cols="50" required></textarea>
+            </div>
+            <div class="modal-footer">
+              <button type="button" class="btn btn-secondary"  data-bs-dismiss="modal">Close</button>
+              <!-- <button type="submit" id="reporterstatus" data-url="{% url 'reporterreportstatus' 0 %}" onclick="reporterhold(this)" class="reporterstatus"  >Save changes</button> -->
+                
+                <button type="submit" id="reporterstatus" onclick="reporterhold()" class="reporterstatus"  >Save changes</button>
+            </div>   
+          
+            </form>
+          </div>
+        
+
+          
+      </div>
+    </div>
+  </div>
+  <div class="container" style="display:block; background-color:#f6f6f6; padding:40px 20px 37px;">
+
+    <div class="row my-3">
+        <div class="card">
+          <div class="card-body">
+            
+            <a class="btn btn-success btn-sm float-end" href="/api/engcompletedreportexport">Export to Excel</a>
+            <h6>Completed Request</h6>
+            <hr>
+            <table id="engineertablecomp" class="table table-hover table-striped tavle-bordered" style="font-size: 90%;">
+              <thead>
+                <tr>
+                  <th scope="col">#</th>
+                  <!-- <th scope="col">APP.DATE</th> -->
+                  <th scope="col">APP.NO.</th>
+                  <th scope="col">NAME</th>
+                  <th scope="col">BANK NAME</th>
+                  <th scope="col">Visit In Presence</th>
+                  <th scope="col">casetype</th>
+                  <!-- <th scope="col">ASSIGNED VISITOR</th>
+                  <th scope="col">ASSIGNED REPORTER</th> -->
+                  <th scope="col">Action</th>
+                </tr>
+              </thead>
+              <tbody>
+                <!-- {{requestcompleted}} -->
+                {% for reqcom in requestcompleted %}
+                <tr>
+                  <td scope="row">{{forloop.counter}}</th>
+                  <!-- <td >{{recrep.id}}</td> -->
+                  <!-- <td >{{reqcom.applicationdate}}</td> -->
+                  <td >{{reqcom.applicationnumber}}</td>
+                  <td >{{reqcom.name}}</td>
+                  <td >{{reqcom.bankname}}</td>
+                  <td >{{reqcom.visitinpresence}}</td>
+                  <td >{{reqcom.casetype}}</td>
+                  <!-- <td >{{reqcom.visitingperson}}</td>
+                  <td >{{reqcom.reportperson}}</td> -->
+                  <td>
+                    <!-- <a href="/engineer/deleteengineerreport/{{reqcom.id}}/{{reqcom.applicationnumber}}" class="btn btn-danger btn-sm">
+                    <i class="fa fa-trash" aria-hidden="true"></i></a> -->
+                    <a href="/engineer/updateengineerreport/{{reqcom.id}}" class="btn btn-warning btn-sm"><i class="fa fa-pencil" aria-hidden="true"></i></a>
+                  </td> 
+                  </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+</div>
+ 
+
+{% endblock %}
+{% block scripts%}
+<Script type="text/javascript" src="{% static 'js/engineer.js' %}" > </Script>
+<Script type="text/javascript" src="{% static 'js/sidebartoggle.js' %}"> </Script>
+{% endblock scripts%}

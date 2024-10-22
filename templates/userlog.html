@@ -1,0 +1,81 @@
+
+{% extends "sidebar.html" %}
+{% block title %}User log{% endblock %}
+{% load static %}
+
+{% block content %}
+    
+  
+  <div class="container my-2" style="display:block; background-color:#f6f6f6; padding:20px 20px 20px;">
+    <p>Request Received</p>
+            
+    <div class="row">
+      <div class="col-md-12">
+        <div class="card">
+          <div class="card-body">
+            <a class="btn btn-success btn-sm float-end" href="/api/engcompletedreportexport">Export to Excel</a><br>
+              <hr>
+            
+            <table id="userlogtable" class="table table-hover table-striped table-bordered" style="font-size: 90%;">
+              <thead>
+                <tr>
+                  <th scope="col">#</th>
+                  <!-- <th scope="col">APP.DATE</th> -->
+                  <th scope="col">User Name</th>
+                  <th scope="col">User Id</th>
+                  <th scope="col">Email</th>
+                  <th scope="col">Action Type</th>
+                  <th scope="col">IP Address</th>
+                  <th scope="col">Date & Time</th>
+                  <th scope="col">Action</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for useractiviti in useractivities %}
+                <tr {% if recrep.receptionid.priority%}  class="table-danger" {%else%} class=""{% endif %}>
+                  <td scope="row">{{forloop.counter}}</td>
+                  <!-- <td >{{recrep.id}}</td> -->
+                  <!-- <td >{{recrep.applicationdate}}</td> -->
+                  <td >{{useractiviti.userdetails.first_name}} {{useractiviti.userdetails.last_name}}</td>
+                  <td >{{useractiviti.user.username}}</td>
+                  <td >{{useractiviti.user.email}}</td>
+                  <td >{{useractiviti.action_type}}</td>
+                  <td >{{useractiviti.ip_address}}</td>
+                  <!-- <td >{{recrep.add1}}</td>
+                  <td >{{useractiviti.city}}</td> -->
+                  <td >{{useractiviti.timestamp}}</td>
+                  <!-- <td >{{recrep.reportperson}}</td> -->
+                  <!-- <td><a href="/reception/deletereceptionreport/{{recrep.id}}" class="btn btn-danger btn-sm">Delete</a></td>  -->
+                  <!-- <td><a href="/reception/updatereceptionreport/{{recrep.id}}" class="btn btn-warning btn-sm">Upload</a></td>   -->
+                    <td><a class="btn-sm"  href="/reporter/reporter/{{recrep.id}}"><i class="fa-solid fa-circle-plus fa-2x"></i></a>&nbsp;&nbsp;
+                        <a class="" id="p{{recrep.id}}" data-url="" href="#"  title="Set Status">
+                          {% if recrep.reporter == 'InProgress' %}
+                          <i class="fa-solid fa-spinner fa-2x" style="color: green;"></i> 
+                         {% elif recrep.reporter == 'Hold' %} 
+                         <i class="fa-solid fa-circle-pause fa-2x" style="color: red;"></i>
+                         {%else%} 
+                         <i class="fa-regular fa-clock fa-2x" style="color: blue;"></i>
+                         {% endif %}
+                        </a>
+                        {% if recrep.receptionid.reportperson == 0  %}
+                        &nbsp;&nbsp;<a class="reportassign" data-url="{% url 'reportassign' recrep.id %}" href="#" title="Assign yourself"><i class="fas fa-tasks fa-2x" style="color: gray;"></i></a>
+                        {% endif %}
+                    </td>
+                </tr>
+                
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+   
+  
+  
+
+
+ 
+
+{% endblock %}

@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>{% block title %}Default Title{% endblock %}</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    {% include 'bootstrap_link.html' %}
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'css/sidebarstyle.css' %}">
+    <link rel="stylesheet" href="{% static 'css/formstyle.css' %}">
+</head>
+<body>
+    <div class="wrapper">
+        <aside id="sidebar">
+            <div class="d-flex">
+                <button id="toggle-btn" type="button">
+                    <i class="lni lni-grid-alt"></i>
+                </button>
+                <div class="sidebar-logo">
+                    <a href="#">blc</a>
+                </div>
+            </div>
+            <ul class="sidebar-nav">
+                <li class="sidebar-item">
+                    <a href="{% url 'profile' 0 %}?next={{ request.path }}" class="sidebar-link tooltip-test"  title="Profile">
+                        <i class="fa-solid fa-user"></i>
+                        <span>Profile</span>
+                    </a>
+                </li>
+                <li class="sidebar-item">
+                    <a href="{% url 'home' %}" class="sidebar-link tooltip-test" title="Dashboard">
+                        <i class="lni lni-dashboard"></i>
+                        <span>Dashboard</span>
+                    </a>
+                </li>
+                <li class="sidebar-item">
+                    <a href="{% url 'receptionhome' %}" class="sidebar-link tooltip-test" title="Reception">
+                        <i class="lni lni-school-bench"></i>
+                        <span>Reception</span>
+                    </a>
+                </li>
+                
+                <li class="sidebar-item">
+                    <a href="{% url 'engineerhome' %}" class="sidebar-link tooltip-test" title="Site Engineer">
+                        <i class="fa-solid fa-graduation-cap"></i>
+                        <span>Site Engineer</span>
+                    </a>
+                </li>
+                
+                <li class="sidebar-item">
+                    <a href="{% url 'reporterhome' %}" class="sidebar-link tooltip-test" title="Reporter">
+                        <i class="fa-brands fa-wpbeginner"></i>
+                        <span>Reporter</span>
+                    </a>
+                </li>
+                
+                <!-- <li class="sidebar-item">
+                    <a href="{% url 'banks' 0 %}?next={{ request.path }}" class="sidebar-link" title="Bank Management">
+                        <i class="fa-solid fa-building-columns"></i>
+                        <span>Banks</span>
+                    </a>
+                </li> -->
+                <li class="sidebar-item">
+                    <a href="#" class="sidebar-link collapsed has-dropdown" data-bs-toggle="collapse"
+                        data-bs-target="#bank" aria-expanded="false" aria-controls="bank">
+                        <i class="fa-solid fa-building-columns"></i>
+                        <span>Bank Management</span>
+                    </a>
+                    
+                    <ul id="bank" class="sidebar-dropdown list-unstyled collapse" data-bs-parent="#sidebar">
+                        <li class="sidebar-item">
+                            <a href="{% url 'banks' 0 %}?next={{ request.path }}" class="sidebar-link">Add bank</a>
+                        </li>
+                        <li class="sidebar-item">
+                            <a href="{% url 'bankmanage' %}" class="sidebar-link">Edit Bank</a>
+                        </li>
+                    </ul>
+                    
+                </li>
+                
+                <li class="sidebar-item">
+                    <a href="{% url 'companyprofile' %}?next={{ request.path }}" class="sidebar-link">
+                        <i class="lni lni-briefcase"></i>
+                        <span>Company Profile</span>
+                    </a>
+                </li>
+                <li class="sidebar-item">
+                    <a href="{% url 'generatebill' %}" class="sidebar-link">
+                        <i class="fa-solid fa-file-invoice-dollar"></i>
+                        <span>Generate Bills</span>
+                    </a>
+                </li>
+            
+                <li class="sidebar-item">
+                    <a href="#" class="sidebar-link collapsed has-dropdown" data-bs-toggle="collapse"
+                        data-bs-target="#auth" aria-expanded="false" aria-controls="auth">
+                        <i class="lni lni-protection"></i>
+                        <span>Auth</span>
+                    </a>
+                    
+                    <ul id="auth" class="sidebar-dropdown list-unstyled collapse" data-bs-parent="#sidebar">
+                        <!-- <li class="sidebar-item">
+                            <a href="{% url 'login' %}" class="sidebar-link">Login</a>
+                        </li> -->
+                        <li class="sidebar-item">
+                            <a href="{% url 'signup' %}" class="sidebar-link">Register</a>
+                        </li>
+                        <li class="sidebar-item">
+                            <a href="{% url 'userlog' %}" class="sidebar-link">User Log</a>
+                        </li>
+                    </ul>
+                    
+                </li>
+                
+            </ul>
+            <div class="sidebar-footer">
+                
+                <a href="{% url 'logout' %}" class="sidebar-link">
+                    <i class="lni lni-exit"></i>
+                    <span>Logout</span>
+                </a>
+            </div>
+        </aside>
+         <div class="main p-0" style="height: 100vh; overflow-x: hidden;overflow-y: auto;" >
+            <!-- <nav class="topnavbar">
+                <div class="container-fluid d-inline-block align-text-centre ">
+                    <a class="float-end " href="#" >
+                        <i class="lni lni-exit d-inline-block align-text-centre"></i>
+                        <span class="" id="" style="color: white;">Logout</span>
+                      </a>
+                      <a class="navbar-brand float-end" href="#" >
+                    <img src="{% static 'img/logo.png' %}" alt="" width="60" height="48" class="d-inline-block align-text-centre">
+                    
+                    <span id="topnavbarusername" style="color: white;">BNC</span></a>
+                    
+                  
+                </div>
+              </nav> -->
+              <nav class="topnavbar navbar d-flex navbar-expand-lg navbar-light ">
+                <div class="container-fluid">
+                    <img src="{% static 'img/logo.png' %}" alt="" width="50" height="40" class="">
+                  <a class="navbar-brand" style="color: white;" href="#">  bnc</a>
+                  <button class="navbar-toggler" style="background-color: white;" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                    <span class="navbar-toggler-icon"></span>
+                  </button>
+                  <div class="collapse navbar-collapse " id="navbarNav">
+                    <ul class="navbar-nav ms-auto">
+                    <li class="nav-item" style="text-align: center; display: flex; align-items: center; justify-content: center;position: relative;"></li>
+                    <input type="text" id="searchquery" name="searchquery" class="form-control mr-sm-2" style="width: 100%; margin: auto;" placeholder="Search..." >  
+                    <button type="button" id="gsearchclear" style="position: absolute; right: 250px; top: 40%; transform: translateY(-50%); font-size: 36px;color: gray;width: 25px; height: 25px;  background: transparent; border: none; cursor: pointer;" onclick="clearsearch()"> &times;  </button>
+                        
+                        
+                    </li>
+                      
+                        
+                        
+                      <li class="nav-item" style="text-align: center;width: -webkit-fill-available;">
+                        <!-- <a class="nav-link" href="#" > -->
+                            <span class="nav-link" id="topnavbarusername" style="color: white;"></span>
+                            <span  class="nav-link" id="topnavbaremail" style="color: white; margin-top: -20px;"></span>
+                        <!-- </a> -->
+                      </li>
+                      <!-- <li class="nav-item">
+                        <a class="nav-link " href="{% url 'logout' %}" >
+                            <i class="lni lni-exit"></i>
+                            <span class="" id="" style="color: white;">Logout</span>
+                          </a>
+                      </li> -->
+                      
+                    </ul>
+                    <img id="navprofileimg" {% if userdata.profileimage %} src="{{userdata.profileimage.url}}" {% else %} src="{% static 'img/OIP.jpg' %}" {% endif%} alt=""  class="circle-image" onclick="toggleMenu()">
+                    <div class="sub-menu-wrap" id="submenu">
+                        <div class="sub-menu">
+                            <div class="user-info">
+                                <img  id="navmenuprofileimg" {% if userdata.profileimage %} src="{{userdata.profileimage.url}}" {% else %} src="{% static 'img/OIP.jpg' %}" {% endif%} alt="" width="50" height="40" class="circle-image">
+                                <p id="topnavbarmenuusername">bnc</p>
+                            </div>
+                            <hr>
+                            <a href="{% url 'profile' 0 %}?next={{ request.path }}" class="sub-menu-link">
+                            <!-- <img src="" alt=""> -->
+                            <i class="fa fa-user "></i>
+                            <p>Edit Profile</p>
+                            <span></span>
+                            </a>
+                            <a href="#" class="sub-menu-link">
+                            <!-- <img src="" alt=""> -->
+                            <i class="fa-regular fa-circle-question"></i>
+                            <p>Help & Support</p>
+                            <span></span>
+                            </a>
+                            <a href="{% url 'changepassword' %}" class="sub-menu-link">
+                            <!-- <img src="" alt=""> -->
+                            <i class="fa-solid fa-key"></i>
+                            <p>Change Password</p>
+                            <span></span>
+                            </a>
+                            <a href="{% url 'logout' %}" class="sub-menu-link">
+                            <!-- <img src="" alt=""> -->
+                            <i class="fa-solid fa-right-from-bracket"></i>
+                            <p>Logout</p>
+                            <span></span>
+                            </a>
+                        </div>
+                    </div>
+                  </div>
+                </div>
+              </nav>
+              
+            {% block content %}
+        
+            <!-- <div class="main p-3" style="height: 100vh; overflow-x: hidden;overflow-y: auto;">
+                
+            </div> -->
+            {% endblock content %}
+        </div>
+       
+    </div>
+<!-- jQuery -->
+<script src='https://code.jquery.com/jquery-3.7.0.js'></script>
+<!-- Data Table JS -->
+<script src='https://cdn.datatables.net/1.13.5/js/jquery.dataTables.min.js'></script>
+<script src='https://cdn.datatables.net/responsive/2.1.0/js/dataTables.responsive.min.js'></script>
+<script src='https://cdn.datatables.net/1.13.5/js/dataTables.bootstrap5.min.js'></script>   
+</body>
+{% block scripts %}
+<Script type="text/javascript" src="{% static 'js/sidebartoggle.js' %}"> </Script>
+
+<Script type="text/javascript" src="{% static 'js/tableattribute.js' %}"> </Script>
+
+
+
+{% endblock scripts %}
+</html>

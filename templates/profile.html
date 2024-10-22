@@ -1,0 +1,122 @@
+{% extends "sidebar.html" %}
+<!-- {% include 'bootstrap_link.html' %} -->
+{% block title %}Site Engineer{% endblock %}
+{% load static %}
+<link rel="stylesheet" href="{% static '/css/formstyle.css' %}">
+{% block content %}
+<div class="card container rounded bg-white mt-3 mb-1">
+ <!-- {% if userdata.profileimage %}
+  {{userdata.profileimage.url}}
+  {% endif%} -->
+  <form action="" method="post" id="profileform" enctype="multipart/form-data">
+  <div class="row">
+   
+      {% csrf_token %}
+      <div class="col-md-3 border-right">
+          
+        <div class="d-flex flex-column align-items-center text-center p-3 py-5">
+          <div>
+            <input type="text" id="profileid" name="profileid" value="{{userdata.id}}" hidden>
+          <img class="rounded-circle mt-5" id="profileimaged"  width="150px" style="height: 150px;"{% if userdata.profileimage %} src="{{userdata.profileimage.url}}" {% else %} src="{% static 'img/OIP.jpg' %}" {% endif%} >
+          <input class="form-control" type="file" name="profileimage" id="profileimage" accept="image/*" style="display: none;">
+          <label for="profileimage" id="openFileBrowser"> <i class="fa-solid fa-camera upload-icon"></i></label>
+        </div>
+          <span class="font-weight-bold">{{userdata.first_name}} {{userdata.last_name}} </span>
+          <span class="text-black-50">{{userdata.user_email}}</span><span>{{userdata.role}} </span>
+          <!-- <span class="upload-icon">&#x1F4C8;</span>  You can use any icon or an <img> here -->
+          </div>
+      </div>
+      <div class="col-md-5 border-right">
+          <div class="p-1 py-3">
+              <div class="d-flex justify-content-between align-items-center mb-3">
+                  <h4 class="text-right">Profile Settings</h4>
+              </div>
+              <div class="row mt-1">
+                  <div class="col-md-6"><label class="labels">Name</label><input name="first_name" type="text" class="form-control" placeholder="first name" value="{{userdata.first_name}}"></div>
+                  <div class="col-md-6"><label class="labels">Surname</label><input name="last_name" type="text" class="form-control" value="{{userdata.last_name}}" placeholder="surname"></div>
+              </div>
+              <div class="row mt-1">
+                  <div class="col-md-12"><label class="labels">Mobile Number</label><input name="phone" type="text" class="form-control" placeholder="enter phone number" value="{{userdata.phone}}"></div>
+                  
+                  <div class="col-md-12"><label class="labels">Email ID</label><input name="email" type="email" class="form-control" placeholder="enter email id" value="{{userdata.user_email}}" {% if  uid == 0 %} readonly {% endif %} ></div>
+                  <div class="item">
+                    <label class="labels">Address</label>
+                    <input type="text" name="add1" placeholder="Street address"
+                    {% if userdata %}
+                    value="{{userdata.add1}}"
+                    {% endif %}/>
+                    <input type="text" name="add2" placeholder="address line 2" 
+                    {% if userdata %}
+                    value="{{userdata.add2}}"
+                    {% endif %}/>
+                    <div class="city-item">
+                      <input type="text" name="city" placeholder="City" required
+                      {% if userdata %}
+                    value="{{userdata.city}}"
+                    {% endif %}/>
+                      <input type="text" name="region" placeholder="State" 
+                      {% if userdata %}
+                    value="{{userdata.region}}"
+                    {% endif %}/>
+                      <input type="text" name="zip" placeholder="Postal / Zip code" 
+                      {% if userdata %}
+                    value="{{userdata.zip}}"
+                    {% endif %}/>
+                      <select name="country" required>
+                        <option value="">{% if recptreport %} "{{recptreport.country}}" {% else %} Country {% endif %}</option>
+                        <option value="India" selected>India</option>
+                        
+                      </select>
+                    </div>
+                  </div>
+                  <!-- <div class="col-md-12"><label class="labels">Education</label><input type="text" class="form-control" placeholder="education" value=""></div> -->
+              </div>
+              <!-- <div class="row mt-3">
+                  <div class="col-md-6"><label class="labels">Country</label><input type="text" class="form-control" placeholder="country" value=""></div>
+                  <div class="col-md-6"><label class="labels">State/Region</label><input type="text" class="form-control" value="" placeholder="state"></div>
+              </div> -->
+              <div class="mt-1 text-center"><button class="btn btn-primary profile-button" type="submit">Save Profile</button></div>
+          </div>
+      </div>
+      <div class="col-md-4">
+          <div class="p-1 py-5">
+              <!-- <div class="d-flex justify-content-between align-items-center experience"><span>Edit Experience</span><span class="border px-3 p-1 add-experience"><i class="fa fa-plus"></i>&nbsp;Experience</span></div><br>
+              <div class="col-md-12"><label class="labels">Experience in Designing</label><input type="text" class="form-control" placeholder="experience" value=""></div> <br>
+              <div class="col-md-12"><label class="labels">Additional Details</label><input type="text" class="form-control" placeholder="additional details" value=""></div> -->
+              <div class="item">
+                <label class="labels"><b>Bank Details</b></label>
+                <input type="text" name="bankname" placeholder="Bank Name"
+                {% if userdata %}
+                value="{{userdata.bankname}}"
+                {% endif %}/>
+                <!-- <input type="text" name="acholdname" placeholder="Account holder name" 
+                {% if recptreport %}
+                value="{{recptreport.add2}}"
+                {% endif %}/> -->
+                <div class="city-item">
+                  <input type="text" name="acno" placeholder="Account number" 
+                  {% if userdata %}
+                value="{{userdata.bankacno}}"
+                {% endif %}/>
+                  <input type="text" name="confacno" placeholder="Repeate account number" 
+                  {% if userdata %}
+                value="{{userdata.bankacnoconf}}"
+                {% endif %}/>
+                  <input type="text" name="ifsc" placeholder="IFSC Code" 
+                  {% if userdata %}
+                value="{{userdata.ifsccode}}"
+                {% endif %}/>
+                  
+                </div>
+              </div>
+          </div>
+      </div>
+  </div>
+
+  </form>
+</div>
+
+
+    
+    {% endblock content %}
+    
