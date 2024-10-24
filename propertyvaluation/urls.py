@@ -38,3 +38,4 @@ urlpatterns = [
     path('banks/<int:uid>', views.banks, name='banks'),
     path('bankmanage', views.bankmanage, name='bankmanage'),
 ]+static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)+static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOTPROFILE) 
+urlpatterns+= static(settings.MEDIA_URL,document_root=settings.MEDIA_ROOTREPORTER)

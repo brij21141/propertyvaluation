@@ -359,6 +359,7 @@ function buildreppendinprogtable(data,id) {
                   <th scope="col">Reporter</th>
                   <th scope="col">Valuation Result</th>
                   <th scope="col">Completed by Reporter on</th>
+                  <th scope="col">View</th>
   </tr>`
   }
   reptableheader.innerHTML=tabhead
@@ -416,7 +417,7 @@ function buildreppendinprogtable(data,id) {
       <td scope="col">${data[i].receptionid.reportpersonname}</td>
       <td scope="col">${data[i].valuationresult}</td>
       <td>${moment((data[i].updated_at).split('T')[0]).format('DD-MM-YYYY')}</td>
-      
+      <td><a href="../../reception/repcompreportpdf/${data[i].id}" id="" type="" target="_blank"> <i class="fa-regular fa-eye"></i></a></td>
       </tr>`
       table.innerHTML += row
     }

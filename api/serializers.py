@@ -41,6 +41,7 @@ class BankSerializer(serializers.HyperlinkedModelSerializer):
         fields = "__all__"      
            
 class ReporterSerializer(serializers.HyperlinkedModelSerializer):
+    id = serializers.ReadOnlyField()
     receptionid=ReceptionfieldsSerializer()
     bankid=BankSerializer()
     class Meta:

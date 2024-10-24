@@ -12,7 +12,6 @@ https://docs.djangoproject.com/en/5.1/ref/settings/
 
 from pathlib import Path
 import os    #to set the path
-import tempfile
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -93,11 +92,8 @@ WSGI_APPLICATION = 'propertyvaluation.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': os.path.join(tempfile.gettempdir(), 'db.sqlite3'),  
-}  
-
-        # 'NAME': BASE_DIR / 'db.sqlite3',
-    
+        'NAME': BASE_DIR / 'db.sqlite3',
+    }
 }
 
 
@@ -146,7 +142,7 @@ MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 MEDIA_ROOTRECEPTION = os.path.join(BASE_DIR, 'media/reception')
 
 MEDIA_ROOTENGINEER = os.path.join(BASE_DIR, 'media/engineer')
-MEDIA_ROOTREPORTER = os.path.join(BASE_DIR, 'media/reporter')
+MEDIA_ROOTREPORTER = os.path.join(BASE_DIR, 'media/reporter/')
 MEDIA_ROOTPROFILE = os.path.join(BASE_DIR, 'media/profile')
 API_BASE_URL = 'http://127.0.0.1:8000/api/'
 

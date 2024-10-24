@@ -1,0 +1,401 @@
+
+<!-- {% extends "sidebar.html" %} -->
+{% include 'bootstrap_link.html' %}
+{% block title %}Reporter report{% endblock %}
+{% load static %}
+
+{% block content %}
+
+  <div class="testbox col-md-8 offset-md-2">
+        
+      <form action="">{% csrf_token %}
+        <div class="banner">
+            <h1>Reporter Property Report</h1>
+        </div>
+            <div class="row my-2">
+                <div class="col-sm-6">
+                    <b> Loan Application Number : </b> {{requestreceived.applicationnumber}}
+                   <br> <b> Date of inspection : </b> {{appdd}}
+                   <br><b> Customer name : </b> {{requestreceived.name}}
+                   <br><b> Document holder name : </b> {{requestreceived.docholdername}}
+                    
+                </div>
+                <div class="col-sm-6">
+                    <b> Type of property : </b> 
+                        <br><input type="radio" id="res" name="propertytype" value="Residential" {% if requestreceived.propertytype == 'Residential' %}checked{% endif %}>
+                        <label for="res">Residential</label>&nbsp;&nbsp;
+                        <input type="radio" id="com" name="propertytype" value="Commercial" {% if requestreceived.propertytype == 'Commercial' %}checked{% endif %}>
+                        <label for="com">Commercial</label>&nbsp;&nbsp;
+                        <input type="radio" id="rescumcom" name="propertytype" value="Residential cum commercial" {% if requestreceived.propertytype == 'Residential cum commercial' %}checked{% endif %}>
+                        <label for="rescumcom">Residential cum commercial</label>&nbsp;&nbsp;
+                        <br><input type="radio" id="indust" name="propertytype" value="Industrial" {% if requestreceived.propertytype == 'Industrial' %}checked{% endif %}>
+                        <label for="indust">Industrial</label>&nbsp;&nbsp;
+                        <input type="radio" id="vacant" name="propertytype" value="Vacant plot" {% if requestreceived.propertytype == 'Vacant plot' %}checked{% endif %}>
+                        <label for="vacant">Vacant plot</label>
+                        
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-sm-6">
+                    <b>Property Address :</b><br>
+                    {{requestreceived.add1}} <br>
+                    {{requestreceived.add2}} <br>
+                    {{requestreceived.city}}, {{requestreceived.region}}, {{requestreceived.zip}} <br>
+                    {{requestreceived.country}} <br>
+                    <b>Land mark :</b>{{requestreceived.landmark}}
+                </div>
+                <div class="col-sm-6">
+                    <b>Legal Address of Property ( House No./ Survey no./ khasra No.) :</b><br>
+                    {{requestreceived.ladd1}} <br>
+                    {{requestreceived.ladd2}} <br>
+                    {{requestreceived.lcity}}, {{requestreceived.lregion}}, {{requestreceived.lzip}} <br>
+                    {{requestreceived.lcountry}}
+                </div>
+            </div> 
+            <div class="row">
+                <b>SURROUNDING LOCALITY DETAILS :</b><br>
+                <div class="col-sm-3">
+                    Ward No./ Municipal land No. {{requestreceived.wardlandno}}
+                </div>
+                <div class="col-sm-3">
+                    Approach Road Width : {{requestreceived.approachroadwidth}}
+                </div>
+                <div class="col-sm-3">
+                    Plot Demarcated at site : {{requestreceived.plotdem}}
+                </div>
+                <div class="col-sm-3">
+                    Vicinity : {{requestreceived.vicinity}}
+                </div>
+            </div>   
+            <div class="row">
+                <div class="col-sm-3">
+                    Property Location :  {{requestreceived.propertylocation}}
+                </div>
+                <div class="col-sm-3">
+                    Property Identification : {{requestreceived.propertyidentification}}
+                </div>
+                <div class="col-sm-3">
+                    </div>
+                <div class="col-sm-3">
+                    </div>
+            </div>   
+            
+        
+        <div class="row">
+            <b>Connectivity/Infrastructure Development :</b>
+          <div class="col-sm-4">
+            Connectivity/Infrastructure : {{requestreceived.connectivityinfrastructure}}
+          </div>
+          <div class="col-sm-4">
+            Railway Station : {{requestreceived.railwaystation}}
+          </div>
+          <div class="col-sm-4">
+            Bus Stop : {{requestreceived.busstop}}
+          </div>
+        </div>
+        <div class="row">
+            <div class="col-sm-4">
+                Hospital : {{requestreceived.hospital}}
+            </div>
+            <div class="col-sm-4">
+                Landmark : {{requestreceived.nearestlandmark}}
+            </div>
+            <div class="col-sm-4">
+
+            </div>
+        </div>
+        <div class="row" >
+          <b>PROPERTY DETAILS :</b>
+              
+            <div class="item col-sm-4">
+                Type of Usage of entire property : {{requestreceived.typeusageproperty}}
+            </div>
+            <div class="item col-sm-4">
+                Additional Amenities : {{requestreceived.additionalamenities}}
+            </div>
+            <div class="item col-sm-4">
+            Legal status of Property : {{requestreceived.legalstatusproperty}}
+            </div>
+        </div>
+        <div class="row">
+            <b>SUBJECT PROPERTY DETAILS :</b>
+            <div class="col-sm-3">
+                Type of Premises : {{requestreceived.typepremises}}
+            </div>
+            <div class="col-sm-3">
+                Taxation/Maintance cost : {{requestreceived.taxationmaintancecost}}
+            </div>
+            <div class="col-sm-3">
+                Renting Potential : {{requestreceived.rentingpotential}}
+            </div>
+            <div class="col-sm-3">
+                Market Rentals : {{requestreceived.marketrentals}}
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-sm-3">
+                Occupied by: {{requestreceived.occupiedby}}
+            </div>
+            <div class="col-sm-3">
+                Is property rented? : {{requestreceived.ispropertyrented}}
+            </div>
+            <div class="col-sm-3">
+                If rented list of occupants : {{requestreceived.listofoccupants}}
+            </div>
+            <div class="col-sm-3">
+
+            </div>
+        </div>
+        <div class="row">
+            <b>Boundary Details As per Document:</b>
+            <div class="col-sm-3">
+                East: {{requestreceived.perdcboundryeast}}
+            </div>
+            <div class="col-sm-3">
+                West: {{requestreceived.perdcboundrywest}}
+            </div>
+            <div class="col-sm-3">
+                North: {{requestreceived.perdcboundrynorth}}
+            </div>
+            <div class="col-sm-3">
+                South: {{requestreceived.perdcboundrysouth}}
+            </div>
+        </div>
+        <div class="row">
+            <b>Boundary Details As per site:</b>
+            <div class="col-sm-3">
+                East: {{requestreceived.perstboundryeast}}
+            </div>
+            <div class="col-sm-3">
+                West: {{requestreceived.perstboundrywest}}
+            </div>
+            <div class="col-sm-3">
+                North: {{requestreceived.perstboundrynorth}}
+            </div>
+            <div class="col-sm-3">
+                South: {{requestreceived.perstboundrysouth}}
+            </div>
+        </div>
+        <div class="row">
+            <b>Structural details:</b>
+            <div class="col-sm-3">
+                Type of structure: {{requestreceived.typestructure}}
+            </div>
+            <div class="col-sm-3">
+                No. of Floors: {{requestreceived.nofloors}}
+            </div>
+            <div class="col-sm-3">
+                No. of Wings: {{requestreceived.nowings}}
+            </div>
+            <div class="col-sm-3">
+                No. of units on each floor: {{requestreceived.nouniteachfloor}}
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-sm-3">
+                No. of lifts in each wing: {{requestreceived.nolifteachwing}}
+            </div>
+            <div class="col-sm-3">
+                Age of the Property: {{requestreceived.ageproperty}}
+            </div>
+            <div class="col-sm-3">
+                Estimated Future Life: {{requestreceived.futurelife}}
+            </div>
+            <div class="col-sm-3">
+                Exteriors: {{requestreceived.exterior}}
+            </div>
+        </div>
+        
+        <div class="row">
+            <b>Quality of Construction</b>
+            <div class="col-sm-6">
+                
+                Appearance & Maintenance of Building: {{requestreceived.constructionquality}}
+            </div>
+            <div class="col-sm-3">
+                Beam & Column Structure: {{requestreceived.beamcolumnstru}}
+            </div>
+            <div class="col-sm-3">
+                Common Areas Remarks: {{requestreceived.commonarearemark}}
+            </div>
+            </div>
+        <div class="row">
+            <b>Internal Composition of property</b>
+            <div class="col-sm-6">
+               Internal Composition of property: {{requestreceived.internalcomposition}}
+            </div>
+            <div class="col-sm-6">
+                Other Observations: {{requestreceived.otherobservation}}
+            </div>
+        </div>
+        <div class="row">
+          <b>Interiors:</b>
+          <div class="col-sm-3">
+            Flooring & finishing: {{requestreceived.floornfinish}}
+          </div>
+          <div class="col-sm-3">
+            Roofing and terracing: {{requestreceived.roofingnterracing}}
+          </div>
+          <div class="col-sm-3">
+            No. Of lifts: {{requestreceived.nooflifts}}
+          </div>
+          <div class="col-sm-3">
+            Quality of fixtures and fittings: {{requestreceived.qualityfixing}}
+          </div>
+        </div>
+        <div class="row">
+          <b>Plan Approvals:</b>
+          <div class="col-sm-6">
+            Construction as per approved/ sanctioned  plans: {{requestreceived.constasperaprove}}
+          </div>
+          <div class="col-sm-6">
+            Details of approved plan  with approval no and date: {{requestreceived.aprnodate}}
+          </div>
+          
+        </div>
+        <div class="row">
+          <div class="col-sm-6">
+            If plans not available then is the structure confirming to the local byelaws: {{requestreceived.confirmlocalbilaws}}
+          </div>
+          <div class="col-sm-6">
+            Violations Observed if Any Or is there any risk of Demolition in case of violation: {{requestreceived.violationifany}}
+          </div>
+          
+        </div>
+        <div class="row">
+          <div class="col-sm-6">
+            Construction permission Number and date: {{requestreceived.constnodate}}
+          </div>
+          <div class="col-sm-6">
+            Other Documents Verified: {{requestreceived.otherverifieddoc}}
+          </div>
+        <div class="row">
+          <b>Valuation (Individual Apartments / flats)</b>
+          <div class="col-sm-6">
+            Carpet Area (Sqft)-Floor-wise: {{requestreceived.carpetareaflwise}}
+          </div>
+          <div class="col-sm-6">
+            Approved BUA / SBUA (Sqft) in Apartment--Floor-wise: {{requestreceived.aprovbuaflwise}}
+          </div>
+        </div>
+        <div class="row">
+          <div class="col-sm-6">
+            Current Govt Approved rates : {{requestreceived.govtapprovalrate}}
+          </div>
+          <div class="col-sm-6">
+            Recommended Rate and basis for recommendation: {{requestreceived.recomendrate}}
+          </div>
+        </div>
+        <div class="row">
+          <b>Final Market value</b>
+          <div class="col-sm-6">
+            Rs. in figure: {{requestreceived.mktvalueinfig}}
+          </div>
+          <div class="col-sm-6">
+            Rs. in words: {{requestreceived.mktvalueinwords}}
+          </div>
+        </div>
+        <div class="row">
+          <b>Forced sale value</b>
+          <div class="col-sm-6">
+            Forced Sale 20 % Less: {{requestreceived.forcessalesless}}
+          </div>
+          <div class="col-sm-6">
+            Area x rate per Sqft: {{requestreceived.arearatepsft}}
+          </div>
+        </div>
+        <div class="row">
+          <div class="col-sm-6">
+            Rs. in figure: {{requestreceived.areavalueinfig}}
+          </div>
+          <div class="col-sm-6">
+            Rs. in words: {{requestreceived.areavalueinwords}}
+          </div>
+        </div>    
+        <div class="row">
+          <div class="col-sm-6">
+            Land Area: {{requestreceived.landarea}}
+          </div>
+          <div class="col-sm-6">
+            Rs. In figures Current Government Approved Rates for land: {{requestreceived.govtaprovelandrate}}
+          </div>
+        </div>    
+        <div class="row">
+          <div class="col-sm-6">
+            Recommended Rate and Basis for recommendation: {{requestreceived.recommendedlandrate}}
+          </div>
+          <div class="col-sm-6">
+            Land value--Land area x Rate per Sqft: {{requestreceived.landvalue}}
+          </div>
+        </div>    
+        <div class="row">
+          <div class="col-sm-6">
+            Actual Bua of the premises(Sqft.): {{requestreceived.actualbua}}
+          </div>
+          <div class="col-sm-6">
+            Bua as per the Approvals(Sqft.): {{requestreceived.asperpermissionbua}}
+          </div>
+        </div>    
+        <div class="row">
+          <div class="col-sm-6">
+            Construction cost as per the Amenities provided. Per Sqft.: {{requestreceived.constcostperaminity}}
+          </div>
+          <div class="col-sm-6">
+            Total value of construction Approved Bua x const cost: {{requestreceived.totalconstvalue}}
+          </div>
+        </div>    
+        <div class="row">
+          <div class="col-sm-12">
+            Depreciated value of Construction: {{requestreceived.depreciatedconstvalue}}
+          </div>
+          </div>
+        <div class="row">
+          <b>Total valuation  Land value+ Depreciated constructed value</b>
+          <div class="col-sm-6">
+            Rs. In Figure: {{requestreceived.landvaluedepndepconstvalueinfig}}
+          </div>
+          <div class="col-sm-6">
+            Rs. In words: {{requestreceived.landvaluedepndepconstvalueinword}}
+          </div>
+        </div>     
+        <div class="row">
+          <b>Forced sale value</b>
+          <div class="col-sm-3">
+            Area x rate per Sqft.: {{requestreceived.forcesalevaluepersqft}}
+          </div>
+          <div class="col-sm-3">
+            Rs. In Figure: {{requestreceived.forcesvalueinfig}}
+          </div>
+          <div class="col-sm-6">
+            Rs. In words: {{requestreceived.forcesvalueinword}}
+          </div>
+        </div>     
+        <div class="row">
+          <div class="col-sm-6">
+            Marketability: {{requestreceived.marketibility}}
+          </div>
+          <div class="col-sm-6">
+            Valuation result: {{requestreceived.valuationresult}}
+          </div>
+         </div>     
+        <div class="row">
+          <div class="col-sm-12">
+            Remarks if any: {{requestreceived.remark}}
+           </div>
+         </div>    
+         {% for document in documents %} 
+         <div class="row">
+          
+          <img src="{{MEDIA_URL}}{{document.file_path}}" alt="">
+          
+         </div>
+         {% endfor %}  
+      </form>
+      
+  </div>
+  
+{% endblock %}
+{% block scripts%}
+<Script type="text/javascript" src="{% static 'js/reporter.js' %}" > </Script>
+<Script type="text/javascript" src="{% static 'js/sidebartoggle.js' %}"> </Script>
+{% endblock scripts%}

@@ -1,5 +1,7 @@
 from django.urls import path
 from . import views
+from django.conf.urls.static import static
+from django.conf import settings
 
 urlpatterns = [
     path('reception',views.add_report,name='receptionreport'),
@@ -9,4 +11,5 @@ urlpatterns = [
     path('add_report/', views.add_report, name='add_report'),
     path('delete_file/<int:doc_id>/', views.delete_file, name='delete_file'),
     path('engcompreportpdf/<int:doc_id>/', views.engcompreportpdf, name='engcompreportpdf'),
+    path('repcompreportpdf/<int:doc_id>/', views.repcompreportpdf, name='repcompreportpdf'),
 ]

@@ -45,14 +45,15 @@
               '<br><strong>City:</strong> ' + maplocation.city +  
               '<br><strong>Landmark:</strong> ' + maplocation.landmark +  
              '<br><strong>Governemnt approved rate:</strong> ' + maplocation.govrate +  
-             '<br><strong>Recommended rate:</strong> ' + maplocation.recomrate +   
+             '<br><strong>Recommended rate:</strong> ' + maplocation.recomrate + 
+             '<br><a href="../../reception/repcompreportpdf/'+maplocation.id+'" target="_blank">Click here for more info</a>' +   
              '</div>'  
-              
+             
           });
           
 
           infoWindow.push(infowindow)
-
+          
           marker.addListener('click', function(){
               infoWindow.forEach(function(iw){
                   iw.close();

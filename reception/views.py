@@ -17,6 +17,7 @@ from reportlab.lib.styles import getSampleStyleSheet
 from reportlab.platypus import Paragraph
 from reportlab.lib.enums import TA_LEFT
 from django.contrib.auth.decorators import login_required
+from reporter.models import ReporterReport
 
 # Create your views here.
 
@@ -416,12 +417,12 @@ def engcompreportpdf(request, doc_id):
     c.drawText(textobjb)
     c.showPage()
     documents = Document.objects.filter(application_number=data["applicationnumber"],reception_idno=data['receptionid']['id'], platform = 'engineer')
-    print (data["applicationnumber"],data['receptionid']['id'],documents)
+    # print (data["applicationnumber"],data['receptionid']['id'],documents)
     i=1
     y=0
     for doc in documents:
         
-        print (doc.file_name)
+        # print (doc.file_name)
         valid_extensions = ('.jpg', '.jpeg', '.png', '.gif', '.bmp', '.tiff')  
         if(doc.file_name.lower().endswith(valid_extensions)):  
             img = Image.open(doc.file_path)
@@ -453,5 +454,13 @@ def engcompreportpdf(request, doc_id):
     return response 
 
     # return FileResponse(buf,as_attachment=True,filename='engreport')
+def repcompreportpdf(request, doc_id):
+    data = ReporterReport.objects.get(pk=doc_id)
+    appdate=data.inspectiondate.strftime("%d-%m-%Y")
+    documents = Document.objects.filter(application_number=data.applicationnumber,reception_idno=data.receptionid.id,platform='reporter')
+    # print(data.receptionid.id)
+    # for document in documents:
+    #     print(document.file_name, document.file_path)
+    return render(request,'reporter/reporterreport.html',{"requestreceived":data,"appdd":appdate,"documents":documents,"MEDIA_URL":settings.MEDIA_URL})
 
 

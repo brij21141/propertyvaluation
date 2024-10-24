@@ -197,10 +197,11 @@ def profile(request, uid):
         userdetails.bankacno = request.POST.get('acno')
         userdetails.ifsccode = request.POST.get('ifsc')
         uploaded_files = request.FILES.getlist('profileimage') 
+        # uploaded_files = request.FILES.['profileimage'] 
         if uploaded_files:    
             for uploaded_file in uploaded_files:
                 newfilename = userdetails.first_name+'_'+str(userdetails.user_id)+'_'+uploaded_file.name
-                print(newfilename, request.POST.get('first_name'))
+                # print(newfilename, request.POST.get('first_name'))
                 file_path = os.path.join(settings.MEDIA_ROOTPROFILE, newfilename)
                 with open(file_path, 'wb+') as destination:
                     for chunk in uploaded_file.chunks():

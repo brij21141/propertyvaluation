@@ -53,6 +53,7 @@ def add_report(request,repid):
         rr.lcountry=rre['lcountry']
         rr.wardlandno=rre['ward']
         rr.approachroadwidth=rre['aroadwidth']
+        rr.plotdem=rre['plotds']
         rr.vicinity=rre['vicinity']
         rr.propertylocation=rre['proplocation']
         rr.propertyidentification=rre['propident']
@@ -304,6 +305,7 @@ def update_report(request,repid):
         rr.lcountry=rre['lcountry']
         rr.wardlandno=rre['ward']
         rr.approachroadwidth=rre['aroadwidth']
+        rr.plotdem=rre['plotds']
         rr.vicinity=rre['vicinity']
         rr.propertylocation=rre['proplocation']
         rr.propertyidentification=rre['propident']
@@ -456,6 +458,7 @@ class Geomapview(View):
 
         for a in eligable_locations: 
             data = {
+                'id':a.id,
                 'lat': float(a.lat), 
                 'lng': float(a.lng), 
                 'name': a.name,

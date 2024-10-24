@@ -24,6 +24,7 @@ class ReporterReport(models.Model):
     lcountry = models.CharField(max_length=20,null=True,default='India')
     wardlandno = models.CharField(max_length=20,null=True)
     approachroadwidth =models.CharField(max_length=20,null=True)
+    plotdem = models.CharField(max_length=20,null=True)
     vicinity=models.CharField(max_length=10,null=True)
     propertylocation=models.CharField(max_length=100,null=True)
     propertyidentification=models.CharField(max_length=100,null=True)

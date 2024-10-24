@@ -50,9 +50,9 @@
                 <label for="dname">Document holder name</label>
                     <input id="dname" name="dname" type="text" class="form-control" placeholder="Enter name"
                     {% if requestreceived %}
-                    value="{{requestreceived.name}}"
+                    value="{{requestreceived.docholdername}}"
                     {% else %}
-                    value="{{recptreport.name}}"
+                    value="{{recptreport.docholdername}}"
                     {% endif %}/>
                   </div>
               
@@ -754,7 +754,7 @@
                     </div>
                     
               </div>
-              <div class="row"></div>
+              <div class="row">
                 <div class="item col-sm-6">
                   <label for="recomndrate">Recommended Rate and Basis for recommendation</label>
                   <input id="recomndrate" name="recomndrate" type="text" class="form-control" placeholder="Enter Recommended rate"
@@ -882,7 +882,7 @@
             <div class="item">
               <label for="remark">Remarks if any</label>
               
-              <textarea id="remark" name="remark" rows="3" class="form-control" placeholder="Enter Remarks"></textarea>
+              <textarea id="remark" name="remark" rows="3" class="form-control" placeholder="Enter Remarks">{{recptreport.remark}}</textarea>
             
           </div>
           <div class="item">
