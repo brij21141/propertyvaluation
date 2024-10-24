@@ -411,7 +411,7 @@ def engcompreportpdf(request, doc_id):
     rgb_img = img.convert('RGB')
     rgb_img.save('llogo.jpg')
     c.drawInlineImage('llogo.jpg',20,-20,25,25)
-    c.drawCentredString(330,30, f"Site Visit Report submitted by: {data["receptionid"]["visitingpersonname"]} ")
+    c.drawCentredString(330,30, f"Site Visit Report submitted by: {data['receptionid']['visitingpersonname']} ")
     c.drawText(textobj)
     c.drawText(textobja)
     c.drawText(textobjb)
