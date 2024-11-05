@@ -16,7 +16,7 @@
             <h1>Reporter Report Form</h1>
             {% endif %}
         </div>
-        <div class="step" id="step1" style="height: 70vh; overflow-x: hidden;overflow-y: auto;">
+    
                 <div class="row">
                 <div class="item col-sm-6">
                     <label for="appno">Loan Application Number</label>
@@ -35,7 +35,7 @@
                   {% endif %}/>
                   <i class="fas fa-calendar-alt"></i>
               </div>
-            </div>
+                </div>
                 <div class="row">
                   <div class="col-sm-6">
                   <label for="custname">Customer name</label>
@@ -251,8 +251,8 @@
             <label for="hosp">Hospital</label>
                   <input id="hosp" name = "hosp" type="text" placeholder="Nearest Hospital in km" class="form-control"
                   {% if recptreport %}
-                  value="{{recptreport.hospital}}"/>
-                  {% endif %}
+                  value="{{recptreport.hospital}}"
+                  {% endif %}/>
           </div>
           <div class="col-sm-3">
           <label for="nlandmark">Landmark</label>
@@ -263,11 +263,9 @@
           </div> 
         </div>
       <div>
-        <button class="btn-btn-sm float-end" type="button" onclick="nextStep(2)">Next</button>
+        <!-- <button class="btn-btn-sm float-end" type="button" onclick="nextStep(2)">Next</button> -->
       </div>
-      </div>  
-    </div>
-        <div class="step" id="step2" style="display:none; height: 70vh; overflow-y: auto;overflow-x: hidden;">
+    
           <p>PROPERTY DETAILS </p>
               <div class="row">
                 <div class="item col-sm-4">
@@ -559,10 +557,9 @@
     {% endif %}/>
     </div>
     </div>
-    <button class="btn-btn-sm float-end" type="button" onclick="nextStep(3)">Next</button>
-    <button class="btn-btn-sm float-end" type="button" onclick="nextStep(1)">Back</button>
-  </div>
-        <div class="step" id="step3" style="display:none; height: 70vh; overflow-y: auto;overflow-x: hidden;">
+    <!-- <button class="btn-btn-sm float-end" type="button" onclick="nextStep(3)">Next</button>
+    <button class="btn-btn-sm float-end" type="button" onclick="nextStep(1)">Back</button> -->
+    
           <div class="row">
             <p>Interiors</p>
             <div class="item col-sm-3">
@@ -915,17 +912,27 @@
               <p>No files are present.</p>
             {% endif %}
           {% endif %}
-
+          <div class="row">
+            <div class="col-sm-4">
+              <button class="btn-btn-sm" type="button" onclick="window.location.href='../reporterhome'">Cancel</button>
+            </div>
+            <div class="col-sm-4">
+          <!-- <button class="" type="button" onclick="window.location.href='../reporterhome'">Cancel</button> -->
           
-            <button class="btn-btn-sm float-end" type="button" onclick="nextStep(2)">Back</button>
+          </div>
+            <!-- <button class="btn-btn-sm float-end" type="button" onclick="nextStep(2)">Back</button> -->
+          <div class="col-sm-4">
           {% if recptreport %}
-            <button class="float-end" type="submit" href="/">Update Application</button>
+            <button class="float-end btn-btn-sm" type="submit" href="/">Update</button>
           {% else %}
-            <button class="float-end" type="submit" href="/">Save Application</button>
+            <button class="float-end btn-btn-sm" type="submit" href="/">Save</button>
           {% endif %}
-            
+        
+          </div>
+        </div>  
         </div>
       </form>
+    </div>
   </div>
   
 {% endblock %}

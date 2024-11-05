@@ -1,7 +1,7 @@
 from rest_framework import serializers
 from site_engineer.models import EngineerReport
 from django.contrib.auth.models import User
-from reception.models import ReceptionReport
+from reception.models import ReceptionReport,Document
 from propval.models import UserDetails,Banks
 from reporter.models import ReporterReport
 
@@ -71,4 +71,7 @@ class ResetPasswordSerializer(serializers.Serializer):
     token = serializers.CharField()
     password = serializers.CharField()
 
-
+class FileUploadSerializer(serializers.Serializer):  
+    class Meta:
+        model = Document
+        fields = "__all__"

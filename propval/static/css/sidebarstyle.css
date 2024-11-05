@@ -282,3 +282,6 @@ a.sidebar-link:hover {
     font-weight: 600;
     color: red; /* Text color */  
 } 
+.spinnervisibility{
+    display: none;
+}

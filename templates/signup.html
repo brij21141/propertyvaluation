@@ -103,4 +103,15 @@
       </div>
     </section>
 </body>
+
+{% if messages %}  
+    <script>  
+        window.onload = function() {  
+                   
+            {% for message in messages %}  
+                swal("Fail!", "{{ message }}", "error");  
+            {% endfor %}  
+        };  
+    </script>  
+{% endif %} 
 </html>

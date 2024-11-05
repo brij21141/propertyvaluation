@@ -190,10 +190,11 @@
                         {% endif %}
 
                         <div class="btn-block">
+                          <button class="btn btn-primary profile-button" type="button" onclick="cancelAction()">Cancel</button>
                           {% if profile %}
-                            <button type="submit" href="/">Update</button>
+                            <button class="btn btn-primary profile-button" type="submit" href="/">Update</button>
                           {% else %}
-                            <button type="submit">Save</button>
+                            <button class="btn btn-primary profile-button" type="submit">Save</button>
                           {% endif %}
                             
                           </div>
@@ -201,4 +202,8 @@
                 
 </div>
 </div>
+<script>  
+  // Store the last accessed URL in localStorage  
+  localStorage.setItem('last_accessed_url', document.referrer);  
+</script>
 {% endblock %}

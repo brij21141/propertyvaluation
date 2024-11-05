@@ -166,10 +166,14 @@
                         {% endif %}
 
                         <div class="btn-block">
+                          
                           {% if recptreport %}
-                            <button type="submit" href="/">Update Application</button>
+                          <button type="button" onclick="window.location.href='../receptionhome'">Cancel</button>  
+                          <button type="submit" href="/">Update</button>
+
                           {% else %}
-                            <button type="submit">Save Application</button>
+                          <button type="button" onclick="window.location.href='receptionhome'">Cancel</button>
+                            <button type="submit">Save</button>
                           {% endif %}
                             
                           </div>

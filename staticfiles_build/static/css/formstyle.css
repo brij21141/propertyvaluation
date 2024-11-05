@@ -1,0 +1,242 @@
+html, body {
+  min-height: 100%;
+  }
+  body, div, form, input, select, textarea, p { 
+  padding: 0;
+  margin: 0;
+  outline: none;
+  font-family: Roboto, Arial, sans-serif;
+  font-size: 14px;
+  color: #666;
+  line-height: 22px;
+  }
+  h1 {
+  position: absolute;
+  margin: 0;
+  font-size: 38px;
+  color: #fff;
+  z-index: 2;
+  }
+  .testbox {
+  display: flex;
+  width: 70%;
+  justify-content: center;
+  align-items: center;
+  /* height: inherit; */
+  padding: 20px;
+  }
+  form {
+  width: 100%;
+  padding: 20px;
+  border-radius: 6px;
+  background: #fff;
+  box-shadow: 0 0 25px 0 #892e9b; 
+  }
+  .banner {
+  position: relative;
+  height: 10vh;
+  background-image: url("https://www.w3docs.com/uploads/media/default/0001/01/c43630149befa5c9559813f72e99bcb6bf149e62.jpeg");  
+  background-size: cover;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  }
+  .banner::after {
+  content: "";
+  background-color: rgba(0, 0, 0, 0.3); 
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  }
+  input, select, textarea {
+  margin-bottom: 10px;
+  border: 1px solid #ccc;
+  border-radius: 3px;
+  }
+  input {
+  /* width: calc(100% - 10px); */
+  padding: 5px;
+  }
+  input[type="text"] {
+    width: calc(100% - 10px);
+    padding: 5px;
+    }
+  input[type="date"] {
+  width: calc(100% - 10px);
+  padding: 4px 5px;
+  }
+  select {
+  width: 100%;
+  padding: 5px 0;
+  background: transparent;
+  }
+  textarea {
+  width: calc(100% - 12px);
+  padding: 5px;
+  }
+  .item:hover p, .item:hover i, .question:hover p, .question label:hover, input:hover::placeholder {
+  color: #892e9b;
+  }
+  .item input:hover, .item select:hover, .item textarea:hover {
+  border: 1px solid transparent;
+  box-shadow: 0 0 6px 0 #892e9b;
+  color: #892e9b;
+  }
+  .item {
+  position: relative;
+  margin: 10px 0;
+  }
+  input[type="date"]::-webkit-inner-spin-button {
+  display: none;
+  }
+  .item i, input[type="date"]::-webkit-calendar-picker-indicator {
+  position: absolute;
+  font-size: 20px;
+  color: #a9a9a9;
+  }
+  .item i {
+  right: 6%;
+  top: 30px;
+  z-index: 1;
+  }
+  [type="date"]::-webkit-calendar-picker-indicator {
+  right: 6%;
+  z-index: 2;
+  opacity: 0;
+  cursor: pointer;
+  }
+  /* input[type=radio], input[type=checkbox]  {
+  display: none;
+  } */
+  /* label.radio {
+  position: relative;
+  display: inline-block;
+  margin: 5px 20px 15px 0;
+  cursor: pointer;
+  } */
+  .question span {
+  margin-left: 30px;
+  }
+  /* label.radio:before {
+  content: "";
+  position: absolute;
+  left: 0;
+  width: 17px;
+  height: 17px;
+  border-radius: 50%;
+  border: 2px solid #ccc;
+  } */
+  /* input[type=radio]:checked + label:before, label.radio:hover:before {
+  border: 2px solid #892e9b;
+  }
+  label.radio:after {
+  content: "";
+  position: absolute;
+  top: 6px;
+  left: 5px;
+  width: 8px;
+  height: 4px;
+  border: 3px solid #892e9b;
+  border-top: none;
+  border-right: none;
+  transform: rotate(-45deg);
+  opacity: 0;
+  }
+  input[type=radio]:checked + label:after {
+  opacity: 1;
+  } */
+  .btn-block {
+  margin-top: 10px;
+  text-align: center;
+  }
+  button {
+  width: 150px;
+  padding: 10px;
+  border: none;
+  border-radius: 5px; 
+  background: #892e9b;
+  font-size: 16px;
+  color: #fff;
+  cursor: pointer;
+  }
+  button:hover {
+  background: #b52ed1;
+  }
+  @media (min-width: 568px) {
+  .name-item, .city-item {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  }
+  .radioinput{
+    width: calc(100% - 10px);
+    justify-content: space-between;
+  }
+  .name-item input, .city-item input {
+  width: calc(50% - 10px);
+  }
+  .city-item select {
+  width: calc(50% - 8px);
+  }
+  }
+
+  /* profile css */
+  .form-control:focus {
+    box-shadow: none;
+    border-color: #BA68C8
+}
+
+.profile-button {
+    background: rgb(99, 39, 120);
+    box-shadow: none;
+    border: none
+}
+
+.profile-button:hover {
+    background: #682773
+}
+
+.profile-button:focus {
+    background: #682773;
+    box-shadow: none
+}
+
+.profile-button:active {
+    background: #682773;
+    box-shadow: none
+}
+
+.back:hover {
+    color: #682773;
+    cursor: pointer
+}
+
+.labels {
+    font-size: 11px
+}
+
+.add-experience:hover {
+    background: #BA68C8;
+    color: #fff;
+    cursor: pointer;
+    border: solid 1px #BA68C8
+}
+
+.upload-icon {  
+    position: absolute;  
+    transform: translatex(-150%);  
+    font-size: 2em; /* Adjust icon size */  
+    color: #666; /* Adjust icon color */
+    cursor: pointer;  
+    margin-top: 60px;
+}
+
+/* for gmap css */
+.mapholder{
+    height: 500px;
+    width: 100%;
+}
+#map{
+    height: 100%;
+}

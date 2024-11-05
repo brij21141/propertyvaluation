@@ -45,13 +45,24 @@
                       <div class="item">
                           <label for="bankname">Bank</label>
                         <div class="name-item">
-                          <input id="bankname" name="bankname" type="text" class="form-control" placeholder="Enter bank name"
+                          <!-- <input id="bankname" name="bankname" type="text" class="form-control" placeholder="Enter bank name"
                           {% if requestreceived %}
                           value="{{requestreceived.bankname}}"
                           {% else %}
                           value="{{recptreport.bankname}}"
-                          {% endif %}/>
-                          
+                          {% endif %}/> -->
+                          <select class="form-select" aria-label="Default select example" name="bankid" required>
+                            <option value="0" >Select Bank</option>
+                            {% for bk in banks %}
+                            <!-- {{er.user_id}} -->
+                            {% if bk.id == recptreport.bankid  %}
+                            <option value="{{bk.id}}" selected >{{bk.name}} {{bk.branch}} {{bk.city}}</option>
+                            {% else %}
+                            <option value="{{bk.id}}" >{{bk.name}} {{bk.branch}} {{bk.city}}</option>
+                            {% endif %}
+                            {%  endfor %}
+                            
+                          </select>
                       </div>
 
                       <div class="item">
@@ -289,10 +300,11 @@
     {% endif %}
 
     <div class="btn-block">
+      <button type="button" onclick="window.location.href='../engineerhome'">Cancel</button>
     {% if recptreport %}
-      <button type="submit" href="/">Update Application</button>
+      <button type="submit" href="/">Update</button>
     {% else %}
-      <button type="submit" href="/">Save Application</button>
+      <button type="submit" href="/">Save</button>
     {% endif %}
       
     </div>

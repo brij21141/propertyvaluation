@@ -75,6 +75,15 @@ document.getElementById('profileimage').onchange = function(event) {
 };
 
 
+  function cancelAction() {  
+    // Get the last accessed URL from localStorage  
+    const lastUrl = localStorage.getItem('last_accessed_url') || '/default-url/';  
+    
+    // Redirect to the last accessed URL  
+    window.location.href = lastUrl;  
+}  
+
+
 
 
 

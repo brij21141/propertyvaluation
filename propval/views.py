@@ -19,7 +19,7 @@ from django.template.loader import get_template
 from io import BytesIO
 from xhtml2pdf import pisa
 from django.views import View
-from django.db.models import Count, Case, When, IntegerField, Q,OuterRef, Subquery
+from django.db.models import OuterRef, Subquery
 from rest_framework import viewsets  
 from .models import UserActivity  
 from .serializers import UserActivitySerializer
@@ -110,6 +110,7 @@ def Home(request):
             submitted_count=Count('userdetailsid_id'), 
             other_count=Subquery(reporter_count_subquery)  # Total count of visitingperson using subquery     
         ).order_by('receptionid__reportperson')
+        print(queryset)
         allreports = ReceptionReport.objects.all()
         return render (request,'home.html',{'userdata':userdetails,'usno':dictusersno,'recpreports':recpreport,'totrep':totrep,'context':context,'repwise':queryset,'allreports':allreports})
     elif user_details.role == 'Engineer':
@@ -131,14 +132,25 @@ def Signup(request):
         uconfpassword = request.POST.get('confpassword')
         role = request.POST.get('role')
         if upassword!=uconfpassword:
-           return HttpResponse('Password and confirm password does not match')
+        #    return HttpResponse('Password and confirm password does not match')
+            messages.success(request, "Password and confirm password does not match!")  
+            return redirect('signup')  
+        #    return JsonResponse({'error': 'confpassword','message': 'Password and confirm password does not match'})
         #else:
-        my_user = User.objects.create_user(uemail,uemail,upassword)
-        my_user.save()
-        UserDetails.objects.create(user=my_user,first_name=ufname,last_name=ulname,role=role)
+        try:  
+            user = User.objects.get(username=uemail)  
+            # return HttpResponse('User or email already exists') 
+            # return JsonResponse({'error': 'userexists','message': 'User or email already exists'})
+            messages.success(request, "User or email already exists!")  
+            return redirect('signup')  
+        except User.DoesNotExist:  
+            my_user = User.objects.create_user(uemail,uemail,upassword)
+            my_user.save()
+            UserDetails.objects.create(user=my_user,first_name=ufname,last_name=ulname,role=role)
        # return HttpResponse('User has been created')
-        return redirect('login')
-        print(uemail,upassword,uconfpassword)
+            return redirect('home')
+        # return redirect('login')
+        # print(uemail,upassword,uconfpassword)
     return render (request,'signup.html')
 
 def Signin(request):
@@ -173,7 +185,8 @@ def changepassword(request):
         fm=PasswordChangeForm(user=request.user)
     return render(request,'changepassword.html',{'fm':fm})
 
-def profile(request, uid):
+    
+def profile(request, uid=0):
     if(uid == 0):
         userdetails = UserDetails.objects.filter(user_email=request.user.email).first()
     else:
@@ -182,7 +195,7 @@ def profile(request, uid):
     if not userdetails:
         return HttpResponse('User data does not exist')
     if request.method == 'POST':
-        print(userdetails.first_name)
+        print(userdetails.first_name , userdetails.last_name)
         userdetails.first_name = request.POST.get('first_name')
         userdetails.last_name = request.POST.get('last_name')
         userdetails.user_email = request.POST.get('email')
@@ -214,6 +227,7 @@ def profile(request, uid):
         else:
             return redirect('home')
     return render (request,'profile.html',{'userdata':userdetails,'uid':uid})
+
 
 # @require_POST
 def del_user(request,uid,udid):
@@ -344,6 +358,7 @@ def generatebill(request):
 def bill(request, uid):
     # bills=ReceptionReport.objects.filter(reporter='Submitted')
     bills=ReporterReport.objects.filter(pk=uid)
+    print(bills)
     # print(ReporterReport.objects.get(pk=uid).bankid_id)
     banks=Banks.objects.get(pk=ReporterReport.objects.get(pk=uid).bankid_id)
     company = CompanyProfile.objects.first()
@@ -355,7 +370,7 @@ def bills(request,uid=None):
     bills=ReporterReport.objects.filter(bankid=uid)
     banks=Banks.objects.get(pk=uid)
     company = CompanyProfile.objects.first()
-    print(company.name)
+    # print(company.name)
     # appdate=bills.applicationdate.strftime("%Y-%m-%d")
     return render(request, 'bills/bill.html',{'bills': bills,'banks': banks,'company':company})
 

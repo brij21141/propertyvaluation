@@ -156,7 +156,11 @@ def receptionhome(request):
 def del_report(request,repid):
     # print (repid)
     rr=ReceptionReport.objects.get(pk=repid)
-    rr.delete()
+    if rr.engineer == 'Submitted' or rr.reporter == 'Submitted':
+        totno=ReceptionReport.objects.all().count()
+        return JsonResponse({'success': False,'message': 'Cannot delete record. Report is in submitted state.','total': totno})
+    else:
+        rr.delete()
     totno=ReceptionReport.objects.all().count()
     print(totno)
     return JsonResponse({'success': True,'message': 'Record removed successfully','total': totno})

@@ -26,6 +26,9 @@ from django_rest_passwordreset.signals import reset_password_token_created
 from django.core.mail import send_mail
 from django.urls import reverse
 from django_rest_passwordreset.models import ResetPasswordToken
+import os
+from django.conf import settings
+from reception.models import Document
 
 
 
@@ -493,7 +496,7 @@ class EngineerViewSet(viewsets.ModelViewSet):
 #http://127.0.0.1:8000/api/engineer/createengreport/     adding record of eng report api
      @action(detail=False, methods=['post'])
      def createengreport(self, request, pk=None):
-          queryset = EngineerReport.objects.all()
+      #     queryset = EngineerReport.objects.all()
           serializer_class=EngineerCreateSerializer(data=request.data,context={'request':request})
           if serializer_class.is_valid():  
             serializer_class.save()  
@@ -702,4 +705,46 @@ class ResetPasswordConfirmView(generics.GenericAPIView):
             reset_password_token.delete()
             return Response({"message": "Password has been reset successfully."}, status=status.HTTP_200_OK)
         return Response({"message": "Invalid or expired token."}, status=status.HTTP_400_BAD_REQUEST)
-          
+class DocumentUploadView(APIView):  
+    def post(self, request,recid):  
+        # Extract common metadata from the request  
+      #   serializer = DocumentSerializer(data=request.data)  
+      #   if serializer.is_valid(): 
+        application_number = request.data.get('application_number')  
+        reception_idno = request.data.get('reception_idno')  
+        username = request.data.get('username')  
+        role = request.data.get('role')  
+        usersdetailsid = request.data.get('usersdetailsid')  
+        platform = request.data.get('platform')  
+
+        # Check if file data is provided  
+        if not request.FILES:  
+            return Response({'message': 'No files provided.'}, status=status.HTTP_400_BAD_REQUEST)  
+
+        # Handle the file uploads  
+        for file_data in request.FILES.getlist('files'):  
+            upload_dir = os.path.join(settings.MEDIA_ROOT, 'engineer')  
+            os.makedirs(upload_dir, exist_ok=True)  
+
+            # Define the full path for the file  
+            newfilename = application_number + "_"+str(recid)+"_" + file_data.name
+            file_path = os.path.join(upload_dir, newfilename)  
+            # Save the uploaded file  
+            with open(file_path, 'wb+') as destination:  
+                for chunk in file_data.chunks():  
+                    destination.write(chunk)  
+
+            # Create a new Document instance for each file  
+            Document.objects.create(  
+                application_number=application_number,  
+                reception_idno=reception_idno,  
+                username=username,  
+                role=role,  
+                usersdetailsid=usersdetailsid,  
+                platform=platform,  
+            #     file_path=os.path.join('engineer', file_data.name),  # Save the relative path  
+                file_path=file_path,  
+                file_name=newfilename,  
+            )  
+
+        return Response({'message': 'Files uploaded successfully.'}, status=status.HTTP_201_CREATED)            

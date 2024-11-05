@@ -124,6 +124,7 @@ GOOGLE_MAPS_API_KEY = 'AIzaSyCfgnTSvVbxXARla1ToRRvMT96uDPcfvrU'
 LANGUAGE_CODE = 'en-us'
 
 TIME_ZONE = 'UTC'
+# TIME_ZONE = 'Asia/Kolkata'
 
 USE_I18N = True
 

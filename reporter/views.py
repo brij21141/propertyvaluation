@@ -13,6 +13,7 @@ from django.conf import settings
 from django.core.files.storage import default_storage
 from propval.models import Banks
 import os
+from django.utils import timezone
 # Create your views here.
 
 def add_report(request,repid):
@@ -37,7 +38,11 @@ def add_report(request,repid):
         rr.inspectiondate = rre['inspdate']
         rr.name=rre['custname']
         rr.docholdername=rre['dname']
-        rr.propertytype=rre['propertytype']
+        # print(rre['propertytype'])
+        try:
+            rr.propertytype=rre['propertytype']
+        except Exception as e:
+            rr.propertytype=None
         rr.add1=rre['add1']
         rr.add2=rre['add2']
         rr.city=rre['city']
@@ -177,6 +182,7 @@ def add_report(request,repid):
         rr.save()
         rr=EngineerReport.objects.get(applicationnumber=rre['appno'],pk=repid)
         rr.reporter='Submitted'
+        rr.reportersubmitdate=timezone.now()
         rr.save()
         
         # print(request.POST.get("nala"))

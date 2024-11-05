@@ -2,7 +2,7 @@ from django.shortcuts import render, redirect,get_object_or_404
 from site_engineer.models import EngineerReport
 from reception.models import ReceptionReport,Document
 from datetime import datetime
-from propval.models import UserDetails
+from propval.models import UserDetails,Banks
 from django.contrib import messages
 from django.core.files.storage import default_storage
 from django.http import HttpResponseRedirect,JsonResponse
@@ -26,7 +26,9 @@ def add_report(request,repid):
         app_number = request.POST.get("appno")
         app_name = request.POST.get("name")
         visitinpresence = request.POST.get("presence")
-        app_bankname = request.POST.get("bankname")
+        # app_bankname = request.POST.get("bankname")
+        app_bankname = Banks.objects.get(pk=request.POST.get("bankid")).name
+        app_bankid = request.POST.get("bankid")
         casetype = request.POST.get("case")
         app_add1 = request.POST.get("add1")
         app_add2 = request.POST.get("add2")
@@ -65,6 +67,7 @@ def add_report(request,repid):
         er.name = app_name
         er.visitinpresence = visitinpresence
         er.bankname = app_bankname
+        er.bankid = app_bankid
         er.casetype = casetype
         er.add1 = app_add1
         er.add2 = app_add2
@@ -156,7 +159,8 @@ def add_report(request,repid):
     # print(repid)
     # receivedrequest=ReceptionReport.objects.all().filter(id=repid).values
     rr=ReceptionReport.objects.get(pk=repid)
-    return render(request,"engineer/engineersiteform.html",{'requestreceived':rr})
+    banks= Banks.objects.all().values('id','name','branch','city')
+    return render(request,"engineer/engineersiteform.html",{'requestreceived':rr,'banks':banks})
 
 def engineerhome(request):
     if request.method =='POST':
@@ -223,7 +227,9 @@ def update_report(request,repid):
         app_number = request.POST.get("appno")
         app_name = request.POST.get("name")
         visitinpresence = request.POST.get("presence")
-        app_bankname = request.POST.get("bankname")
+        # app_bankname = request.POST.get("bankname")
+        app_bankname = Banks.objects.get(pk=request.POST.get("bankid")).name
+        app_bankid = request.POST.get("bankid")
         casetype = request.POST.get("case")
         app_add1 = request.POST.get("add1")
         app_add2 = request.POST.get("add2")
@@ -263,6 +269,7 @@ def update_report(request,repid):
         er.name = app_name
         er.visitinpresence = visitinpresence
         er.bankname = app_bankname
+        er.bankid = app_bankid
         er.casetype = casetype
         er.add1 = app_add1
         er.add2 = app_add2
@@ -351,7 +358,8 @@ def update_report(request,repid):
     print(recid)
     # appdate=rr.applicationdate.strftime("%Y-%m-%d")
     documents = Document.objects.filter(application_number=rr.applicationnumber,reception_idno=recid, platform = 'engineer')
-    return render(request,'engineer/engineersiteform.html',{'recptreport':rr,'documents':documents})
+    banks= Banks.objects.all().values('id','name','branch','city')
+    return render(request,'engineer/engineersiteform.html',{'recptreport':rr,'documents':documents,'banks':banks})
 
 def delete_file(request, doc_id):
     try:

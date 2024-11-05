@@ -13,7 +13,7 @@ from django.contrib.auth.models import User
 
 
 class UserDetails(models.Model):
-    user = models.OneToOneField(User, on_delete=models.CASCADE)
+    user = models.OneToOneField(User, on_delete=models.DO_NOTHING)
     user_email = models.EmailField(unique=True, null=True, blank=True)
     first_name = models.CharField(max_length=30, null=True, blank=True)
     last_name = models.CharField(max_length=30, null=True, blank=True)  # Allow null and blank values

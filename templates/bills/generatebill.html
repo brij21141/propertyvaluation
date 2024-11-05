@@ -41,6 +41,7 @@
                 </thead>
                 <tbody>
                   {% for reqcom in bills %}
+                  
                   <tr {% if reqcom.receptionid.priority%}  class="table-danger" {%else%} class=""{% endif %}>
                     <td scope="row">{{forloop.counter}}</td>
                     <!-- <td >{{recrep.id}}</td> -->

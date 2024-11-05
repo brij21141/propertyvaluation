@@ -350,7 +350,7 @@
                     {% endif %}
                     <td><a class="delet" data-url="{% url 'deluser' recrep.user.id recrep.id %}" href="#" class="btn btn-danger btn-sm" >
                       <i class="fa fa-trash" aria-hidden="true"></i></a>&nbsp;&nbsp;&nbsp;
-                      <a href="{% url 'profile'  recrep.id %} " class=""><i class="fa fa-pencil" aria-hidden="true"></i></a>
+                      <a href="{% url 'profile'  recrep.id %}" class=""><i class="fa fa-pencil" aria-hidden="true"></i></a>
                     </td> 
                     </tr>
                   {% endfor %}
@@ -399,7 +399,9 @@
                         </tr>
                       </thead>
                       <tbody id="engcomptable">
-                        
+                        <div class="text-center">
+                          <div id="engspinner" class="spinner-border text-primary" role="status"></div>
+                        </div>
                       </tbody>
                     </table>
                   </div>
@@ -445,7 +447,9 @@
                   </tr> -->
                 </thead>
                 <tbody id="reptable">
-                  
+                  <div class="text-center">
+                  <div id="reportspinner" class="spinner-border text-primary" role="status"></div>
+                  </div>
                 </tbody>
               </table>
             </div>

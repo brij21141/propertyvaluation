@@ -1,7 +1,7 @@
 from django.urls import path,include 
 from . import views
 from .views import LoginAPI, LogoutAPI,EngineerViewSet,UserViewSet,ReceptionViewSet,ReporterViewSet,UserProfileUpdateView,UserdetailViewSet
-from .views import ResetPasswordRequestView, ResetPasswordConfirmView,BankViewSet
+from .views import ResetPasswordRequestView, ResetPasswordConfirmView,BankViewSet,DocumentUploadView
 from rest_framework import routers
 
 router = routers.DefaultRouter()
@@ -15,6 +15,7 @@ router.register(r'bank',BankViewSet)
 urlpatterns = [
     # to get all users api
     path('profile/update/<int:pk>/', UserProfileUpdateView.as_view(), name='profile-update'),
+    path('engfilesupload/<int:recid>/', DocumentUploadView.as_view(), name='engfile-upload'),  
     path('all-users',views.allUsers,name='alluserapi'),
     path('currentuser',views.currentUser,name='currentuserapi'),
     path('export',views.export,name='exportalluserapi'),

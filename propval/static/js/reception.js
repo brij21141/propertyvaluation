@@ -96,8 +96,14 @@ $(document).ready(function() {
         event.preventDefault();
         var button = $(this);
         var url = button.data('url');
-        
-       console.log(url);
+        swal({  
+          title: "Are you sure?",  
+          text: "You will not be able to recall this record!",  
+          icon: "warning",  
+          buttons: true,  
+          dangerMode: true,  
+      }).then((willDelete) => {  
+          if (willDelete) {  
         $.ajax({
             url: url,
             type: 'GET',
@@ -111,10 +117,23 @@ $(document).ready(function() {
                   $('#totrecrep').text('');
                   $('#totrecrep').text(response.total);
                 } else {
-                    alert('Error: ' + response.error);
+                  $('#totrecrep').text('');
+                  $('#totrecrep').text(response.total);
+                  swal({  
+              
+                    text: response.message,  
+                    
+                    button: "Okay",  
+                });
+                  // alert('Error: ' + response.message);
                 }
             }
         });
+      } else {  
+        // Optionally do something when cancelled  
+        swal("Record is safe!");  
+    }  
+});  
     });
   });
 
@@ -148,6 +167,7 @@ $(document).ready(function() {
 // eye view of reception dasboard modal heading fix here modhead---->modal head
   let modhead=document.getElementById('modhead');  
   let repmodhead=document.getElementById('repmodhead');
+  let engspinner=document.getElementById('engspinner');
   $(document).ready(function() {
     $('#engcomp').click(function(event) {
         var fullApiUrl = apiBaseUrl + 'engineer/engineercomjob/';
@@ -161,6 +181,7 @@ $(document).ready(function() {
             success: function(response) {
                 if (response.success) {
                   engArray=response.data;  
+                  engspinner.classList.add('spinnervisibility') 
                   buildtable(engArray);  
                   modhead.innerHTML='Completed by Engineers'; 
                 } else {
@@ -200,6 +221,7 @@ $(document).ready(function() {
                 // console.log(response.data);
                 engArray=response.data;  
                 buildpendinprogtable(engArray);  
+                engspinner.classList.add('spinnervisibility')
                 modhead.innerHTML='Pending Jobs';
               } else {
                   alert('Error: ' + response.error);
@@ -223,6 +245,7 @@ $(document).ready(function() {
           success: function(response) {
               if (response.success) {
                 engArray=response.data;  
+                engspinner.classList.add('spinnervisibility')
                 buildpendinprogtable(engArray);  
                 modhead.innerHTML='Inprogress Jobs';
               } else {
@@ -275,6 +298,7 @@ for (var i=0; i<data.length; i++) {
   function repview(id){
     // console.log(id)
   // $('#reppend').click(function(event) {
+    reportspinner=document.getElementById('reportspinner');
   if (id=='rephold') {
     var fullApiUrl = apiBaseUrl + 'reporter/reporterholdjob/';
   }else if(id=='reppend') {
@@ -302,7 +326,8 @@ for (var i=0; i<data.length; i++) {
             // console.log(response.data);
               if (response.success) {
                 console.log(response.data);
-                repArray=response.data;  
+                repArray=response.data; 
+                reportspinner.classList.add('spinnervisibility') 
                 buildreppendinprogtable(repArray,id);  
                 
               } else {
