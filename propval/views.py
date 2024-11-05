@@ -49,7 +49,7 @@ def Home(request):
     # ,role_count_dict['Reception'],role_count_dict['Engineer'],role_count_dict['Reporter']
     # for rlcd in role_count_dict :
     #     userno.append(entry['user_count'])
-    print(userno1)
+    # print(userno1)
     dictusersno={
       "usersno":[]
     }
@@ -59,7 +59,7 @@ def Home(request):
     dictusersno["usersno"].append(role_count_dict['Engineer']) 
     dictusersno["usersno"].append(role_count_dict['Reporter']) 
 
-    userdetails = UserDetails.objects.select_related('user').all()
+    userdetails = UserDetails.objects.select_related('user').exclude(user__last_name='deleted') 
 
     user_details = UserDetails.objects.filter(user_email=request.user.email).first()
 
@@ -233,7 +233,9 @@ def profile(request, uid=0):
 def del_user(request,uid,udid):
     print (uid,udid)
     u=User.objects.get(pk=uid)
-    u.delete()
+    u.last_name='deleted'
+    u.save()
+    # u.delete()
     # ud=UserDetails.objects.get(pk=udid)
     # ud.delete()
     return JsonResponse({'success': True,'message': 'User removed successfully'})
