@@ -463,10 +463,16 @@ $(document).ready(function() {
   $('#globalsearchengineertable_filter').hide(); 
   $('#searchquery').on('keyup', function() { 
     // $('#globalsearchmodal').modal('show')
+    window.scrollTo({  
+      top: 0,   
+      behavior: 'smooth'   
+  });
       var searchValue = this.value;
       if (searchValue.length > 0) {  
           // $('#myTable').show(); // Show the table 
-          document.getElementById("globalengtablediv").style.display = "block";  
+          console.log('checkscroll2'); //
+          document.getElementById("globalengtablediv").style.display = "block"; 
+          document.getElementById('globalengtablediv').scrollIntoView({ behavior: 'smooth' }); 
       } else {  
           // $('#myTable').hide(); // Hide the table  
           document.getElementById("globalengtablediv").style.display = "none";

@@ -14,35 +14,35 @@
           <div class="col-md-2">
               <div class="card text-center widget-card border-light shadow-sm" style="background-image: url('{% static "img/cardprog.jpg" %}'); ">
                   <div class="card-body">
-                    <span id="totreq">{{totreq}}</span> <br><br>Request Received
+                    <span id="totreq" class="circle">{{totreq}}</span> <br><h6>Request Received</h6>
                   </div>
                 </div>
           </div>
           <div class="col-md-2">
               <div class="card text-center widget-card border-light shadow-sm" style="background-image: url('{% static "img/cardprog.jpg" %}'); ">
                   <div class="card-body">
-                    <span id="pending">{{pending}}</span> <br><br>Request Pending
+                    <span id="pending" class="circle">{{pending}}</span> <br><h6>Request Pending</h6>
                   </div>
                 </div>
           </div>
           <div class="col-md-2">
               <div class="card text-center widget-card border-light shadow-sm" style="background-image: url('{% static "img/cardprog.jpg" %}'); ">
                   <div class="card-body">
-                    <span id="inprogress">{{inprogress}}</span> <br><br>Request in Progress
+                    <span id="inprogress" class="circle">{{inprogress}}</span> <br><h6>Request in Progress</h6>
                   </div>
                 </div>
           </div>
           <div class="col-md-2">
             <div class="card text-center widget-card border-light shadow-sm" style="background-image: url('{% static "img/cardprog.jpg" %}'); ">
                 <div class="card-body">
-                  <span id="hold">{{hold}}</span> <br><br>Request on hold
+                  <span id="hold" class="circle">{{hold}}</span> <br><h6>Request on hold</h6>
                 </div>
               </div>
         </div>
           <div class="col-md-2">
               <div class="card text-center widget-card border-light shadow-sm" style="background-image: url('{% static "img/cardprog.jpg" %}'); ">
                   <div class="card-body">
-                  <span id="compreq">{{compreq}}</span> <br><br> Request Completed
+                  <span id="compreq" class="circle">{{compreq}}</span> <br><h6>Request Completed</h6>
                   </div>
                 </div>
           </div>
@@ -51,7 +51,7 @@
             <div class="card text-center widget-card border-light shadow-sm" style="background-image: url('{% static "img/mapbg.png" %}'); ">
                 <div class="card-body">
                 
-                  <i class="fa-solid fa-map-location-dot"></i><br><br>View map
+                  <i class="fa-solid fa-map-location-dot"></i><br><br><span style="font-weight:500;">View map</span>
                 
                 </div></a>
               </div>
@@ -61,9 +61,7 @@
   
   <!-- Global search table -->
 
-  <div class="container my-2" id="globalengtablediv" style="display:none; background-color:#f6f6f6; padding:20px 20px 20px;">
-    <p>All Task with status</p>
-            
+  <div class="container my-2" id="globalengtablediv" style="display:none; background-color:#30527b; padding:80px 10px 10px;">
     <div class="row">
       <div class="col-md-12">
         <div class="card">
@@ -124,6 +122,7 @@
                 
                 {% endfor %}
               </tbody>
+              <tfoot><h6 class="blink">Search Result</h6></tfoot>
             </table>
           </div>
         </div>

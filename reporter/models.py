@@ -1,6 +1,6 @@
 from django.db import models
 from django.contrib.auth.models import User
-from reception.models import ReceptionReport
+from reception.models import ReceptionReport,ArchieveReceptionReport
 from propval.models import Banks
 
 class ReporterReport(models.Model):
@@ -105,7 +105,7 @@ class ReporterReport(models.Model):
     lat = models.CharField(max_length=200,null=True,blank=True)
     lng = models.CharField(max_length=200,null=True,blank=True)
     placeid = models.CharField(max_length=200,null=True,blank=True)
-    receptionid = models.ForeignKey(ReceptionReport, on_delete=models.SET_NULL, null=True, blank=True)
+    receptionid = models.ForeignKey(ReceptionReport, on_delete=models.DO_NOTHING, null=True, blank=True)
     bankid = models.ForeignKey(Banks,on_delete=models.SET_NULL, null=True, blank=True)
     userdetailsid = models.ForeignKey(User, on_delete=models.DO_NOTHING)
     archieved = models.BooleanField(default=False)
@@ -216,7 +216,9 @@ class ArchieveReporterReport(models.Model):
     lat = models.CharField(max_length=200,null=True,blank=True)
     lng = models.CharField(max_length=200,null=True,blank=True)
     placeid = models.CharField(max_length=200,null=True,blank=True)
-    receptionid = models.ForeignKey(ReceptionReport, on_delete=models.SET_NULL, null=True, blank=True)
+    # receptionid = models.ForeignKey(ReceptionReport, on_delete=models.DO_NOTHING, null=True, blank=True)
+    receptionid = models.ForeignKey(ArchieveReceptionReport, on_delete=models.DO_NOTHING,null=True, blank=True)
+    # receptiontempid = models.IntegerField(null=True, blank=True)
     bankid = models.ForeignKey(Banks,on_delete=models.SET_NULL, null=True, blank=True)
     userdetailsid = models.ForeignKey(User, on_delete=models.DO_NOTHING)
     archieved = models.BooleanField(default=False)

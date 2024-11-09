@@ -22,6 +22,7 @@ urlpatterns = [
     path('generatebill/bills/<int:uid>',views.bills,name='bills'),
     path('generatebill/billinpdf',views.billinpdf.as_view(),name='billinpdf'),
     path('userlog',views.Userlog,name='userlog'),
+    path('archive',views.Archive,name='archive'),
     
     path('', include(router.urls)),
 ]+ static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOTPROFILE)  +static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

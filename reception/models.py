@@ -26,6 +26,8 @@ class ReceptionReport(models.Model):
     priority = models.BooleanField(default=False)
     engineerholdcause = models.TextField(blank=True, null=True)
     reporterholdcause = models.TextField(null=True, blank=True)
+    engid=models.IntegerField(null=True, blank=True)
+    repid=models.IntegerField(null=True, blank=True)
     archieved = models.BooleanField(default=False)
     datecreated = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
@@ -54,10 +56,11 @@ class ArchieveReceptionReport(models.Model):
     priority = models.BooleanField(default=False)
     engineerholdcause = models.TextField(blank=True, null=True)
     reporterholdcause = models.TextField(null=True, blank=True)
+    engid=models.IntegerField(null=True, blank=True)
+    repid=models.IntegerField(null=True, blank=True)
     archieved = models.BooleanField(default=False)
     datecreated = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
-    archievedate = models.DateTimeField(auto_now_add=True)
     def __str__(self):
         return str(self.id)
 

@@ -1,0 +1,117 @@
+
+{% extends "sidebar.html" %}
+{% include 'bootstrap_link.html' %}
+{% block title %}Home Page{% endblock %}
+{% load static %}
+{% load math_filters %}
+
+{% block content %}
+<script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.1/moment.min.js"></script>
+<!-- <p>Home Page</p>
+<a href="{% url 'logout' %}" class="btn btn-primary">Logout</a>   -->
+<style>  
+  /* For WebKit browsers (Chrome, Safari) */  
+  .table-responsive::-webkit-scrollbar {  
+      width: 12px;  
+      height: 12px;  
+  }  
+
+  .table-responsive::-webkit-scrollbar-track {  
+      background: #f1f1f1;  
+  }  
+
+  .table-responsive::-webkit-scrollbar-thumb {  
+      background: #888;  
+      border-radius: 6px;  
+  }  
+
+  .table-responsive::-webkit-scrollbar-thumb:hover {  
+      background: #555;  
+  }  
+
+  /* For Firefox */  
+  .table-responsive {  
+      scrollbar-width: thin; /* Use 'thin' or 'auto' */  
+      scrollbar-color: #888 #f1f1f1; /* thumb color and track color */  
+  }  
+</style>  
+
+    <div class="container my-2" id="archivediv" style=" background-color:#30527b; padding:80px 10px 10px;">
+
+      <div class="row">
+        <div class="col-md-12">
+          <div class="card">
+            <div class="card-body">
+              <!-- <a class="btn btn-success btn-sm float-end" href="/api/receptiongenreportexport">Export to Excel</a> -->
+              <!-- <h6>All Task with status</h6> -->
+              
+              <!-- <a class="btn btn-success " href="/reception/reception">Add Report</a> -->
+              <table id="globalsearchengineertable" class="table table-hover table-striped table-bordered " style="font-size: 90%;">
+                <thead>
+                  <tr>
+                    <th scope="col">#</th>
+                    <th scope="col">APP.DATE</th>
+                    <th scope="col">APP.NO.</th>
+                    <th scope="col">NAME</th>
+                    <th scope="col">BANK NAME</th>
+                    <th scope="col">VERTICAL</th>
+                    <th scope="col">PHONE</th>
+                    <th scope="col">ASSIGNED VISITOR</th>
+                    <th scope="col">Status</th>
+                    <th scope="col">Archived</th>
+                    <th scope="col">View</th>
+                    
+                  </tr>
+                </thead>
+                <tbody>
+                  {% for recrep in archives %}
+                  <tr {% if recrep.priority%}  class="table-danger" {%else%} class=""{% endif %}>
+                    <td scope="row">{{forloop.counter}}</th>
+                    <td >{{recrep.applicationdate|date:"d-m-Y"}}</td>
+                    <td >{{recrep.applicationnumber}}</td>
+                    <td >{{recrep.name}}</td>
+                    <td >{{recrep.bankname}}</td>
+                    <td >{{recrep.bankvertical}}</td>
+                    <td >{{recrep.phonenumber}}</td>
+                    <td >{{recrep.visitingpersonname}}</td>
+                    <td {% if recrep.engineer != "Submitted" %} class="tablred my-2 mx-1" {% else %} class="tablgreen my-2 mx-1" {% endif %}  >
+                      {% if recrep.engineer == "Submitted" %} Completed
+                      {% elif recrep.engineer is none %} Pending
+                      {% else %} {{recrep.engineer}}
+                      {% endif %}
+                      
+                    </td>
+                    <td >
+                      {% if recrep.archieved %} True
+                      {%else%}
+                      False
+                      {% endif %}
+                    </td>
+                    <td><a href="{% url 'engcompreportpdf' recrep.engid %}" id=""  target="_blank" type="button" class="float-end" > <i class="fa-regular fa-eye float-end"></i>Engineer</a><br>
+                    <a href="../../reception/engcompreportpdf/${data[i].id}" id=""  target="_blank" type="button" class="float-end" > <i class="fa-regular fa-eye float-end"></i>Reporter</a></td>
+                     </tr>
+                  
+                  {% endfor %}
+                </tbody>
+                <tfoot><h6 class="blink">Archive Reports</h6></tfoot>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  
+  {% endblock content %}
+  
+  
+{% block scripts%}
+<script type="text/javascript">
+  var apiBaseUrl = "{{ context.api_base_url }}";
+  console.log(apiBaseUrl);
+</script>
+
+<Script type="text/javascript" src="{% static 'js/reception.js' %}" > </Script>
+<Script type="text/javascript" src="{% static 'js/datatables.js' %}" > </Script>
+<Script type="text/javascript" src="{% static 'js/sidebartoggle.js' %}"> </Script>
+{% endblock scripts%}

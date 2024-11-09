@@ -4,8 +4,8 @@ from django.contrib.auth.models import User
 import csv,json
 from propval.models import UserDetails,Banks
 from django.db.models import Count
-from reception.models import ReceptionReport
-from site_engineer.models import EngineerReport
+from reception.models import ReceptionReport,ArchieveReceptionReport
+from site_engineer.models import EngineerReport,ArchieveEngineerReport
 from reporter.models import ReporterReport
 from django.contrib.auth import login, authenticate, logout
 from rest_framework.views import APIView
@@ -500,6 +500,13 @@ class EngineerViewSet(viewsets.ModelViewSet):
           serializer_class=EngineerCreateSerializer(data=request.data,context={'request':request})
           if serializer_class.is_valid():  
             serializer_class.save()  
+            print(request.data.get('receptionid').split('/')[-2] ) 
+            queryset=ReceptionReport.objects.get(id=request.data.get('receptionid').split('/')[-2])
+            print(queryset)
+            queryset.engineer='Submitted'
+            queryset.save()
+            # rr=ReceptionReport.objects.get(applicationnumber=app_number,pk=repid)
+        
             return Response({'success': True, 'data': serializer_class.data}, status=status.HTTP_201_CREATED)  
           return Response(serializer_class.errors, status=status.HTTP_400_BAD_REQUEST)  
 #http://127.0.0.1:8000/api/engineer/updateengreport/     updating record of eng report api
@@ -522,6 +529,27 @@ class EngineerViewSet(viewsets.ModelViewSet):
           return Response({
             'success': True,
             'data': engineercompjob_serializer.data
+             }, status=status.HTTP_200_OK)
+#http://127.0.0.1:8000/api/engineer/engcomjobpdfarctoo/   api to create engineer pdf also for archive data
+     @action(detail=True,methods=['get'])
+     def engcomjobpdfarctoo(self, request,pk=None):
+          try:
+            working_records = EngineerReport.objects.filter(pk=pk) 
+            if working_records.exists():
+                 engcomjobpdfarctoo_serializer=EngineerSerializer(working_records,many=True,context={'request':request})
+            else:
+                 archive_records = ArchieveEngineerReport.objects.filter(pk=pk) 
+                 if archive_records.exists():
+                  engcomjobpdfarctoo_serializer=EngineerSerializer(archive_records,many=True,context={'request':request})
+             
+          except EngineerReport.DoesNotExist:
+            return JsonResponse({'success': False, 'error':'Record not found'})
+      #     engcomjobpdfarctoo=EngineerReport.objects.filter(receptionid__engineer='Submitted').select_related('receptionid')  
+      #     engcomjobpdfarctoo_serializer=EngineerSerializer(engcomjobpdfarctoo,many=True,context={'request':request})
+      #     return Response(engineercompjob_serializer.data)
+          return Response({
+            'success': True,
+            'data': engcomjobpdfarctoo_serializer.data
              }, status=status.HTTP_200_OK)
 #http://127.0.0.1:8000/api/engineer/engineercomjobapi/   for mobile app
      @action(detail=True,methods=['get'])

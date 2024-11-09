@@ -15,11 +15,11 @@ def archive_records():
     call_command('archive_records')  # Your management command here  
 def job():  
     # Check if today is the first day of the month  
-    if datetime.now().day == 10:  # Change to your desired day  
+    if datetime.now().day == 9:  # Change to your desired day  
         archive_records()  
 
 # Schedule the job to run every day  
-schedule.every().day.at("00:00").do(job)  
+schedule.every().day.at("16:53").do(job)  
 
 
 # Schedule the task for the 1st day of each month  

@@ -153,6 +153,7 @@ def add_report(request,repid):
 
         rr=ReceptionReport.objects.get(applicationnumber=app_number,pk=repid)
         rr.engineer='Submitted'
+        rr.engid=newrecid
         rr.save()
         # print(request.POST.get("nala"))
         return redirect ('/engineer/engineerhome/')

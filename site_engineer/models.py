@@ -1,5 +1,5 @@
 from django.db import models
-from reception.models import ReceptionReport
+from reception.models import ReceptionReport,ArchieveReceptionReport
 from propval.models import UserDetails
 from django.contrib.auth.models import User
 
@@ -44,7 +44,10 @@ class EngineerReport(models.Model):
     remark = models.CharField(max_length=100, null=True, blank=True)
     reporter = models.CharField(max_length=10, null=True)
     reportersubmitdate = models.DateTimeField(null=True, blank=True)
-    receptionid = models.ForeignKey(ReceptionReport, on_delete=models.SET_NULL, null=True, blank=True)
+    lat = models.CharField(max_length=200,null=True,blank=True)
+    lng = models.CharField(max_length=200,null=True,blank=True)
+    placeid = models.CharField(max_length=200,null=True,blank=True)
+    receptionid = models.ForeignKey(ReceptionReport, on_delete=models.DO_NOTHING, null=True, blank=True)
     priority = models.BooleanField(default=False,null=True)
     userdetailsid = models.ForeignKey(User, on_delete=models.DO_NOTHING, default=0)
     reporterholdcause = models.TextField(blank=True, null=True)
@@ -92,7 +95,12 @@ class ArchieveEngineerReport(models.Model):
     remark = models.CharField(max_length=100, null=True, blank=True)
     reporter = models.CharField(max_length=10, null=True)
     reportersubmitdate = models.DateTimeField(null=True, blank=True)
-    receptionid = models.ForeignKey(ReceptionReport, on_delete=models.SET_NULL, null=True, blank=True)
+    lat = models.CharField(max_length=200,null=True,blank=True)
+    lng = models.CharField(max_length=200,null=True,blank=True)
+    placeid = models.CharField(max_length=200,null=True,blank=True)
+    # receptionid = models.ForeignKey(ReceptionReport, on_delete=models.DO_NOTHING, null=True, blank=True)
+    receptionid = models.ForeignKey(ArchieveReceptionReport, on_delete=models.DO_NOTHING,null=True, blank=True)
+    # receptiontempid = models.IntegerField(null=True, blank=True)
     priority = models.BooleanField(default=False,null=True)
     userdetailsid = models.ForeignKey(User, on_delete=models.DO_NOTHING, default=0)
     reporterholdcause = models.TextField(blank=True, null=True)

@@ -315,11 +315,14 @@ $(document).ready(function() {
     $('#globalsearchengineertable_filter').hide(); 
     $('#searchquery').on('keyup', function() { 
         
+        
         var searchValue = this.value;
         if (searchValue.length > 0) {  
             // $('#myTable').show(); // Show the table 
             document.getElementById("globalengtablediv").style.display = "block";  
-        } else {  
+            // Delay scrolling to allow DOM changes  
+                document.getElementById('globalengtablediv').scrollIntoView({ behavior: 'smooth' });
+           } else {  
             // $('#myTable').hide(); // Hide the table  
             document.getElementById("globalengtablediv").style.display = "none";
         }  

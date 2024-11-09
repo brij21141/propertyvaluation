@@ -55,7 +55,7 @@
       </div>
     </div>
     </div>
-    <div class="container my-2" id="globalengtablediv" style="display:none; background-color:#f6f6f6; padding:40px 20px 37px;">
+    <div class="container my-2" id="globalengtablediv" style="display:none; background-color:#30527b; padding:80px 10px 10px;">
 
       <div class="row">
         <div class="col-md-12">
@@ -65,7 +65,6 @@
               <!-- <h6>All Task with status</h6> -->
               
               <!-- <a class="btn btn-success " href="/reception/reception">Add Report</a> -->
-              
               <table id="globalsearchengineertable" class="table table-hover table-striped table-bordered " style="font-size: 90%;">
                 <thead>
                   <tr>
@@ -78,7 +77,9 @@
                     <th scope="col">PHONE</th>
                     <th scope="col">ASSIGNED VISITOR</th>
                     <th scope="col">Status</th>
+                    <th scope="col">Archived</th>
                     <th scope="col">Hold reason</th>
+                    <!-- <th scope="col">View</th> -->
                     
                   </tr>
                 </thead>
@@ -101,16 +102,24 @@
                       
                     </td>
                     <td >
+                      {% if recrep.archieved %} True
+                      {%else%}
+                      False
+                      {% endif %}
+                    </td>
+                    <td >
                       {% if recrep.engineerholdcause is none %} 
                       {%else%}
                       {{recrep.engineerholdcause}}
                       {% endif %}
-                    </td>
-                      
-                      
-                  </tr>
+                    <!-- </td>
+                    <td><a href="#" id="" type="button" class="float-end" > <i class="fa-regular fa-eye float-end"></i>Engineer</a><br>
+                    <a href="#" id="" type="button" class="float-end" > <i class="fa-regular fa-eye float-end"></i>Reporter</a></td> -->
+                     </tr>
+                  
                   {% endfor %}
                 </tbody>
+                <tfoot><h6 class="blink">Search Result</h6></tfoot>
               </table>
             </div>
           </div>

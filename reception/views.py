@@ -18,6 +18,7 @@ from reportlab.platypus import Paragraph
 from reportlab.lib.enums import TA_LEFT
 from django.contrib.auth.decorators import login_required
 from reporter.models import ReporterReport
+from django.urls import reverse 
 
 # Create your views here.
 
@@ -264,12 +265,15 @@ def delete_file(request, doc_id):
 def engcompreportpdf(request, doc_id):
     api_base_url= settings.API_BASE_URL
     # url=api_base_url+'engineer/'+str(doc_id)
-    url = f'{api_base_url}engineer/{doc_id}' 
-    print(str(doc_id), url)
+    url = f'{api_base_url}engineer/{doc_id}/engcomjobpdfarctoo' 
+    # print(str(doc_id), url)
     try:
         response = requests.get(url)
         response.raise_for_status()  # Raise an exception for HTTP errors
-        data = response.json()
+        data1 = response.json()
+        data = data1['data'][0]
+        print(data['receptionid'])
+        # print(data['data'][0]['updated_at'])
         # return JsonResponse(data)
     except requests.exceptions.HTTPError as http_err:
         return JsonResponse({'error': f'HTTP error occurred: {http_err}'}, status=500)
@@ -284,6 +288,8 @@ def engcompreportpdf(request, doc_id):
     textobj.setTextOrigin(60,72)  # instead inch inch use 72 to 1 inch margin
     textobj.setFont("Helvetica",14)
     textobj.setFillColor(colors.black)
+
+    
 
     # Define your styles
     styles = getSampleStyleSheet()
@@ -424,6 +430,13 @@ def engcompreportpdf(request, doc_id):
     # print (data["applicationnumber"],data['receptionid']['id'],documents)
     i=1
     y=0
+    # Draw a rectangle where you would like the download icon to be  
+    c.drawImage('propval/static/img/download.png', 550, 5, width=50, height=50)  
+
+    # Set link for the icon (assuming you have a download view)  
+    # download_url = request.build_absolute_uri(reverse('download_image'))  #download_image is view to download image
+    # c.linkURL(download_url, (100, 600, 150, 650), relative=1)  
+        # like this  path('download-image/', download_image, name='download_image'),  
     for doc in documents:
         
         # print (doc.file_name)

@@ -179,6 +179,7 @@ def add_report(request,repid):
 
         rr=ReceptionReport.objects.get(applicationnumber=rre['appno'],pk=er.receptionid_id)
         rr.reporter='Submitted'
+        rr.repid=newrecid
         rr.save()
         rr=EngineerReport.objects.get(applicationnumber=rre['appno'],pk=repid)
         rr.reporter='Submitted'

@@ -5,7 +5,7 @@ from django.contrib.auth.decorators import login_required
 from django.core.serializers.json import DjangoJSONEncoder
 import datetime, os
 from django.http import JsonResponse
-from reception.models import ReceptionReport
+from reception.models import ReceptionReport,ArchieveReceptionReport
 from reporter.models import ReporterReport
 from .models import UserDetails, CompanyProfile,Banks
 from django.db.models import Count
@@ -110,7 +110,20 @@ def Home(request):
             submitted_count=Count('userdetailsid_id'), 
             other_count=Subquery(reporter_count_subquery)  # Total count of visitingperson using subquery     
         ).order_by('receptionid__reportperson')
-        print(queryset)
+        # working_records = ReceptionReport.objects.prefetch_related('engineerreport_set','reporterreport_set').all()  
+        # archive_records = ArchieveReceptionReport.objects.prefetch_related('engineerreport_set','reporterreport_set').all()  
+         
+# Combine the querysets using union  
+        # allreports = working_records.union(archive_records)  
+        # for report in allreports:
+        #     print(report.id)
+        #     try:
+        #         engId=report.engineerreport_set.get(receptionid_id=report.id)
+        #     except :
+        #         engId=None
+        #     if engId is not None:
+        #         print(engId.id,engId.name)
+        #     print(engId)
         allreports = ReceptionReport.objects.all()
         return render (request,'home.html',{'userdata':userdetails,'usno':dictusersno,'recpreports':recpreport,'totrep':totrep,'context':context,'repwise':queryset,'allreports':allreports})
     elif user_details.role == 'Engineer':
@@ -416,6 +429,10 @@ class UserActivityViewSet(viewsets.ModelViewSet):
 def Userlog(request):
     useractivities = UserActivity.objects.all()
     return render(request, 'userlog.html', {'useractivities': useractivities})
+
+def Archive(request):
+    archives = ArchieveReceptionReport.objects.all()
+    return render(request, 'archive.html', {'archives': archives})
 
 # def update_employee(id, userdetailsid):
 #     conn = sqlite3.connect('db.sqlite3')
