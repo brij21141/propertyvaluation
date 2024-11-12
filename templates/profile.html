@@ -36,30 +36,30 @@
                   <div class="col-md-6"><label class="labels">Surname</label><input name="last_name" type="text" class="form-control" value="{{userdata.last_name}}" placeholder="surname"></div>
               </div>
               <div class="row mt-1">
-                  <div class="col-md-12"><label class="labels">Mobile Number</label><input name="phone" type="text" class="form-control" placeholder="enter phone number" value="{{userdata.phone}}"></div>
+                  <div class="col-md-12"><label class="labels">Mobile Number</label><input name="phone" maxlength="10" type="tel" class="form-control" placeholder="enter phone number" {% if usetdata.phone %} value="{{userdata.phone}}"{%endif%}></div>
                   
                   <div class="col-md-12"><label class="labels">Email ID</label><input name="email" type="email" class="form-control" placeholder="enter email id" value="{{userdata.user_email}}" {% if  uid == 0 %} readonly {% endif %} ></div>
                   <div class="item">
                     <label class="labels">Address</label>
                     <input type="text" name="add1" placeholder="Street address"
-                    {% if userdata %}
+                    {% if userdata.add1 %}
                     value="{{userdata.add1}}"
                     {% endif %}/>
                     <input type="text" name="add2" placeholder="address line 2" 
-                    {% if userdata %}
+                    {% if userdata.add2 %}
                     value="{{userdata.add2}}"
                     {% endif %}/>
                     <div class="city-item">
                       <input type="text" name="city" placeholder="City" required
-                      {% if userdata %}
+                      {% if userdata.city %}
                     value="{{userdata.city}}"
                     {% endif %}/>
                       <input type="text" name="region" placeholder="State" 
-                      {% if userdata %}
+                      {% if userdata.region %}
                     value="{{userdata.region}}"
                     {% endif %}/>
                       <input type="text" name="zip" placeholder="Postal / Zip code" 
-                      {% if userdata %}
+                      {% if userdata.zip %}
                     value="{{userdata.zip}}"
                     {% endif %}/>
                       <select name="country" required>
@@ -89,7 +89,7 @@
               <div class="item">
                 <label class="labels"><b>Bank Details</b></label>
                 <input type="text" name="bankname" placeholder="Bank Name"
-                {% if userdata %}
+                {% if userdata.bankname %}
                 value="{{userdata.bankname}}"
                 {% endif %}/>
                 <!-- <input type="text" name="acholdname" placeholder="Account holder name" 
@@ -97,16 +97,16 @@
                 value="{{recptreport.add2}}"
                 {% endif %}/> -->
                 <div class="city-item">
-                  <input type="text" name="acno" placeholder="Account number" 
-                  {% if userdata %}
+                  <input type="tel" name="acno" placeholder="Account number" 
+                  {% if userdata.bankacno %}
                 value="{{userdata.bankacno}}"
                 {% endif %}/>
-                  <input type="text" name="confacno" placeholder="Repeate account number" 
-                  {% if userdata %}
+                  <input type="tel" name="confacno" placeholder="Confirm account number" 
+                  {% if userdata.bankacnoconf %}
                 value="{{userdata.bankacnoconf}}"
                 {% endif %}/>
                   <input type="text" name="ifsc" placeholder="IFSC Code" 
-                  {% if userdata %}
+                  {% if userdata.ifsccode %}
                 value="{{userdata.ifsccode}}"
                 {% endif %}/>
                   

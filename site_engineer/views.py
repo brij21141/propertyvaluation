@@ -7,7 +7,7 @@ from django.contrib import messages
 from django.core.files.storage import default_storage
 from django.http import HttpResponseRedirect,JsonResponse
 from django.conf import settings
-import os 
+import os , requests
 from django.contrib.auth.models import User
 from django.contrib import messages
 
@@ -161,7 +161,13 @@ def add_report(request,repid):
     # receivedrequest=ReceptionReport.objects.all().filter(id=repid).values
     rr=ReceptionReport.objects.get(pk=repid)
     banks= Banks.objects.all().values('id','name','branch','city')
-    return render(request,"engineer/engineersiteform.html",{'requestreceived':rr,'banks':banks})
+    response = requests.get("https://cdn-api.co-vin.in/api/v2/admin/location/states")
+    if response.status_code == 200:  
+        allstates = response.json()  
+        states=allstates.get('states')
+    else:  
+        states=[{'state_name':'Madhya Pradesh','state_id':20}, {'state_name':'Uttar Pradesh'}, {'state_name':'Rajsthan'}, {'state_name':'Delhi'}]
+    return render(request,"engineer/engineersiteform.html",{'requestreceived':rr,'banks':banks,'states':states})
 
 def engineerhome(request):
     if request.method =='POST':
@@ -175,23 +181,23 @@ def engineerhome(request):
                     userrole = UserDetails.objects.get(user_email=useremail).role   
                     if userrole == "Admin":
                             allreport=ReceptionReport.objects.all()
-                            receivedrequest=ReceptionReport.objects.exclude(engineer ='Submitted')
+                            receivedrequest=ReceptionReport.objects.exclude(engineer ='Submitted').order_by('-priority','-updated_at')
                             totalrequestnumber = ReceptionReport.objects.count()
                             totalcompleted = ReceptionReport.objects.filter(engineer='Submitted').count()
                             # print(totalrequestnumber-totalcompleted)
-                            completedrequest=EngineerReport.objects.all()
+                            completedrequest=EngineerReport.objects.all().order_by('-priority','-updated_at')
                             inprogress = ReceptionReport.objects.filter(engineer='InProgress').count()
                             hold = ReceptionReport.objects.filter(engineer='Hold').count()
                             pendingrequest = totalrequestnumber-(totalcompleted+inprogress+hold)
                             
                     else:
                             allreport=ReceptionReport.objects.filter(visitingpersonname=username)
-                            receivedrequest=ReceptionReport.objects.exclude(engineer ='Submitted').filter(visitingpersonname=username)
+                            receivedrequest=ReceptionReport.objects.exclude(engineer ='Submitted').filter(visitingpersonname=username).order_by('-priority','-updated_at')
                             # totalrequestnumber = ReceptionReport.objects.filter(visitingpersonname=username).count()
                             totalrequestnumber = ReceptionReport.objects.filter(visitingpersonname=username).count()
                             totalcompleted = ReceptionReport.objects.filter(visitingpersonname=username, engineer='Submitted').count()
                             # print(totalrequestnumber-totalcompleted)
-                            completedrequest=EngineerReport.objects.filter(receptionid__visitingpersonname=username)
+                            completedrequest=EngineerReport.objects.filter(receptionid__visitingpersonname=username).order_by('-priority','-updated_at')
                             inprogress = ReceptionReport.objects.filter(visitingpersonname=username, engineer='InProgress').count()
                             hold = ReceptionReport.objects.filter(visitingpersonname=username, engineer='Hold').count()
                             pendingrequest = totalrequestnumber-(totalcompleted+inprogress+hold)

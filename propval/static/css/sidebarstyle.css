@@ -295,3 +295,12 @@ a.sidebar-link:hover {
 .blink {  
   animation: blink 1s infinite;  
 }  
+
+.bg {
+    background-image: url('/static/img/1711028983_TP_Images_6.jpg');
+    height: 100%;
+    background-position: center;
+    background-repeat: no-repeat;
+    background-size: cover;
+    position: relative;
+}

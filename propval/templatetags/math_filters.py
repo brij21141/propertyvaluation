@@ -63,3 +63,7 @@ def calculate_percent(itema, itemb):
     print(itema  )
     total = itema *100/itemb
     return total
+
+@register.filter(name='trim')
+def trim(value):
+    return value.strip()

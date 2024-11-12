@@ -122,14 +122,24 @@ def add_report(request):
     #     print(er)
     rrs=UserDetails.objects.filter(role='Reporter').values('user_id','id','first_name','last_name')
     banks= Banks.objects.all().values('id','name','branch','city')
-    return render(request,"reception/receptionreport.html",{'engineers':ers,'reporters':rrs,'banks':banks})
+    response = requests.get("https://cdn-api.co-vin.in/api/v2/admin/location/states")
+    if response.status_code == 200:  
+        allstates = response.json()  
+        states=allstates.get('states')
+        # print(states)
+        # print(allstates.get('states')[0]['state_name'])  
+    else:  
+        states=[{'state_name':'Madhya Pradesh','state_id':20}, {'state_name':'Uttar Pradesh'}, {'state_name':'Rajsthan'}, {'state_name':'Delhi'}]
+        # print(states[0]['state_name']) 
+    #  print("Error:", response.status_code, response.json())  
+    return render(request,"reception/receptionreport.html",{'engineers':ers,'reporters':rrs,'banks':banks,'states':states})
 @login_required(login_url='login')
 def receptionhome(request):
     allreports = ReceptionReport.objects.all()
     context = {
         'api_base_url': settings.API_BASE_URL,
     }
-    recpreport=ReceptionReport.objects.all().order_by('-priority','updated_at')
+    recpreport=ReceptionReport.objects.all().order_by('-priority','-updated_at')
     totrep=ReceptionReport.objects.all().count()
     user_details = UserDetails.objects.filter(user_email=request.user.email).first()
     if not user_details:

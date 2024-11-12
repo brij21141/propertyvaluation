@@ -50,11 +50,21 @@
                               {% if bank %}
                             value="{{bank.city}}"
                             {% endif %}/>
-                              <input type="text" name="region" placeholder="State" 
+                              <!-- <input type="text" name="region" placeholder="State" 
                               {% if bank %}
                             value="{{bank.state}}"
-                            {% endif %}/>
-                              <input type="text" name="zip" placeholder="Postal / Zip code" 
+                            {% endif %}/> -->
+                            <select name="region" required>
+                              <option value="">{% if bank %} {{bank.state}} {% else %} Select State {% endif %}</option>
+                              {% for state in states %}
+                                {% if state.state_id == 20 %}
+                                  <option value={{state.state_name}}  selected   >{{state.state_name}}</option>
+                                {% else %}
+                                  <option value={{state.state_name}}   >{{state.state_name}}</option>
+                                {%endif%}
+                              {% endfor %}
+                            </select>
+                              <input type="tel" name="zip" placeholder="Postal / Zip code" maxlength="6"
                               {% if bank %}
                             value="{{bank.zip}}"
                             {% endif %}/>
@@ -67,23 +77,23 @@
                           </div>
                           <div class="row">
                       
-                            <div class="item col-sm-5">
+                            <div class="item col-sm-4">
                                 <label for="phonenumber">Contact Number</label>
-                              <input id="phonenumber" type="text" name="phonenumber" placeholder="Phone number" 
+                              <input id="phonenumber" type="tel" name="phonenumber" placeholder="Phone number" maxlength="10"
                               {% if bank %}
                             value="{{bank.contact_no}}"
                             {% endif %}/>
                             </div>
-                            <div class="item col-sm-2">
+                            <div class="item col-sm-4">
                                 <label for="std">STD code</label>
-                              <input id="std" type="text" name="std" placeholder="STD code" 
+                              <input id="std" type="tel" name="std" placeholder="STD code" maxlength="4"
                               {% if bank %}
                             value="{{bank.std}}"
                             {% endif %}/>
                             </div>
-                            <div class="item col-sm-5">
+                            <div class="item col-sm-4">
                                 <label for="landline">Land line no.</label>
-                              <input id="landline" type="text" name="landline" placeholder="Land line no." 
+                              <input id="landline" type="tel" name="landline" placeholder="Land line no." maxlength="7"
                               {% if bank %}
                             value="{{bank.landline}}"
                             {% endif %}/>
@@ -117,21 +127,21 @@
                           <div class="row">
                             <div class="item col-sm-4">
                                 <label for="internalrate">Internal Rate</label>
-                              <input id="internalrate" type="text" name="internalrate" placeholder="Internal Rate" 
+                              <input id="internalrate" type="number" name="internalrate" placeholder="Internal Rate" 
                               {% if bank %}
                             value="{{bank.internalrate}}"
                             {% endif %}/>
                             </div>
                             <div class="item col-sm-4">
                                 <label for="externalrate">External Rate</label>
-                              <input id="externalrate" type="text" name="externalrate" placeholder="External Rate" 
+                              <input id="externalrate" type="number" name="externalrate" placeholder="External Rate" 
                               {% if bank %}
                             value="{{bank.externalrate}}"
                             {% endif %}/>
                             </div>
                             <div class="item col-sm-4">
                                 <label for="partamount">Part Amount</label>
-                              <input id="partamount" type="text" name="partamount" placeholder="Part Amount" 
+                              <input id="partamount" type="number" name="partamount" placeholder="Part Amount" 
                               {% if bank %}
                             value="{{bank.partamount}}"
                             {% endif %}/>

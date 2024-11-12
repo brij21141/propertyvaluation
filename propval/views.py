@@ -3,7 +3,7 @@ from django.contrib.auth.models import User
 from django.contrib.auth import login, authenticate, logout,update_session_auth_hash
 from django.contrib.auth.decorators import login_required
 from django.core.serializers.json import DjangoJSONEncoder
-import datetime, os
+import datetime, os,requests
 from django.http import JsonResponse
 from reception.models import ReceptionReport,ArchieveReceptionReport
 from reporter.models import ReporterReport
@@ -358,7 +358,13 @@ def banks(request,uid=None):
         # return redirect('companyprofile')
         # next_url = request.GET.get('next', '/default-url/')
         return redirect('bankmanage') 
-    return render(request, 'banks.html', {'bank': bank})
+    response = requests.get("https://cdn-api.co-vin.in/api/v2/admin/location/states")
+    if response.status_code == 200:  
+        allstates = response.json()  
+        states=allstates.get('states')
+    else:  
+        states=[{'state_name':'Madhya Pradesh','state_id':20}, {'state_name':'Uttar Pradesh'}, {'state_name':'Rajsthan'}, {'state_name':'Delhi'}]
+    return render(request, 'banks.html', {'bank': bank,'states': states})
 
 def bankmanage(request):
     banks = Banks.objects.all()
@@ -427,7 +433,7 @@ class UserActivityViewSet(viewsets.ModelViewSet):
     serializer_class = UserActivitySerializer
 
 def Userlog(request):
-    useractivities = UserActivity.objects.all()
+    useractivities = UserActivity.objects.all().order_by('-timestamp')
     return render(request, 'userlog.html', {'useractivities': useractivities})
 
 def Archive(request):

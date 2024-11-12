@@ -566,7 +566,7 @@ class EngineerViewSet(viewsets.ModelViewSet):
      @action(detail=False,methods=['get'])
      def engineerpendjob(self, request,pk=None):
       #     engineercompjob=EngineerReport.objects.filter(receptionid__engineer='Submitted').select_related('receptionid').values('receptionid__visitingpersonname', 'receptionid__phonenumber')
-          engineerpendjob=ReceptionReport.objects.filter(engineer=None)
+          engineerpendjob=ReceptionReport.objects.filter(Q(engineer=None) | Q(engineer='null'))
           engineerpendjob_serializer=ReceptionSerializer(engineerpendjob,many=True,context={'request':request})
       #     return Response(engineercompjob_serializer.data)
           return Response({
@@ -643,7 +643,7 @@ class ReporterViewSet(viewsets.ModelViewSet):
      @action(detail=False,methods=['get'])
      def reporterpendjob(self, request,pk=None):
       #     engineercompjob=EngineerReport.objects.filter(receptionid__engineer='Submitted').select_related('receptionid').values('receptionid__visitingpersonname', 'receptionid__phonenumber')
-          reporterpendjob=EngineerReport.objects.filter(reporter=None)
+          reporterpendjob=EngineerReport.objects.filter(Q(reporter=None) | Q(reporter='null'))
           reporterpendjob_serializer=EngineerSerializer(reporterpendjob,many=True,context={'request':request})
       #     return Response(engineercompjob_serializer.data)
           return Response({

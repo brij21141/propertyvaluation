@@ -95,13 +95,23 @@
                             {% else %}
                             value="{{recptreport.city}}"
                             {% endif %}/>
-                            <input type="text" name="region" placeholder="State" 
+                            <!-- <input type="text" name="region" placeholder="State" 
                             {% if requestreceived %}
                           value="{{requestreceived.region}}"
                           {% else %}
                           value="{{recptreport.region}}"
-                          {% endif %}/>
-                          <input type="text" name="zip" placeholder="Postal / Zip code" 
+                          {% endif %}/> -->
+                          <select name="region" required>
+                            <option value="">{% if requestreceived %} {{requestreceived.region}} {% else %} {{recptreport.region}} {% endif %}</option>
+                            {% for state in states %}
+                              {% if state.state_id == 20 %}
+                                <option value={{state.state_name}}  selected   >{{state.state_name}}</option>
+                              {% else %}
+                                <option value={{state.state_name}}   >{{state.state_name}}</option>
+                              {%endif%}
+                            {% endfor %}
+                          </select>
+                          <input type="tel" name="zip" placeholder="Postal / Zip code" maxlength="6"
                           {% if requestreceived %}
                           value="{{requestreceived.zip}}"
                           {% else %}

@@ -39,8 +39,6 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'propval',
-    'crispy_forms',
-    'crispy_bootstrap5',
     'api.apps.ApiConfig',
     'reception',
     'site_engineer',
@@ -51,9 +49,6 @@ INSTALLED_APPS = [
     'django_rest_passwordreset',
     ]
 
-CRISPY_ALLOWED_TEMPLATE_PACKS = "bootstrap5"
-
-CRISPY_TEMPLATE_PACK = "bootstrap5"
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
@@ -141,7 +136,7 @@ MEDIA_URL = '/media/'  # Base URL to serve media files
 MEDIA_PROFILEURL = 'propval/media/'  # Base URL to serve profile media files
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 MEDIA_ROOTRECEPTION = os.path.join(BASE_DIR, 'media/reception')
-
+MEDIA_PROFILE = os.path.join(BASE_DIR, 'media/profile')
 MEDIA_ROOTENGINEER = os.path.join(BASE_DIR, 'media/engineer')
 MEDIA_ROOTREPORTER = os.path.join(BASE_DIR, 'media/reporter/')
 MEDIA_ROOTPROFILE = os.path.join(BASE_DIR, 'media/profile')

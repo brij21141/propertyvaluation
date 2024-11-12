@@ -7,8 +7,6 @@
     
   
   <div class="container my-2" style="display:block; background-color:#f6f6f6; padding:20px 20px 20px;">
-    <p>Request Received</p>
-            
     <div class="row">
       <div class="col-md-12">
         <div class="card">
@@ -27,18 +25,28 @@
                   <th scope="col">Action Type</th>
                   <th scope="col">IP Address</th>
                   <th scope="col">Date & Time</th>
-                  <th scope="col">Action</th>
+                  
                 </tr>
               </thead>
               <tbody>
                 {% for useractiviti in useractivities %}
                 <tr {% if recrep.receptionid.priority%}  class="table-danger" {%else%} class=""{% endif %}>
                   <td scope="row">{{forloop.counter}}</td>
-                  <!-- <td >{{recrep.id}}</td> -->
-                  <!-- <td >{{recrep.applicationdate}}</td> -->
+                  {% if useractiviti.userdetails.first_name %}
                   <td >{{useractiviti.userdetails.first_name}} {{useractiviti.userdetails.last_name}}</td>
+                  {%else%}
+                  <td style="color: red; font-weight: 600;" >Suspicious user</td>
+                  {% endif %}
+                  {% if useractiviti.user.username %}
                   <td >{{useractiviti.user.username}}</td>
+                  {% else %}
+                  <td >{{useractiviti.username}}</td>
+                  {% endif %}
+                  {% if useractiviti.user.email %}
                   <td >{{useractiviti.user.email}}</td>
+                  {% else%}
+                  <td >{{useractiviti.useremail}}</td>
+                  {% endif %}
                   <td >{{useractiviti.action_type}}</td>
                   <td >{{useractiviti.ip_address}}</td>
                   <!-- <td >{{recrep.add1}}</td>
@@ -47,20 +55,7 @@
                   <!-- <td >{{recrep.reportperson}}</td> -->
                   <!-- <td><a href="/reception/deletereceptionreport/{{recrep.id}}" class="btn btn-danger btn-sm">Delete</a></td>  -->
                   <!-- <td><a href="/reception/updatereceptionreport/{{recrep.id}}" class="btn btn-warning btn-sm">Upload</a></td>   -->
-                    <td><a class="btn-sm"  href="/reporter/reporter/{{recrep.id}}"><i class="fa-solid fa-circle-plus fa-2x"></i></a>&nbsp;&nbsp;
-                        <a class="" id="p{{recrep.id}}" data-url="" href="#"  title="Set Status">
-                          {% if recrep.reporter == 'InProgress' %}
-                          <i class="fa-solid fa-spinner fa-2x" style="color: green;"></i> 
-                         {% elif recrep.reporter == 'Hold' %} 
-                         <i class="fa-solid fa-circle-pause fa-2x" style="color: red;"></i>
-                         {%else%} 
-                         <i class="fa-regular fa-clock fa-2x" style="color: blue;"></i>
-                         {% endif %}
-                        </a>
-                        {% if recrep.receptionid.reportperson == 0  %}
-                        &nbsp;&nbsp;<a class="reportassign" data-url="{% url 'reportassign' recrep.id %}" href="#" title="Assign yourself"><i class="fas fa-tasks fa-2x" style="color: gray;"></i></a>
-                        {% endif %}
-                    </td>
+                    
                 </tr>
                 
                 {% endfor %}

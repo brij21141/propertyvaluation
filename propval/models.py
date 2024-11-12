@@ -86,7 +86,9 @@ class Banks(models.Model):
 
 class UserActivity(models.Model):  
     user = models.ForeignKey(User, on_delete=models.DO_NOTHING,null=True) 
+    username=models.CharField(max_length=80,null=True)
     userdetails = models.ForeignKey(UserDetails, on_delete=models.DO_NOTHING,null=True) 
+    useremail=models.CharField(max_length=80,null=True)
     action_type = models.CharField(max_length=50)  # e.g. "login", "logout", "login_failed"  
     timestamp = models.DateTimeField(auto_now_add=True)  
     ip_address = models.GenericIPAddressField(null=True, blank=True)  # Optional  

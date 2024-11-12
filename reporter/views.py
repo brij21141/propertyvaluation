@@ -12,7 +12,7 @@ import googlemaps
 from django.conf import settings
 from django.core.files.storage import default_storage
 from propval.models import Banks
-import os
+import os,requests
 from django.utils import timezone
 # Create your views here.
 
@@ -190,8 +190,13 @@ def add_report(request,repid):
         return redirect ('/reporter/reporterhome/')
     # print(repid)
     # receivedrequest=ReceptionReport.objects.all().filter(id=repid).values
-    
-    return render(request,"reporter/reporterform.html",{'requestreceived':er})
+    response = requests.get("https://cdn-api.co-vin.in/api/v2/admin/location/states")
+    if response.status_code == 200:  
+        allstates = response.json()  
+        states=allstates.get('states')
+    else:  
+        states=[{'state_name':'Madhya Pradesh','state_id':20}, {'state_name':'Uttar Pradesh'}, {'state_name':'Rajsthan'}, {'state_name':'Delhi'}]
+    return render(request,"reporter/reporterform.html",{'requestreceived':er,'states':states})
 
 def reporterhome(request):
     if request.method =='POST':
@@ -221,9 +226,9 @@ def reporterhome(request):
                 #   receivedrequest=ReceptionReport.objects.filter(engineer ='Submitted')
                 #   receivedrequest=EngineerReport.objects.filter(receptionid__engineer='Submitted')
                   allreport=EngineerReport.objects.all()
-                  receivedrequest=EngineerReport.objects.exclude(reporter ='Submitted')
+                  receivedrequest=EngineerReport.objects.exclude(reporter ='Submitted').order_by('-priority','-updated_at')
                   print(receivedrequest)
-                  completedrequest=ReporterReport.objects.all()
+                  completedrequest=ReporterReport.objects.all().order_by('-updated_at')
                 #   print(EngineerReport.objects.get(pk=13).userdetailsid.first_name)
                   totalrequestnumber = EngineerReport.objects.count()
                   totalcompleted = EngineerReport.objects.filter(reporter='Submitted').count()
@@ -232,8 +237,8 @@ def reporterhome(request):
                   hold = EngineerReport.objects.filter(reporter='Hold').count()
             else:
                   allreport=EngineerReport.objects.filter(Q(receptionid__reportperson=userid) | Q(receptionid__reportperson=0))
-                  receivedrequest=EngineerReport.objects.exclude(reporter ='Submitted').filter(Q(receptionid__reportperson=userid) | Q(receptionid__reportperson=0))
-                  completedrequest=ReporterReport.objects.filter(receptionid__reportperson=userid)
+                  receivedrequest=EngineerReport.objects.exclude(reporter ='Submitted').filter(Q(receptionid__reportperson=userid) | Q(receptionid__reportperson=0)).order_by('-priority','-updated_at')
+                  completedrequest=ReporterReport.objects.filter(receptionid__reportperson=userid).order_by('-updated_at')
                   totalrequestnumber = EngineerReport.objects.filter(receptionid__reportperson=userid).count()
                   totalcompleted = EngineerReport.objects.filter(receptionid__reportperson=userid, reporter='Submitted').count()
                   inprogress = EngineerReport.objects.filter(receptionid__reportperson=userid, reporter='InProgress').count()

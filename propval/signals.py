@@ -22,11 +22,13 @@ def log_user_login_failed(sender, request,credentials, **kwargs):
         userobject = User.objects.get(username=credentials['username'])
     except User.DoesNotExist:
         userobject=None
+        uname=credentials['username']
     try: 
         userdetail =UserDetails.objects.get(user_email=credentials['username']) 
     except UserDetails.DoesNotExist:
         userdetail=None
-    UserActivity.objects.create(user=userobject,userdetails=userdetail, action_type='login_failed', ip_address=ip_address)  
+        uemail=credentials['username']
+    UserActivity.objects.create(user=userobject,username=uname,userdetails=userdetail,useremail=uemail, action_type='login_failed', ip_address=ip_address)  
 @receiver(user_logged_out)
 def log_user_logout(sender,user, request, **kwargs):
     # print('User {} logged out through page {}'.format(user.username,request.META.get('HTTP_REFERER')))

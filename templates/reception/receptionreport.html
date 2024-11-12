@@ -82,16 +82,26 @@
                               {% if recptreport %}
                             value="{{recptreport.city}}"
                             {% endif %}/>
-                              <input type="text" name="region" placeholder="State" 
+                              <!-- <input type="text" name="region" placeholder="State" 
                               {% if recptreport %}
                             value="{{recptreport.region}}"
-                            {% endif %}/>
-                              <input type="text" name="zip" placeholder="Postal / Zip code" 
+                            {% endif %}/> -->
+                            <select name="region" required>
+                              <option value="">{% if recptreport %} {{recptreport.region}} {% else %} Select State {% endif %}</option>
+                              {% for state in states %}
+                                {% if state.state_id == 20 %}
+                                  <option value={{state.state_name}}  selected   >{{state.state_name}}</option>
+                                {% else %}
+                                  <option value={{state.state_name}}   >{{state.state_name}}</option>
+                                {%endif%}
+                              {% endfor %}
+                            </select>
+                              <input type="tel" name="zip" placeholder="Postal / Zip code" maxlength="6"
                               {% if recptreport %}
                             value="{{recptreport.zip}}"
                             {% endif %}/>
                               <select name="country" required>
-                                <option value="">{% if recptreport %} "{{recptreport.country}}" {% else %} Country {% endif %}</option>
+                                <option value="">{% if recptreport %} {{recptreport.country}} {% else %} Country {% endif %}</option>
                                 <option value="India" selected>India</option>
                                 
                               </select>
@@ -99,7 +109,7 @@
                           </div>
                         <div class="item">
                             <label for="phonenumber">Enter phone Number</label>
-                            <input id="phonenumber" name="phonenumber" type="number" maxlength="10" class="form-control" placeholder="Enter phone Number"
+                            <input id="phonenumber" name="phonenumber" type="tel" maxlength="10" class="form-control" placeholder="Enter phone Number"
                             {% if recptreport %}
                             value="{{recptreport.phonenumber}}"
                             {% endif %}/>

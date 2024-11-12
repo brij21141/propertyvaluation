@@ -182,6 +182,7 @@ $(document).ready(function() {
                 if (response.success) {
                   engArray=response.data;  
                   engspinner.classList.add('spinnervisibility') 
+                  console.log('spinnervisibility')
                   buildtable(engArray);  
                   modhead.innerHTML='Completed by Engineers'; 
                 } else {
