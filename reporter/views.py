@@ -12,8 +12,9 @@ import googlemaps
 from django.conf import settings
 from django.core.files.storage import default_storage
 from propval.models import Banks
-import os,requests
+import os,requests,time
 from django.utils import timezone
+from django.contrib import messages
 # Create your views here.
 
 def add_report(request,repid):
@@ -159,15 +160,15 @@ def add_report(request,repid):
         newrecid=rr.id
         uploaded_files = request.FILES.getlist('reporterFiles') 
         for uploaded_file in uploaded_files:
-            newfilename = rre['appno'] + "_"+str(newrecid)+"_" + uploaded_file.name
-            file_path = os.path.join(settings.MEDIA_ROOTREPORTER, newfilename)
+            newfilename = rre['appno'] + "_"+str(newrecid)+"_" +time.time()+'_'+ uploaded_file.name
+            file_path = os.path.join(settings.MEDIA_ROOT,'reporter', newfilename)
             with open(file_path, 'wb+') as destination:
                 for chunk in uploaded_file.chunks():
                     destination.write(chunk)
 
             Document.objects.create(
                 application_number=rre['appno'],
-                file_path=file_path,
+                file_path='reporter/'+newfilename,
                 file_name=newfilename,
                 reception_idno=er.receptionid_id,
                 username=username,
@@ -196,7 +197,8 @@ def add_report(request,repid):
         states=allstates.get('states')
     else:  
         states=[{'state_name':'Madhya Pradesh','state_id':20}, {'state_name':'Uttar Pradesh'}, {'state_name':'Rajsthan'}, {'state_name':'Delhi'}]
-    return render(request,"reporter/reporterform.html",{'requestreceived':er,'states':states})
+    invdate=er.datecreated.strftime("%Y-%m-%d")
+    return render(request,"reporter/reporterform.html",{'requestreceived':er,'states':states,'invdate':invdate})
 
 def reporterhome(request):
     if request.method =='POST':
@@ -412,8 +414,8 @@ def update_report(request,repid):
 
         uploaded_files = request.FILES.getlist('reporterFiles')
         for uploaded_file in uploaded_files:
-            newfilename = f"{rr.applicationnumber}_{str(repid)}_{uploaded_file.name}"
-            file_path = os.path.join(settings.MEDIA_ROOTREPORTER, newfilename)
+            newfilename = f"{rr.applicationnumber}_{str(repid)}_{time.time()}_{uploaded_file.name}"
+            file_path = os.path.join(settings.MEDIA_ROOT,'reporter', newfilename)
 
             try:
                 existing_doc = Document.objects.get(application_number=rr.applicationnumber, file_name=newfilename,reception_idno=rr.receptionid_id)
@@ -428,7 +430,7 @@ def update_report(request,repid):
         
             Document.objects.create(
                 application_number=rr.applicationnumber,
-                file_path=file_path,
+                file_path='reporter/'+newfilename,
                 file_name=newfilename,
                 reception_idno=rr.receptionid_id,
                 username=username,
@@ -444,7 +446,13 @@ def update_report(request,repid):
     else:
         appdate=None
     documents = Document.objects.filter(application_number=rr.applicationnumber,reception_idno=rr.receptionid_id, platform = 'reporter')
-    return render(request,'reporter/reporterform.html',{'recptreport':rr,'appdd':appdate,'documents':documents})
+    response = requests.get("https://cdn-api.co-vin.in/api/v2/admin/location/states")
+    if response.status_code == 200:  
+        allstates = response.json()  
+        states=allstates.get('states')
+    else:  
+        states=[{'state_name':'Madhya Pradesh','state_id':20}, {'state_name':'Uttar Pradesh'}, {'state_name':'Rajsthan'}, {'state_name':'Delhi'}]
+    return render(request,'reporter/reporterform.html',{'recptreport':rr,'appdd':appdate,'documents':documents,'states':states})
 
 class Geomapview(View):
     template_name = 'reporter/geomap.html'
@@ -485,9 +493,11 @@ class Geomapview(View):
 
             maplocations.append(data)
     # below lines are only to update in data base the lat and lng and place id 
+        label="no record"
         locations = ReporterReport.objects.values('id','add1', 'add2','city','region','country','landmark','zip','lat','lng','placeid')
         for location in locations:
             # print(location['add1'])
+            
             if location['lat'] and location['lng'] and location['placeid'] !=None:
                 lat=location['lat']
                 lng=location['lng']
@@ -535,5 +545,9 @@ class Geomapview(View):
                     # 'placeid':placeid,
                     'label':label
                    }
+        if(locations):
+            return render(request, self.template_name, context)
+        else:
+            messages.success(request, "No location available to display on map!") 
+            return redirect('/reporter/reporterhome/')
         
-        return render(request, self.template_name, context)

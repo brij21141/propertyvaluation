@@ -30,9 +30,12 @@
                 <div class="item col-sm-6">
                   <label for="inspdate">Date of inspection</label>
                   <input id="inspdate" name = "inspdate" type="date" class="form-control" placeholder="Enter date" 
-                  {% if recptreport %}
-                  value="{{appdd}}"
-                  {% endif %}/>
+                  {% if requestreceived %}
+                    value="{{invdate}}"
+                    {% else %}
+                    value="{{appdd}}"
+                    {% endif %}
+                 />
                   <i class="fas fa-calendar-alt"></i>
               </div>
                 </div>
@@ -108,7 +111,7 @@
                     {%endif%}
                   {% endfor %}
                 </select>
-                <input type="tel" name="zip" placeholder="Postal / Zip code" maxlength="6"
+                <input type="tel" name="zip" placeholder="Postal / Zip code" maxlength="6" oninput="this.value = this.value.replace(/[^0-9]/g, '');"
                 {% if requestreceived %}
                 value="{{requestreceived.zip}}"
                 {% else %}
@@ -125,9 +128,12 @@
               <div class="item">
                 <label for="landmark">Landmark</label>
                 <input id="landmark" name="landmark" type="text" class="form-control" placeholder="Enter Landmark"
-                {% if recptreport %}
-                value="{{recptreport.landmark}}"
-                {% endif %}/>
+                {% if requestreceived %}
+                  value="{{requestreceived.landmark}}"
+                  {% else %}
+                  value="{{recptreport.landmark}}"
+                  {% endif %}
+                />
               </div>
               <div class="item">
                 <p>Legal Address of Property ( House No./ Survey no./ khasra No.)</p>
@@ -144,11 +150,17 @@
                 {% if recptreport %}
                 value="{{recptreport.lcity}}"
                 {% endif %}/>
-                <input type="text" name="lregion" placeholder="State" 
-                {% if recptreport %}
-              value="{{recptreport.lregion}}"
-              {% endif %}/>
-              <input type="text" name="lzip" placeholder="Postal / Zip code" 
+                <select name="lregion" required>
+                  <option value="">{% if recptreport %} {{recptreport.lregion}} {% else %} {{recptreport.lregion}} {% endif %}</option>
+                  {% for state in states %}
+                    {% if state.state_id == 20 %}
+                      <option value={{state.state_name}}  selected   >{{state.state_name}}</option>
+                    {% else %}
+                      <option value={{state.state_name}}   >{{state.state_name}}</option>
+                    {%endif%}
+                  {% endfor %}
+                </select>
+              <input type="text" name="lzip" placeholder="Postal / Zip code" oninput="this.value = this.value.replace(/[^0-9]/g, '');"
               {% if recptreport %}
               {% else %}
               value="{{recptreport.lzip}}"
@@ -172,10 +184,13 @@
               </div>
               <div class="item col-sm-4">
                 <label for="aroadwidth">Approach Road Width</label>
-                <input id="aroadwidth" name = "aroadwidth" type="text" placeholder="Approach Road Width" class="form-control" 
-                {% if recptreport %}
-                value="{{recptreport.approachroadwidth}}"
-                {% endif %}/>
+                <input id="aroadwidth" name = "aroadwidth" type="text" placeholder="Approach Road Width" class="form-control"
+                {% if requestreceived %}
+                  value="{{requestreceived.roadwidth}}"
+                  {% else %}
+                  value="{{recptreport.approachroadwidth}}"
+                  {% endif %} 
+                />
                 
             </div>
             <div class="item col-sm-4">
@@ -417,33 +432,45 @@
         <div class="item col-sm-3">
           <label for="seastboundary">East</label>
           <input id="seastboundary" name="seastboundary" type="text" class="form-control" placeholder="East boundry"
-          {% if recptreport %}
-          value="{{recptreport.perstboundryeast}}"
-          {% endif %}/>
+          {% if requestreceived %}
+                  value="{{requestreceived.east}}"
+                  {% else %}
+                  value="{{recptreport.perstboundryeast}}"
+                  {% endif %}
+         />
       </div>
 
       <div class="item col-sm-3">
         <label for="swestboundary">West</label>
         <input id="swestboundary" name="swestboundary" type="text" class="form-control" placeholder="West boundry"
-        {% if recptreport %}
-        value="{{recptreport.perstboundrywest}}"
-        {% endif %}/>
+        {% if requestreceived %}
+                  value="{{requestreceived.west}}"
+                  {% else %}
+                  value="{{recptreport.perstboundrywest}}"
+                  {% endif %}
+        />
     </div>
 
     <div class="item col-sm-3">
       <label for="snorthboundary">North</label>
       <input id="snorthboundary" name="snorthboundary" type="text" class="form-control" placeholder="North boundry"
-      {% if recptreport %}
-      value="{{recptreport.perstboundrynorth}}"
-      {% endif %}/>
+      {% if requestreceived %}
+                  value="{{requestreceived.north}}"
+                  {% else %}
+                  value="{{recptreport.perstboundrynorth}}"
+                  {% endif %}
+      />
     </div>
 
     <div class="item col-sm-3">
     <label for="ssouthboundary">South</label>
     <input id="ssouthboundary" name="ssouthboundary" type="text" class="form-control" placeholder="South boundry"
-    {% if recptreport %}
-    value="{{recptreport.perstboundrysouth}}"
-    {% endif %}/>
+    {% if requestreceived %}
+        value="{{requestreceived.south}}"
+    {% else %}
+        value="{{recptreport.perstboundrysouth}}"
+    {% endif %}
+    />
     </div>
     </div>
     <div class="row">
@@ -684,11 +711,14 @@
                   {% endif %}/>
                   </div>
                 <div class="item col-sm-8">
-                  <label for="recmdrate">Recommended Rate and basis for recommendation.e</label>
+                  <label for="recmdrate">Recommended Rate and basis for recommendation</label>
                   <input id="recmdrate" name="recmdrate" type="text" class="form-control" placeholder="Enter recommendation rate"
-                  {% if recptreport %}
+                  {% if requestreceived %}
+                  value="{{requestreceived.landrate}}"
+                  {% else %}
                   value="{{recptreport.recomendrate}}"
-                  {% endif %}/>
+                  {% endif %}
+                  />
                   </div>
                 
                 </div> 

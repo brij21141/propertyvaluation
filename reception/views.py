@@ -7,7 +7,7 @@ from django.core.files.storage import default_storage
 from django.http import HttpResponseRedirect,JsonResponse,FileResponse
 from django.conf import settings
 import os 
-import io,requests
+import io,requests,time
 from reportlab.pdfgen import canvas
 from reportlab.lib.units import inch
 from reportlab.lib.pagesizes import letter
@@ -98,15 +98,15 @@ def add_report(request):
         newrecid=rr.id
         uploaded_files = request.FILES.getlist('receptionFiles') 
         for uploaded_file in uploaded_files:
-            newfilename = app_number + "_"+str(newrecid)+"_" + uploaded_file.name
-            file_path = os.path.join(settings.MEDIA_ROOTRECEPTION, newfilename)
+            newfilename = app_number + "_"+str(newrecid)+"_"+time.time()+'_' + uploaded_file.name
+            file_path = os.path.join(settings.MEDIA_ROOT,'reception', newfilename)
             with open(file_path, 'wb+') as destination:
                 for chunk in uploaded_file.chunks():
                     destination.write(chunk)
 
             Document.objects.create(
                 application_number=app_number,
-                file_path=file_path,
+                file_path='reception/'+newfilename,
                 file_name=newfilename,
                 reception_idno=newrecid,
                 username=username,
@@ -229,8 +229,8 @@ def update_report(request,repid):
 
         uploaded_files = request.FILES.getlist('receptionFiles')
         for uploaded_file in uploaded_files:
-            newfilename = f"{app_number}_{str(repid)}_{uploaded_file.name}"
-            file_path = os.path.join(settings.MEDIA_ROOTRECEPTION, newfilename)
+            newfilename = f"{app_number}_{str(repid)}_{time.time()}_{uploaded_file.name}"
+            file_path = os.path.join(settings.MEDIA_ROOT,'reception', newfilename)
 
             try:
                 existing_doc = Document.objects.get(application_number=app_number, file_name=newfilename,reception_idno=repid)
@@ -245,7 +245,7 @@ def update_report(request,repid):
         
             Document.objects.create(
                 application_number=app_number,
-                file_path=file_path,
+                file_path='reception/'+newfilename,
                 file_name=newfilename,
                 reception_idno=repid,
                 username=username,
@@ -261,12 +261,18 @@ def update_report(request,repid):
     rrs=UserDetails.objects.filter(role='Reporter').values('id','user_id','first_name','last_name')
     documents = Document.objects.filter(application_number=rr.applicationnumber,reception_idno=repid, platform = 'reception')
     banks= Banks.objects.all().values('id','name','branch','city')
-    return render(request,'reception/receptionreport.html',{'recptreport':rr,'appdd':appdate,'engineers':ers,'reporters':rrs,'documents':documents,'banks':banks})
+    response = requests.get("https://cdn-api.co-vin.in/api/v2/admin/location/states")
+    if response.status_code == 200:  
+        allstates = response.json()  
+        states=allstates.get('states')
+    else:  
+        states=[{'state_name':'Madhya Pradesh','state_id':20}, {'state_name':'Uttar Pradesh'}, {'state_name':'Rajsthan'}, {'state_name':'Delhi'}]
+    return render(request,'reception/receptionreport.html',{'recptreport':rr,'appdd':appdate,'engineers':ers,'reporters':rrs,'documents':documents,'banks':banks,'states':states})
 
 def delete_file(request, doc_id):
     try:
         document = Document.objects.get(pk=doc_id)
-        os.remove(document.file_path)
+        os.remove(os.path.join(settings.MEDIA_ROOT,document.file_path))
         document.delete()
         return HttpResponseRedirect(request.META.get('HTTP_REFERER', '/'))
     except Document.DoesNotExist:

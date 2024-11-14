@@ -16,14 +16,51 @@ fetch('/api/currentuser')
      navbarname.textContent=data.data[1];
      topnavbarname.textContent=data.data[1]+" ("+ data.data[3]+" )";
      topnavbaremail.textContent=data.data[2];
-     console.log(data.data[4]);
+     console.log(data.data[3]);
     //  navprofileimg.src='/propval/static/img/OIP.jpg';
     //  navmenuprofileimg.src='/propval/static/img/OIP.jpg';
     if(data.data[4]) {
     navprofileimg.setAttribute('src',data.data[4]);
      navmenuprofileimg.setAttribute('src',data.data[4]);
     }
-    
+    if(data.data[3]=='Engineer') {
+      // engspinner.classList.add('spinnervisibility') document.getElementById("globalengtablediv").style.display = "none";
+      document.getElementById("dashboard").style.display = "none";
+      document.getElementById("reception").style.display = "none";
+      // document.getElementById("engineer").style.display = "none";
+      document.getElementById("reporter").style.display = "none";
+      document.getElementById("bankmgmt").style.display = "none";
+      document.getElementById("compprofile").style.display = "none";
+      document.getElementById("genbill").style.display = "none";
+      document.getElementById("administration").style.display = "none";
+    }else if(data.data[3]=='Reporter') {
+      document.getElementById("dashboard").style.display = "none";
+      document.getElementById("reception").style.display = "none";
+      document.getElementById("engineer").style.display = "none";
+      // document.getElementById("reporter").style.display = "none";
+      document.getElementById("bankmgmt").style.display = "none";
+      document.getElementById("compprofile").style.display = "none";
+      document.getElementById("genbill").style.display = "none";
+      document.getElementById("administration").style.display = "none";
+    }
+    else if(data.data[3]=='Reception') {
+      document.getElementById("dashboard").style.display = "none";
+      // document.getElementById("reception").style.display = "none";
+      document.getElementById("engineer").style.display = "none";
+      document.getElementById("reporter").style.display = "none";
+      document.getElementById("bankmgmt").style.display = "none";
+      document.getElementById("compprofile").style.display = "none";
+      // document.getElementById("genbpythonill").style.display = "none";
+      document.getElementById("administration").style.display = "none";
+    }
+    else if(data.data[3]=='Admin') {
+      
+    }
+    let pageTitle = document.title;  
+    console.log(pageTitle);
+    if(pageTitle=="Home" || pageTitle=="Reception" || pageTitle=="Site Engineer" || pageTitle=="Reporter"){
+      document.getElementById("globsearch").style.display = "inline-block";
+    }  
 });
 
 let submenu =document.getElementById("submenu");

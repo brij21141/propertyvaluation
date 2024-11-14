@@ -1,6 +1,6 @@
 {% extends "sidebar.html" %}
 <!-- {% include 'bootstrap_link.html' %} -->
-{% block title %}Site Engineer{% endblock %}
+{% block title %}User Profile{% endblock %}
 {% load static %}
 <link rel="stylesheet" href="{% static '/css/formstyle.css' %}">
 {% block content %}
@@ -54,10 +54,16 @@
                       {% if userdata.city %}
                     value="{{userdata.city}}"
                     {% endif %}/>
-                      <input type="text" name="region" placeholder="State" 
-                      {% if userdata.region %}
-                    value="{{userdata.region}}"
-                    {% endif %}/>
+                    <select name="region" required>
+                      <option value="">{% if userdata.region %} {{userdata.region}} {% else %} Select State {% endif %}</option>
+                      {% for state in states %}
+                        {% if state.state_id == 20 %}
+                          <option value={{state.state_name}}  selected   >{{state.state_name}}</option>
+                        {% else %}
+                          <option value={{state.state_name}}   >{{state.state_name}}</option>
+                        {%endif%}
+                      {% endfor %}
+                    </select>
                       <input type="text" name="zip" placeholder="Postal / Zip code" 
                       {% if userdata.zip %}
                     value="{{userdata.zip}}"

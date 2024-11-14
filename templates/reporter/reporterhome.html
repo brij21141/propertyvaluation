@@ -1,7 +1,7 @@
 
 {% extends "sidebar.html" %}
 <!-- {% include 'bootstrap_link.html' %} -->
-{% block title %}Site Engineer{% endblock %}
+{% block title %}Reporter{% endblock %}
 {% load static %}
 
 {% block content %}
@@ -287,7 +287,16 @@
   
   
 </div>
-
+{% if messages %}  
+    <script>  
+        window.onload = function() {  
+                   
+            {% for message in messages %}  
+                swal("Fail!", "{{ message }}", "error");  
+            {% endfor %}  
+        };  
+    </script>  
+{% endif %} 
  
 
 {% endblock %}

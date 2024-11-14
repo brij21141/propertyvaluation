@@ -21,33 +21,33 @@
                 </div>
             </div>
             <ul class="sidebar-nav">
-                <li class="sidebar-item">
+                <li class="sidebar-item" id="profile">
                     <a href="{% url 'profile' 0 %}?next={{ request.path }}" class="sidebar-link tooltip-test"  title="Profile">
                         <i class="fa-solid fa-user"></i>
                         <span>Profile</span>
                     </a>
                 </li>
-                <li class="sidebar-item">
+                <li class="sidebar-item" id="dashboard">
                     <a href="{% url 'home' %}" class="sidebar-link tooltip-test" title="Dashboard">
                         <i class="lni lni-dashboard"></i>
                         <span>Dashboard</span>
                     </a>
                 </li>
-                <li class="sidebar-item">
+                <li class="sidebar-item" id="reception">
                     <a href="{% url 'receptionhome' %}" class="sidebar-link tooltip-test" title="Reception">
                         <i class="lni lni-school-bench"></i>
                         <span>Reception</span>
                     </a>
                 </li>
                 
-                <li class="sidebar-item">
+                <li class="sidebar-item" id="engineer">
                     <a href="{% url 'engineerhome' %}" class="sidebar-link tooltip-test" title="Site Engineer">
                         <i class="fa-solid fa-graduation-cap"></i>
                         <span>Site Engineer</span>
                     </a>
                 </li>
                 
-                <li class="sidebar-item">
+                <li class="sidebar-item" id="reporter">
                     <a href="{% url 'reporterhome' %}" class="sidebar-link tooltip-test" title="Reporter">
                         <i class="fa-brands fa-wpbeginner"></i>
                         <span>Reporter</span>
@@ -60,7 +60,7 @@
                         <span>Banks</span>
                     </a>
                 </li> -->
-                <li class="sidebar-item">
+                <li class="sidebar-item" id="bankmgmt">
                     <a href="#" class="sidebar-link collapsed has-dropdown" data-bs-toggle="collapse"
                         data-bs-target="#bank" aria-expanded="false" aria-controls="bank">
                         <i class="fa-solid fa-building-columns"></i>
@@ -78,24 +78,24 @@
                     
                 </li>
                 
-                <li class="sidebar-item">
+                <li class="sidebar-item" id="compprofile">
                     <a href="{% url 'companyprofile' %}?next={{ request.path }}" class="sidebar-link">
                         <i class="lni lni-briefcase"></i>
                         <span>Company Profile</span>
                     </a>
                 </li>
-                <li class="sidebar-item">
+                <li class="sidebar-item" id="genbill">
                     <a href="{% url 'generatebill' %}" class="sidebar-link">
                         <i class="fa-solid fa-file-invoice-dollar"></i>
                         <span>Generate Bills</span>
                     </a>
                 </li>
             
-                <li class="sidebar-item">
+                <li class="sidebar-item" id="administration">
                     <a href="#" class="sidebar-link collapsed has-dropdown" data-bs-toggle="collapse"
                         data-bs-target="#auth" aria-expanded="false" aria-controls="auth">
                         <i class="lni lni-protection"></i>
-                        <span>Auth</span>
+                        <span>Admin</span>
                     </a>
                     
                     <ul id="auth" class="sidebar-dropdown list-unstyled collapse" data-bs-parent="#sidebar">
@@ -139,28 +139,29 @@
                   
                 </div>
               </nav> -->
-              <nav class="topnavbar navbar d-flex navbar-expand-lg navbar-light ">
+              <nav class="topnavbar navbar d-flex navbar-expand-lg navbar-light " style="padding-top: inherit;padding-bottom: inherit;">
                 <div class="container-fluid">
-                    <img src="{% static 'img/logo.png' %}" alt="" width="50" height="40" class="">
+                    <img src="{% static 'img/logo.png' %}" alt="" width="35" height="35" class="">
                   <a class="navbar-brand" style="color: white;" href="#">&nbsp;&nbsp;   bnc</a>
                   <button class="navbar-toggler" style="background-color: white;" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
                     <span class="navbar-toggler-icon"></span>
                   </button>
                   <div class="collapse navbar-collapse " id="navbarNav">
                     <ul class="navbar-nav ms-auto">
-                    <li class="nav-item" style="text-align: center; display: flex; align-items: center; justify-content: center;position: relative;"></li>
-                    <input type="text" id="searchquery" name="searchquery" class="form-control mr-sm-2" style="width: 100%; margin: auto;" placeholder="Search..." >  
-                    <button type="button" id="gsearchclear" style="position: absolute; right: 250px; top: 40%; transform: translateY(-50%); font-size: 36px;color: gray;width: 25px; height: 25px;  background: transparent; border: none; cursor: pointer;" onclick="clearsearch()"> &times;  </button>
+                    <li class="nav-item mt-2"  >
+                    <div style="position: relative; display: none; align-items: center;" id="globsearch" >
+                    <input type="text" id="searchquery" name="searchquery"  class="form-control d-flex float-end" style="width: auto;" placeholder="Search..." >  
+                    <button type="button" id="gsearchclear" style="position: absolute; right: 12px; top: 20%; transform: translateY(-50%); font-size: 24px;color: gray; width: 25px; height: 25px; background: transparent; border: none; cursor: pointer;" onclick="clearsearch()"> &times;  </a>
                         
-                        
+                  </div>            
                     </li>
                       
                         
                         
                       <li class="nav-item" style="text-align: center;width: -webkit-fill-available;">
                         <!-- <a class="nav-link" href="#" > -->
-                            <span class="nav-link" id="topnavbarusername" style="color: white;"></span>
-                            <span  class="nav-link" id="topnavbaremail" style="color: white; margin-top: -20px;"></span>
+                            <span class="nav-link" id="topnavbarusername" style="color: white;font-size: 14px;"></span>
+                            <span  class="nav-link" id="topnavbaremail" style="color: white; margin-top: -20px;font-size: 12px;"></span>
                         <!-- </a> -->
                       </li>
                       <!-- <li class="nav-item">

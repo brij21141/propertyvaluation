@@ -58,7 +58,11 @@
                             {% if bk.id == recptreport.bankid  %}
                             <option value="{{bk.id}}" selected >{{bk.name}} {{bk.branch}} {{bk.city}}</option>
                             {% else %}
-                            <option value="{{bk.id}}" >{{bk.name}} {{bk.branch}} {{bk.city}}</option>
+                              {% if requestreceived.bankid == bk.id %}
+                                <option value="{{bk.id}}" selected >{{bk.name}} {{bk.branch}} {{bk.city}}</option>
+                               {% else %} 
+                               <option value="{{bk.id}}">{{bk.name}} {{bk.branch}} {{bk.city}}</option>
+                               {% endif %}
                             {% endif %}
                             {%  endfor %}
                             
@@ -111,7 +115,7 @@
                               {%endif%}
                             {% endfor %}
                           </select>
-                          <input type="tel" name="zip" placeholder="Postal / Zip code" maxlength="6"
+                          <input type="tel" name="zip" placeholder="Postal / Zip code" maxlength="6" oninput="this.value = this.value.replace(/[^0-9]/g, '');"
                           {% if requestreceived %}
                           value="{{requestreceived.zip}}"
                           {% else %}

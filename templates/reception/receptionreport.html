@@ -1,7 +1,7 @@
 
 {% extends "sidebar.html" %}
 {% include 'bootstrap_link.html' %}
-{% block title %}Reception{% endblock %}
+{% block title %}Create Job{% endblock %}
 {% load static %}
 
 {% block content %}
@@ -96,7 +96,7 @@
                                 {%endif%}
                               {% endfor %}
                             </select>
-                              <input type="tel" name="zip" placeholder="Postal / Zip code" maxlength="6"
+                              <input type="tel" name="zip" placeholder="Postal / Zip code" maxlength="6" oninput="this.value = this.value.replace(/[^0-9]/g, '');"
                               {% if recptreport %}
                             value="{{recptreport.zip}}"
                             {% endif %}/>
@@ -109,7 +109,7 @@
                           </div>
                         <div class="item">
                             <label for="phonenumber">Enter phone Number</label>
-                            <input id="phonenumber" name="phonenumber" type="tel" maxlength="10" class="form-control" placeholder="Enter phone Number"
+                            <input id="phonenumber" name="phonenumber" type="tel" maxlength="10" oninput="this.value = this.value.replace(/[^0-9]/g, '');" class="form-control" placeholder="Enter phone Number"
                             {% if recptreport %}
                             value="{{recptreport.phonenumber}}"
                             {% endif %}/>

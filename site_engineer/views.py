@@ -7,7 +7,7 @@ from django.contrib import messages
 from django.core.files.storage import default_storage
 from django.http import HttpResponseRedirect,JsonResponse
 from django.conf import settings
-import os , requests
+import os , requests, time
 from django.contrib.auth.models import User
 from django.contrib import messages
 
@@ -124,22 +124,23 @@ def add_report(request,repid):
         er.remark = remark
         er.userdetailsid=userid
         er.receptionid=ReceptionReport.objects.get(pk=repid,applicationnumber=app_number)
-        print(repid)
+        # print(repid)
         # er.priority = ReceptionReport.objects.get(applicationnumber=app_number,pk=repid).priority
         er.save()
 
         newrecid=er.id
         uploaded_files = request.FILES.getlist('engineerFiles') 
         for uploaded_file in uploaded_files:
-            newfilename = app_number + "_"+str(newrecid)+"_" + uploaded_file.name
-            file_path = os.path.join(settings.MEDIA_ROOTENGINEER, newfilename)
+            # print(time.time())
+            newfilename = app_number + "_"+str(newrecid)+'_'+time.time()+'_' + uploaded_file.name
+            file_path = os.path.join(settings.MEDIA_ROOT,'engineer', newfilename)
             with open(file_path, 'wb+') as destination:
                 for chunk in uploaded_file.chunks():
                     destination.write(chunk)
 
             Document.objects.create(
                 application_number=app_number,
-                file_path=file_path,
+                file_path='engineer/'+newfilename,
                 file_name=newfilename,
                 reception_idno=repid,
                 username=username,
@@ -334,8 +335,8 @@ def update_report(request,repid):
         er.save()
         uploaded_files = request.FILES.getlist('engineerFiles')
         for uploaded_file in uploaded_files:
-            newfilename = f"{app_number}_{str(repid)}_{uploaded_file.name}"
-            file_path = os.path.join(settings.MEDIA_ROOTENGINEER, newfilename)
+            newfilename = f"{app_number}_{str(repid)}_{time.time()}_{uploaded_file.name}"
+            file_path = os.path.join(settings.MEDIA_ROOT,'engineer/', newfilename)
 
             try:
                 existing_doc = Document.objects.get(application_number=app_number, file_name=newfilename,reception_idno=repid)
@@ -350,7 +351,7 @@ def update_report(request,repid):
         
             Document.objects.create(
                 application_number=app_number,
-                file_path=file_path,
+                file_path='engineer/'+newfilename,
                 file_name=newfilename,
                 reception_idno=recid,
                 username=username,
@@ -366,12 +367,19 @@ def update_report(request,repid):
     # appdate=rr.applicationdate.strftime("%Y-%m-%d")
     documents = Document.objects.filter(application_number=rr.applicationnumber,reception_idno=recid, platform = 'engineer')
     banks= Banks.objects.all().values('id','name','branch','city')
-    return render(request,'engineer/engineersiteform.html',{'recptreport':rr,'documents':documents,'banks':banks})
+    response = requests.get("https://cdn-api.co-vin.in/api/v2/admin/location/states")
+    if response.status_code == 200:  
+        allstates = response.json()  
+        states=allstates.get('states')
+    else:  
+        states=[{'state_name':'Madhya Pradesh','state_id':20}, {'state_name':'Uttar Pradesh'}, {'state_name':'Rajsthan'}, {'state_name':'Delhi'}]
+    return render(request,'engineer/engineersiteform.html',{'recptreport':rr,'documents':documents,'banks':banks,'states':states})
 
 def delete_file(request, doc_id):
     try:
         document = Document.objects.get(pk=doc_id)
-        os.remove(document.file_path)
+        # os.remove(document.file_path)
+        os.remove(os.path.join(settings.MEDIA_ROOT,document.file_path))
         document.delete()
         return HttpResponseRedirect(request.META.get('HTTP_REFERER', '/'))
     except Document.DoesNotExist:

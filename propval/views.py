@@ -224,22 +224,30 @@ def profile(request, uid=0):
         userdetails.ifsccode = request.POST.get('ifsc')
         uploaded_files = request.FILES.getlist('profileimage') 
         # uploaded_files = request.FILES.['profileimage'] 
+        profile_dir = os.path.join(settings.MEDIA_ROOT, 'profile')  
+        os.makedirs(profile_dir, exist_ok=True)
         if uploaded_files:    
             for uploaded_file in uploaded_files:
                 newfilename = userdetails.first_name+'_'+str(userdetails.user_id)+'_'+uploaded_file.name
                 # print(newfilename, request.POST.get('first_name'))
-                file_path = os.path.join(settings.MEDIA_ROOTPROFILE, newfilename)
+                file_path = os.path.join(settings.MEDIA_ROOT,'profile', newfilename)
                 with open(file_path, 'wb+') as destination:
                     for chunk in uploaded_file.chunks():
                         destination.write(chunk)
-            userdetails.profileimage = file_path
+            userdetails.profileimage = 'profile/'+newfilename
         userdetails.save()
         if(uid == 0):
             next_url = request.GET.get('next', '/default-url/')
             return redirect(next_url) 
         else:
             return redirect('home')
-    return render (request,'profile.html',{'userdata':userdetails,'uid':uid})
+    response = requests.get("https://cdn-api.co-vin.in/api/v2/admin/location/states")
+    if response.status_code == 200:  
+        allstates = response.json()  
+        states=allstates.get('states')
+    else:  
+        states=[{'state_name':'Madhya Pradesh','state_id':20}, {'state_name':'Uttar Pradesh'}, {'state_name':'Rajsthan'}, {'state_name':'Delhi'}]
+    return render (request,'profile.html',{'userdata':userdetails,'uid':uid,'states':states})
 
 
 # @require_POST
@@ -292,21 +300,30 @@ def company_profile_view(request):
         profile.ifsc = request.POST.get('ifsc')
         profile.terms = request.POST.get('terms')
         uploaded_files = request.FILES.getlist('companyprofilefile') 
+        # Create the profile directory if it does not exist  
+        profile_dir = os.path.join(settings.MEDIA_ROOT, 'profile')  
+        os.makedirs(profile_dir, exist_ok=True)
         if uploaded_files:    
             for uploaded_file in uploaded_files:
                 newfilename = profile.name+str(profile.id)+'_'+uploaded_file.name
                 
-                file_path = os.path.join(settings.MEDIA_PROFILE, newfilename)
+                file_path = os.path.join(settings.MEDIA_ROOT,'profile', newfilename)
                     
                 with open(file_path, 'wb+') as destination:
                     for chunk in uploaded_file.chunks():
                         destination.write(chunk)
-            profile.profileimage = file_path
+            profile.profileimage = 'profile/'+newfilename
         profile.save()
         # return redirect('companyprofile')
         next_url = request.GET.get('next', '/default-url/')
-        return redirect(next_url) 
-    return render(request, 'company_profile.html', {'profile': profile})
+        return redirect(next_url)
+    response = requests.get("https://cdn-api.co-vin.in/api/v2/admin/location/states")
+    if response.status_code == 200:  
+        allstates = response.json()  
+        states=allstates.get('states')
+    else:  
+        states=[{'state_name':'Madhya Pradesh','state_id':20}, {'state_name':'Uttar Pradesh'}, {'state_name':'Rajsthan'}, {'state_name':'Delhi'}] 
+    return render(request, 'company_profile.html', {'profile': profile, 'states': states})
 
 def banks(request,uid=None):
     if uid !=0:

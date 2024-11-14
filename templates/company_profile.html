@@ -54,13 +54,17 @@
                               {% if profile %}
                             value="{{profile.city}}"
                             {% endif %}/>
-                              <input type="text" name="region" placeholder="State" 
-                              {% if profile %}
-                            value="{{profile.state}}"
-                            {% else %}
-                            value = "Madhya Pradesh"
-                            {% endif %}/>
-                              <input type="text" name="zip" placeholder="Postal / Zip code" 
+                            <select name="region" required>
+                              <option value="">{% if profile %} {{profile.region}} {% else %} Select State {% endif %}</option>
+                              {% for state in states %}
+                                {% if state.state_id == 20 %}
+                                  <option value={{state.state_name}}  selected   >{{state.state_name}}</option>
+                                {% else %}
+                                  <option value={{state.state_name}}   >{{state.state_name}}</option>
+                                {%endif%}
+                              {% endfor %}
+                            </select>
+                              <input type="text" name="zip" placeholder="Postal / Zip code" maxlength="6" oninput="this.value = this.value.replace(/[^0-9]/g, '');"
                               {% if profile %}
                             value="{{profile.zip}}"
                             {% endif %}/>
@@ -75,21 +79,21 @@
                       
                             <div class="item col-sm-3">
                                 <label for="phonenumber">Contact Number</label>
-                              <input id="phonenumber" type="text" name="phonenumber" placeholder="Phone number" 
+                              <input id="phonenumber" type="text" name="phonenumber" placeholder="Phone number" maxlength="10" oninput="this.value = this.value.replace(/[^0-9]/g, '');"
                               {% if profile %}
                             value="{{profile.contact_no}}"
                             {% endif %}/>
                             </div>
                             <div class="item col-sm-3">
                                 <label for="std">STD Code</label>
-                              <input id="std" type="text" name="std" placeholder="STD Code" 
+                              <input id="std" type="text" name="std" placeholder="STD Code" maxlength="4" oninput="this.value = this.value.replace(/[^0-9]/g, '');"
                               {% if profile %}
                             value="{{profile.std}}"
                             {% endif %}/>
                             </div>
                             <div class="item col-sm-3">
                                 <label for="landline">Land Line No.</label>
-                              <input id="landline" type="text" name="landline" placeholder="Land Line No." 
+                              <input id="landline" type="text" name="landline" placeholder="Land Line No." maxlength="7" oninput="this.value = this.value.replace(/[^0-9]/g, '');"
                               {% if profile %}
                             value="{{profile.phone}}"
                             {% endif %}/>
@@ -131,7 +135,7 @@
                           <div class="row">
                             <div class="item col-sm-4">
                                 <label for="email">Email Id</label>
-                              <input id="email" type="text" name="email" placeholder="Email Id" 
+                              <input id="email" type="email" name="email" placeholder="Email Id" 
                               {% if profile %}
                             value="{{profile.email}}"
                             {% endif %}/>

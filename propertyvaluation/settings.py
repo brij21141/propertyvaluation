@@ -133,13 +133,13 @@ STATIC_URL = '/static/'
 STATICFILES_DIRS = [os.path.join(BASE_DIR, 'propval/static'),os.path.join(BASE_DIR, 'reception/static'),os.path.join(BASE_DIR, 'propval/templatetags'),]
 STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles_build','static')
 MEDIA_URL = '/media/'  # Base URL to serve media files
-MEDIA_PROFILEURL = 'propval/media/'  # Base URL to serve profile media files
+# MEDIA_PROFILEURL = 'propval/media/'  # Base URL to serve profile media files
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
-MEDIA_ROOTRECEPTION = os.path.join(BASE_DIR, 'media/reception')
-MEDIA_PROFILE = os.path.join(BASE_DIR, 'media/profile')
-MEDIA_ROOTENGINEER = os.path.join(BASE_DIR, 'media/engineer')
-MEDIA_ROOTREPORTER = os.path.join(BASE_DIR, 'media/reporter/')
-MEDIA_ROOTPROFILE = os.path.join(BASE_DIR, 'media/profile')
+# MEDIA_ROOTRECEPTION = os.path.join(BASE_DIR, 'media/reception')
+# MEDIA_PROFILE = os.path.join(BASE_DIR, 'media/profile')
+# MEDIA_ROOTENGINEER = os.path.join(BASE_DIR, 'media/engineer')
+# MEDIA_ROOTREPORTER = os.path.join(BASE_DIR, 'media/reporter/')
+# MEDIA_ROOT_PROFILE = os.path.join(BASE_DIR, 'media/profile')
 API_BASE_URL = 'http://127.0.0.1:8000/api/'
 
 # Default primary key field type
