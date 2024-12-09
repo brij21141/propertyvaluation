@@ -1,3 +1,45 @@
+document.addEventListener('DOMContentLoaded', () => {  
+  const container = document.getElementById('scrollContainer');  
+  const items = Array.from(container.children);  
+  
+  // Clone the items to create an infinite scrolling effect  
+  items.forEach(item => {  
+      const clone = item.cloneNode(true);  
+      container.appendChild(clone);  
+  });  
+  
+  let scrollPosition = 0; // Initial scroll position  
+  const scrollSpeed = 1; // Pixels to scroll per interval  
+  const scrollInterval = 20; // Milliseconds between scrolls  
+
+  function autoScroll() {  
+      // Scroll by `scrollSpeed` pixels  
+      scrollPosition += scrollSpeed;   
+      container.scrollTop = scrollPosition;  
+
+      // If we've scrolled past the original content height, reset to the top  
+      if (scrollPosition >= container.scrollHeight / 2) {  
+          scrollPosition = 0; // Reset scroll position  
+      }  
+  }  
+  function startScrolling() {  
+    // Start auto-scrolling at defined intervals  
+    intervalId = setInterval(autoScroll, scrollInterval);  
+}  
+
+function stopScrolling() {  
+    // Clear the interval to stop scrolling  
+    clearInterval(intervalId);  
+}
+
+  // Start auto-scrolling at defined intervals  
+  // setInterval(autoScroll, scrollInterval); 
+  startScrolling(); 
+
+  container.addEventListener('mouseover', stopScrolling);  
+    container.addEventListener('mouseout', startScrolling);  
+});
+
 const hamburger = document.querySelector("#toggle-btn");
 console.log("sidebar connected");
 hamburger.addEventListener("click",function(){
@@ -27,12 +69,16 @@ fetch('/api/currentuser')
       // engspinner.classList.add('spinnervisibility') document.getElementById("globalengtablediv").style.display = "none";
       document.getElementById("dashboard").style.display = "none";
       document.getElementById("reception").style.display = "none";
+      document.getElementById("sidebar").style.display = "none";
       // document.getElementById("engineer").style.display = "none";
       document.getElementById("reporter").style.display = "none";
       document.getElementById("bankmgmt").style.display = "none";
       document.getElementById("compprofile").style.display = "none";
       document.getElementById("genbill").style.display = "none";
       document.getElementById("administration").style.display = "none";
+      document.querySelectorAll('.engedit').forEach(function(element) {  
+        element.style.display = 'none';  
+    }); 
     }else if(data.data[3]=='Reporter') {
       document.getElementById("dashboard").style.display = "none";
       document.getElementById("reception").style.display = "none";
@@ -42,6 +88,10 @@ fetch('/api/currentuser')
       document.getElementById("compprofile").style.display = "none";
       document.getElementById("genbill").style.display = "none";
       document.getElementById("administration").style.display = "none";
+      document.querySelectorAll('.repedit').forEach(function(element) {  
+        element.style.display = 'none';  
+    }); 
+      
     }
     else if(data.data[3]=='Reception') {
       document.getElementById("dashboard").style.display = "none";
@@ -52,6 +102,9 @@ fetch('/api/currentuser')
       document.getElementById("compprofile").style.display = "none";
       // document.getElementById("genbpythonill").style.display = "none";
       document.getElementById("administration").style.display = "none";
+      document.querySelectorAll('.recedit').forEach(function(element) {  
+        element.style.display = 'none';  
+    }); 
     }
     else if(data.data[3]=='Admin') {
       
@@ -119,9 +172,13 @@ document.getElementById('profileimage').onchange = function(event) {
     // Redirect to the last accessed URL  
     window.location.href = lastUrl;  
 }  
-
-
-
+  function addmorerows() {  
+    document.getElementById("tf").style.display = "inline-block";
+    document.getElementById("frf").style.display = "inline-block";
+    document.getElementById("fvf").style.display = "inline-block";
+    document.getElementById("sxf").style.display = "inline-block";
+    document.getElementById('addmorerows').disabled = true;  
+}  
 
 
  

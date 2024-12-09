@@ -1,12 +1,13 @@
-from django.shortcuts import render, redirect,get_object_or_404, HttpResponse
+from django.shortcuts import render, redirect,get_object_or_404
 from .models import ReceptionReport,Document
-from propval.models import UserDetails, Banks
-from datetime import datetime
+from propval.models import UserDetails, Banks,Impdoc
+# from datetime import datetime
+import datetime
 from django.contrib import messages
 from django.core.files.storage import default_storage
-from django.http import HttpResponseRedirect,JsonResponse,FileResponse
+from django.http import HttpResponseRedirect,JsonResponse,FileResponse,HttpResponse
 from django.conf import settings
-import os 
+import os , zipfile
 import io,requests,time
 from reportlab.pdfgen import canvas
 from reportlab.lib.units import inch
@@ -48,10 +49,12 @@ def add_report(request):
         # print(app_visitor+'A')
         if app_reporter =='' or app_reporter =='0':
             reprtr = 'Reporter Not Assigned'
-            
-            
         else:
             reprtr =  UserDetails.objects.get(user=app_reporter).first_name+' '+UserDetails.objects.get(user=app_reporter).last_name      
+        if app_visitor =='' or app_visitor =='0':
+            visitr = 'Engineer Not Assigned'
+        else:
+            visitr =  UserDetails.objects.get(user=app_visitor).first_name+' '+UserDetails.objects.get(user=app_visitor).last_name 
 
         # # Check if application number already exists
         # if ReceptionReport.objects.filter(applicationnumber=app_number).exists():
@@ -92,13 +95,13 @@ def add_report(request):
         rr.visitingperson=app_visitor
         rr.reportperson=app_reporter
         # print(app_reporter)
-        rr.visitingpersonname= UserDetails.objects.get(user=app_visitor).first_name+' '+UserDetails.objects.get(user=app_visitor).last_name 
+        rr.visitingpersonname= visitr
         rr.reportpersonname=reprtr
         rr.save()
         newrecid=rr.id
         uploaded_files = request.FILES.getlist('receptionFiles') 
         for uploaded_file in uploaded_files:
-            newfilename = app_number + "_"+str(newrecid)+"_"+time.time()+'_' + uploaded_file.name
+            newfilename = app_number + "_"+str(newrecid)+"_"+str(time.time())+'_' + uploaded_file.name
             file_path = os.path.join(settings.MEDIA_ROOT,'reception', newfilename)
             with open(file_path, 'wb+') as destination:
                 for chunk in uploaded_file.chunks():
@@ -122,17 +125,20 @@ def add_report(request):
     #     print(er)
     rrs=UserDetails.objects.filter(role='Reporter').values('user_id','id','first_name','last_name')
     banks= Banks.objects.all().values('id','name','branch','city')
-    response = requests.get("https://cdn-api.co-vin.in/api/v2/admin/location/states")
-    if response.status_code == 200:  
-        allstates = response.json()  
-        states=allstates.get('states')
-        # print(states)
-        # print(allstates.get('states')[0]['state_name'])  
-    else:  
+    try:
+        response = requests.get("https://cdn-api.co-vin.in/api/v2/admin/location/states")
+    
+        if response.status_code == 200:  
+            allstates = response.json()  
+            states=allstates.get('states')
+        else:  
+            states=[{'state_name':'Madhya Pradesh','state_id':20}, {'state_name':'Uttar Pradesh'}, {'state_name':'Rajsthan'}, {'state_name':'Delhi'}]
+    except requests.ConnectionError:
         states=[{'state_name':'Madhya Pradesh','state_id':20}, {'state_name':'Uttar Pradesh'}, {'state_name':'Rajsthan'}, {'state_name':'Delhi'}]
         # print(states[0]['state_name']) 
     #  print("Error:", response.status_code, response.json())  
-    return render(request,"reception/receptionreport.html",{'engineers':ers,'reporters':rrs,'banks':banks,'states':states})
+    currdate=datetime.date.today().strftime("%Y-%m-%d")
+    return render(request,"reception/receptionreport.html",{'engineers':ers,'reporters':rrs,'banks':banks,'states':states,'currdate':currdate})
 @login_required(login_url='login')
 def receptionhome(request):
     allreports = ReceptionReport.objects.all()
@@ -148,7 +154,8 @@ def receptionhome(request):
     
     if user_details.role == 'Admin' or user_details.role == 'Reception':
         # return redirect('home')
-        return render(request,"reception/receptionhome.html",{'recpreports':recpreport,'totrep':totrep,'context':context,'allreports':allreports})
+        impdocs= Impdoc.objects.all()
+        return render(request,"reception/receptionhome.html",{'recpreports':recpreport,'totrep':totrep,'context':context,'allreports':allreports,'impdocs':impdocs})
     elif user_details.role == 'Engineer':
         return redirect('/engineer/engineerhome/')
     # elif user_details.role == 'Reception':
@@ -229,7 +236,7 @@ def update_report(request,repid):
 
         uploaded_files = request.FILES.getlist('receptionFiles')
         for uploaded_file in uploaded_files:
-            newfilename = f"{app_number}_{str(repid)}_{time.time()}_{uploaded_file.name}"
+            newfilename = f"{app_number}_{str(repid)}_{str(time.time())}_{uploaded_file.name}"
             file_path = os.path.join(settings.MEDIA_ROOT,'reception', newfilename)
 
             try:
@@ -261,11 +268,15 @@ def update_report(request,repid):
     rrs=UserDetails.objects.filter(role='Reporter').values('id','user_id','first_name','last_name')
     documents = Document.objects.filter(application_number=rr.applicationnumber,reception_idno=repid, platform = 'reception')
     banks= Banks.objects.all().values('id','name','branch','city')
-    response = requests.get("https://cdn-api.co-vin.in/api/v2/admin/location/states")
-    if response.status_code == 200:  
-        allstates = response.json()  
-        states=allstates.get('states')
-    else:  
+    try:
+        response = requests.get("https://cdn-api.co-vin.in/api/v2/admin/location/states")
+    
+        if response.status_code == 200:  
+            allstates = response.json()  
+            states=allstates.get('states')
+        else:  
+            states=[{'state_name':'Madhya Pradesh','state_id':20}, {'state_name':'Uttar Pradesh'}, {'state_name':'Rajsthan'}, {'state_name':'Delhi'}]
+    except requests.ConnectionError:
         states=[{'state_name':'Madhya Pradesh','state_id':20}, {'state_name':'Uttar Pradesh'}, {'state_name':'Rajsthan'}, {'state_name':'Delhi'}]
     return render(request,'reception/receptionreport.html',{'recptreport':rr,'appdd':appdate,'engineers':ers,'reporters':rrs,'documents':documents,'banks':banks,'states':states})
 
@@ -283,6 +294,7 @@ def engcompreportpdf(request, doc_id):
     # url=api_base_url+'engineer/'+str(doc_id)
     url = f'{api_base_url}engineer/{doc_id}/engcomjobpdfarctoo' 
     # print(str(doc_id), url)
+    width, height = letter
     try:
         response = requests.get(url)
         response.raise_for_status()  # Raise an exception for HTTP errors
@@ -296,7 +308,7 @@ def engcompreportpdf(request, doc_id):
     except Exception as err:
         return JsonResponse({'error': f'Other error occurred: {err}'}, status=500)
     date_str = data["updated_at"]
-    date_obj = datetime.strptime(date_str, "%Y-%m-%dT%H:%M:%S.%fZ")
+    date_obj = datetime.datetime.strptime(date_str, "%Y-%m-%dT%H:%M:%S.%fZ")
     
     buf = io.BytesIO()
     c= canvas.Canvas(buf,pagesize=letter,bottomup=0)
@@ -422,14 +434,16 @@ def engcompreportpdf(request, doc_id):
     else:
         c.rect(checkbox_x, checkbox_y+140, 10, 10, stroke=1, fill=0) 
     c.drawString(checkbox_x+20, checkbox_y+150,"Other please specify")
-    c.drawString(checkbox_x+20, checkbox_y+170,data['others'])
+    if (data['others']):
+        c.drawString(checkbox_x+20, checkbox_y+170,data['others'])
     c.drawString(checkbox_x, checkbox_y+190,"Remark :   ")
-    c.drawString(checkbox_x+60, checkbox_y+190,data['remark'])
+    if (data['remark']):
+        c.drawString(checkbox_x+60, checkbox_y+190,data['remark'])
     # c.drawString(0,10,"A")
     # c.drawString(300,10,"B")
     # c.drawString(600,10,"C")
     c.setFillColorRGB(0,0,255)
-    c.setFont("Courier-Bold",20)
+    c.setFont("Courier-Bold",16)
     c.setTitle(pdffilename)
     c.line(10,40,600,40)
     img = Image.open('propval/static/img/logo.png')
@@ -437,7 +451,8 @@ def engcompreportpdf(request, doc_id):
     rgb_img = img.convert('RGB')
     rgb_img.save('llogo.jpg')
     c.drawInlineImage('llogo.jpg',20,-20,25,25)
-    c.drawCentredString(330,30, f"Site Visit Report submitted by: {data['receptionid']['visitingpersonname']} ")
+    if (data['receptionid']['visitingpersonname']):
+        c.drawCentredString(330,30, f"Site Visit Report submitted by: {data['receptionid']['visitingpersonname']} ")
     c.drawText(textobj)
     c.drawText(textobja)
     c.drawText(textobjb)
@@ -446,19 +461,28 @@ def engcompreportpdf(request, doc_id):
     # print (data["applicationnumber"],data['receptionid']['id'],documents)
     i=1
     y=0
+    icon_x = 550
+    icon_y = 5  # Adjust y-coordinate to position the icon correctly
+    icon_width = 50
+    icon_height = 50
+    icon_y_click = height-55
     # Draw a rectangle where you would like the download icon to be  
-    c.drawImage('propval/static/img/download.png', 550, 5, width=50, height=50)  
+    c.drawImage('propval/static/img/download.png', icon_x, icon_y, width=icon_width, height=icon_height)  
 
     # Set link for the icon (assuming you have a download view)  
-    # download_url = request.build_absolute_uri(reverse('download_image'))  #download_image is view to download image
-    # c.linkURL(download_url, (100, 600, 150, 650), relative=1)  
+    file_ids = ','.join(str(id) for id in documents.values_list('id', flat=True))
+    # file_ids = '1,2,3'
+    download_url = request.build_absolute_uri(reverse('download_image', args=[file_ids]))  #download_image is view to download image
+    print(download_url)
+    # c.linkURL(download_url, (550, 50, 50, 800), relative=1)  
+    c.linkURL(download_url, (icon_x, icon_y_click, icon_x + icon_width, icon_y_click + icon_height), relative=1)  
         # like this  path('download-image/', download_image, name='download_image'),  
     for doc in documents:
         
         # print (doc.file_name)
         valid_extensions = ('.jpg', '.jpeg', '.png', '.gif', '.bmp', '.tiff')  
         if(doc.file_name.lower().endswith(valid_extensions)):  
-            img = Image.open(doc.file_path)
+            img = Image.open(os.path.join(settings.MEDIA_ROOT,doc.file_path))
             img = img.transpose(Image.FLIP_TOP_BOTTOM)  # Adjust as needed
             rgb_img = img.convert('RGB')
             rgb_img.save(doc.file_name)
@@ -495,5 +519,35 @@ def repcompreportpdf(request, doc_id):
     # for document in documents:
     #     print(document.file_name, document.file_path)
     return render(request,'reporter/reporterreport.html',{"requestreceived":data,"appdd":appdate,"documents":documents,"MEDIA_URL":settings.MEDIA_URL})
+def download_image(request,file_ids):
 
+    # Split the incoming file_ids (from URL) into a list  
+    ids = file_ids.split(',')  
+    
+    # Prepare a ZIP file  
+    zip_filename = 'downloaded_files.zip'  
+    zip_filepath = os.path.join('media', zip_filename)  # Adjust path as needed  
+    with zipfile.ZipFile(zip_filepath, 'w') as zip_file:  
+        for file_id in ids:  
+            file_instance = get_object_or_404(Document, id=file_id)  
+            file_path = os.path.join(settings.MEDIA_ROOT,file_instance.file_path )   
+            zip_file.write(file_path, os.path.basename(file_path))  # Add file to the zip  
+
+    # Create a response with the ZIP file  
+    response = HttpResponse(content_type='application/zip')  
+    response['Content-Disposition'] = f'attachment; filename="{zip_filename}"'  
+    
+    # Open the ZIP file in binary read mode and write to the response  
+    with open(zip_filepath, 'rb') as zip_file:  
+        response.write(zip_file.read())  
+    # Optionally, you can delete the zip file after downloading  
+    os.remove(zip_filepath)  
+    
+    return response  
+    # below code is for one file download
+    # file_instance = get_object_or_404(Document, id=file_id)   
+    # file_path = os.path.join(settings.MEDIA_ROOT,file_instance.file_path )  
+    # response = HttpResponse(open(file_path, 'rb'), content_type='application/octet-stream')  
+    # response['Content-Disposition'] = f'attachment; filename="{file_instance.file_name}"'  
+    # return response  
 

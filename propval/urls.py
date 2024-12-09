@@ -21,9 +21,12 @@ urlpatterns = [
     path('generatebill/bill/<int:uid>',views.bill,name='bill'),
     path('generatebill/bills/<int:uid>',views.bills,name='bills'),
     path('generatebill/billinpdf',views.billinpdf.as_view(),name='billinpdf'),
+    # path('generatebill/billinpdf/<int:pk>/',views.billinpdf.as_view(),name='billinpdf'),
     path('userlog',views.Userlog,name='userlog'),
     path('archive',views.Archive,name='archive'),
-    
+    path('impdoc',views.impdoc,name='impdoc'),
+    path('impdocdelete/<int:uid>',views.impdocdelete,name='impdocdelete'),
+    path('impdocupdate/<int:uid>',views.impdocupdate,name='impdocupdate'),
     path('', include(router.urls)),
 ]+ static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
   

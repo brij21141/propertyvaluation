@@ -5,7 +5,7 @@
 {% load static %}
 
 {% block content %}
-    
+<script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.1/moment.min.js"></script>
 <div class="container-fluid" >
   <div class="container my-3" style="display: block; background: #f6f6f6; padding: 40px 20px 37px;">
 
@@ -60,15 +60,23 @@
       </div>
   </div>
   </div>
+  <div class="container my-1">
+    <div class="mt-3" style="display: flex;align-items: center;"><h4>Important document links</h4><span class="ms-2"><a href="" data-bs-toggle="modal" data-bs-target="#impdocpopup">View all</a></span></div>
+    
+  <div id="scrollContainer"> 
+    {% for impdoc in impdocs %} 
+    <div class="item"><a href="{{impdoc.linkurl}}" target="_blank"> {{impdoc.narration}}</a></div>  
+    {% endfor %}
+</div> 
+</div>
 <!-- global search table -->
-<div class="container my-2" id="globalengtablediv" style="display:none; background-color:#30527b; padding:80px 10px 10px;">
+{% include 'globalsearchtemplate.html' %}
+<!-- <div class="container my-2" id="globalengtablediv" style="display:none; background-color:#30527b; padding:80px 10px 10px;">
 
   <div class="row">
     <div class="col-md-12">
       <div class="card">
         <div class="card-body">
-          <!-- <a class="btn btn-success btn-sm float-end" href="/api/receptiongenreportexport">Export to Excel</a> -->
-          <!-- <a class="btn btn-success " href="/reception/reception">Add Report</a> -->
           
           <table id="globalsearchengineertable" class="table table-hover table-striped table-bordered " style="font-size: 90%;">
             <thead>
@@ -136,7 +144,7 @@
     </div>
   </div>
 </div>
-
+ -->
 
   <div class="container my-3" style="display:block; background-color:#f6f6f6; padding:40px 20px 37px;">
 
@@ -170,7 +178,7 @@
               </thead>
               <tbody>
                 {% for recrep in requestreceived %}
-                <tr {% if recrep.priority%}  class="table-danger" {%else%} class=""{% endif %}>
+                <tr {% if recrep.priority%}  class="table-danger" {% elif recrep.npa%} class="table-warning" {%else%} class=""{% endif %}>
                   <td scope="row">{{forloop.counter}}</th>
                   <!-- <td >{{recrep.id}}</td> -->
                   <td >{{recrep.applicationdate|date:"d-m-Y"}}</td>
@@ -249,7 +257,7 @@
             <hr>
             <table id="engineertablecomp" class="table table-hover table-striped tavle-bordered" style="font-size: 90%;">
               <thead>
-                <tr>
+                <tr {% if recrep.priority%}  class="table-danger" {% elif recrep.npa%} class="table-warning" {%else%} class=""{% endif %}>
                   <th scope="col">#</th>
                   <!-- <th scope="col">APP.DATE</th> -->
                   <th scope="col">APP.NO.</th>
@@ -279,7 +287,10 @@
                   <td>
                     <!-- <a href="/engineer/deleteengineerreport/{{reqcom.id}}/{{reqcom.applicationnumber}}" class="btn btn-danger btn-sm">
                     <i class="fa fa-trash" aria-hidden="true"></i></a> -->
-                    <a href="/engineer/updateengineerreport/{{reqcom.id}}" class="btn btn-warning btn-sm"><i class="fa fa-pencil" aria-hidden="true"></i></a>
+                    <a href="/engineer/updateengineerreport/{{reqcom.id}}" id="engedit" class="btn btn-warning btn-sm engedit"><i class="fa fa-pencil" aria-hidden="true"></i></a>
+                    {% if reqcom.edited %}
+                    <a href="#" type="button" data-url="{% url 'engineereditedview' reqcom.id %}" id="engeditedbutton" class="engeditedbutton">Edited</a>
+                    {% endif %}
                   </td> 
                   </tr>
                 {% endfor %}
@@ -290,10 +301,102 @@
       </div>
     </div>
 </div>
- 
+<!-- important document popup -->
+<div class="modal fade" id="impdocpopup" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+  <div class="modal-dialog  modal-dialog-scrollable">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h1 class="modal-title fs-5" id="staticBackdropLabel">Important documents</h1>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        
+            {% for impdoc in impdocs %} 
+            <div class="item"><a href="{{impdoc.linkurl}}" target="_blank"> {{impdoc.narration}}</a></div>  
+            {% endfor %}
+        
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+        
+      </div>
+    </div>
+  </div>
+</div>
+<!-- edited record popup -->
+<div class="modal" id="engeditpop" tabindex="-1">
+  <div class="modal-dialog modal-dialog-scrollable modal-xl modal-dialog-centered">
+    
+    <div class="modal-content">
+      <div class="modal-header">
+        <h1 class="modal-title fs-5" id="staticBackdropLabel">Edited and original records</h1>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        
+        <table id="engeditdataTable" class="table table-hover table-striped table-bordered " style="font-size: 90%;width: 100%;">  
+          <!-- Table headers -->  
+          <thead>  
+            <tr>  
+              <th>#</th>  
+              <th>Application No.</th>  
+              <th>Name</th>  
+              <th>Visit in presence</th>  
+              <th>Bank name</th>  
+              <th>Case type</th>  
+              <th>Add1</th>  
+              <th>Add2</th>  
+              <th>City</th>  
+              <th>Region</th>  
+              <th>Zip</th>  
+              <th>Country</th>  
+              <th>East Boundary</th>  
+              <th>West Boundary</th>  
+              <th>North Boundary</th>  
+              <th>South Boundary</th>  
+              <th>Floor details<br>floor/details/area</th>  
+              <th>Property age</th>  
+              <th>Land rate</th>  
+              <th>Occupant</th>  
+              <th>Rented</th>  
+              <th>Landmark</th>  
+              <th>Road width</th>  
+              <th>High tension line</th>  
+              <th>Railway line</th>  
+              <th>Nala</th>  
+              <th>River</th>  
+              <th>Pahad</th>  
+              <th>Road comes under road binding</th>  
+              <th>Property Access issue</th>  
+              <th>Other check</th>  
+              <th>Other</th>  
+              <th>Remark</th>  
+              <!-- <th>Latitude</th>  
+              <th>Longitude</th>   -->
+            </tr>  
+          </thead>  
+          <tbody>  
+            <!-- Data will be appended here via JavaScript -->  
+          </tbody>  
+        </table>
+        
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+        
+      </div>
+    </div>
+  </div>
+</div>
 
 {% endblock %}
 {% block scripts%}
+<script type="text/javascript">
+  var apiBaseUrl = "{{ context.api_base_url }}";
+  var token = "{{ context.token }}";
+  // console.log(apiBaseUrl);
+</script>
+<Script type="text/javascript" src="{% static 'js/reception.js' %}" > </Script>
 <Script type="text/javascript" src="{% static 'js/engineer.js' %}" > </Script>
 <Script type="text/javascript" src="{% static 'js/sidebartoggle.js' %}"> </Script>
 {% endblock scripts%}

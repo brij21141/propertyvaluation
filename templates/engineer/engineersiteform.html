@@ -162,11 +162,49 @@
                     value="{{recptreport.south}}"
                     {% endif %}/>
                   </div>
-
-
-                <div class="item">
-                    <label for="floor">FLOOR DETAILS</label>
+                
+                  <div id="floorContainer">  
+                    <div class="row">
+                      <div class="d-flex justify-content-between">
+                        <label for="floor">FLOOR DETAILS</label> <a type="button" id="addfloorBtn" class="btn btn-primary btn-sm my-1">Add more rows</a></div>
+                    {% if floors %}
+                    {% for floor in floors %}
+                    <div class="row">
+                      
+                      <div class="col-md-4">
+                        <input  name="floor[]" type="text" class="form-control" value="{{floor.floorname}}"/>
+                      </div>
+                      <div class="col-md-4">
+                        <input  name="floordetails[]" type="text" class="form-control" value="{{floor.floordetail}}" />
+                      </div>
+                      <div class="col-md-4">
+                        <input name="floorarea[]" type="text" class="form-control" value="{{floor.floorarea}}"/>
+                      </div>
+                    </div>
+                    {% endfor %}
+                    {% else %}
+                      <div class="col-md-4">
+                        <input id="basment" name="floor[]" type="text" class="form-control" placeholder="Basement"/>
+                      </div>
+                      <div class="col-md-4">
+                        <input id="basementdetail" name="floordetails[]" type="text" class="form-control" placeholder="Enter Basement Details"/>
+                      </div>
+                      <div class="col-md-4">
+                        <input id="basementarea" name="floorarea[]" type="text" class="form-control" placeholder="Enter Basement Area"/>
+                      </div>
+                      {% endif %}
+                    </div>
+                     
+                  </div> 
+                 
+                <!-- <div class="item">
+                  <div class="d-flex justify-content-between">
+                    <label for="floor">FLOOR DETAILS</label> <a type="button" id="addmorerows" class="btn btn-primary btn-sm my-1" onclick="addmorerows()">Add more rows</a></div>
                   <div class="name-item">
+                    <input id="basement" name="basement" type="text" class="form-control" placeholder="Enter Basement Area"
+                    {% if recptreport %}
+                    value="{{recptreport.barea}}"
+                    {% endif %}/>
                     <input id="gf" name="groundfloor" type="text" class="form-control" placeholder="Enter Ground floor Area"
                     {% if recptreport %}
                     value="{{recptreport.gfarea}}"
@@ -179,12 +217,24 @@
                     {% if recptreport %}
                     value="{{recptreport.sfarea}}"
                     {% endif %}/>
-                    <input id="tf" name="thirdfloor" type="text" class="form-control" placeholder="Enter Third floor Area"
+                    <input id="tf" name="thirdfloor" type="text" class="form-control" placeholder="Enter Third floor Area" 
                     {% if recptreport %}
                     value="{{recptreport.tfarea}}"
-                    {% endif %}/>
+                    {% endif %} style="display: none;"/>
+                    <input id="frf" name="fourthfloor" type="text" class="form-control" placeholder="Enter Fourth floor Area"
+                    {% if recptreport %}
+                    value="{{recptreport.frfarea}}"
+                    {% endif %} style="display: none;"/>
+                    <input id="fvf" name="Fifthfloor" type="text" class="form-control" placeholder="Enter Fifth floor Area" 
+                    {% if recptreport %}
+                    value="{{recptreport.fvfarea}}"
+                    {% endif %} style="display: none;"/>
+                    <input id="sxf" name="sixthfloor" type="text" class="form-control" placeholder="Enter sixth floor Area"
+                    {% if recptreport %}
+                    value="{{recptreport.sxfarea}}"
+                    {% endif %} style="display: none;"/>
                   </div>
-                </div>
+                </div> -->
               <p>Details</p>
 
                   <div class="item">
@@ -304,7 +354,8 @@
             {% for document in documents %}
             <div>
                 {{ document.file_name }}
-                <a href="{% url 'delete_file' document.id %}" onclick="return confirm('Are you sure you want to delete this file?');">❌</a>
+                <!-- <a type="button" class="delete-file-btn" data-file-id="{{document.id}}" href="{% url 'delete_file' document.id %}" onclick="return confirm('Are you sure you want to delete this file?');">❌</a> -->
+                <a type="button" class="delete-file-btn" data-file-id="{{document.id}}" data-url="{% url 'delete_file' document.id %}" href="" onclick="return confirm('Are you sure you want to delete this file?');">❌</a>
             </div>
             {% endfor %}
         </ul>
@@ -327,3 +378,79 @@
   </div>
 </div>
 {% endblock %}
+{% block scripts%}
+<script>
+document.getElementById("addfloorBtn").onclick = function() {  
+  var newRow = document.createElement("div");  
+  newRow.className = "row mb-2";
+
+  var floorDiv = document.createElement("div");  
+  floorDiv.className = "col-md-4";  
+  var floorDetailDiv = document.createElement("div");  
+  floorDetailDiv.className = "col-md-4";  
+  var floorAreaDiv = document.createElement("div");  
+  floorAreaDiv.className = "col-md-4";  
+
+  var floorInput = document.createElement("input");  
+  floorInput.type = "text";  
+  // floorInput.name = "floor"+ (document.getElementById("floorContainer").children.length-2 + 1);    
+  floorInput.name = "floor[]";
+  floorInput.className = "form-control col-md-4";  
+  floorInput.placeholder = "Floor name";    
+
+  var floorDetailInput = document.createElement("input");  
+  floorDetailInput.type = "text";  
+  // floorDetailInput.name = "floortdetails"+ (document.getElementById("floorContainer").children.length-2 + 1);      
+  floorDetailInput.name = "floordetails[]";      
+  floorDetailInput.className = "form-control col-md-4";  
+  floorDetailInput.placeholder = "Enter Floor Details  ";      
+
+  var floorAreaInput = document.createElement("input");  
+  floorAreaInput.type = "text";  
+  // floorAreaInput.name = "floorarea"+ (document.getElementById("floorContainer").children.length-2 + 1);      
+  floorAreaInput.name = "floorarea[]";      
+  floorAreaInput.className = "form-control col-md-4";  
+  floorAreaInput.placeholder = "Enter Floor area "; 
+  
+  floorDiv.appendChild(floorInput);  
+  floorDetailDiv.appendChild(floorDetailInput);  
+  floorAreaDiv.appendChild(floorAreaInput);  
+
+  
+  newRow.appendChild(floorDiv);  
+  newRow.appendChild(floorDetailDiv);  
+  newRow.appendChild(floorAreaDiv);
+  
+  document.getElementById("floorContainer").appendChild(newRow);  
+};
+</script>
+<script>
+  $(document).ready(function() {  
+    // Event listener for delete buttons  
+    $('.delete-file-btn').on('click', function() {  
+        // Get file ID from the data attribute  
+        var fileId = $(this).data('file-id');  
+        var url = $(this).data('url');
+        // Confirm the deletion action  
+        if (confirm('Are you sure you want to delete this file?')) {  
+            $.ajax({  
+                url: url,  
+                type: 'POST',  
+                data: {  
+                    file_id: fileId,  // The file ID for deletion  
+                    csrfmiddlewaretoken: '{{ csrf_token }}'  // Include CSRF token  
+                },  
+                success: function(response) {  
+                    alert(response.message);  // Show the success message  
+                    window.location.href = response.redirect;  // Redirect  
+                },  
+                error: function(xhr, status, error) {  
+                    console.error(error);  // Handle errors  
+                    alert('An error occurred while deleting the file.');  
+                }  
+            });  
+        }  
+    });  
+});  
+</script>
+{% endblock scripts%}

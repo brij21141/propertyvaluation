@@ -10,6 +10,7 @@ class LoginSerializer(serializers.Serializer):
     password = serializers.CharField(max_length=50)
 
 class ReceptionSerializer(serializers.HyperlinkedModelSerializer):
+    id = serializers.ReadOnlyField()
     class Meta:
         model = ReceptionReport
         fields = "__all__"
@@ -75,3 +76,33 @@ class FileUploadSerializer(serializers.Serializer):
     class Meta:
         model = Document
         fields = "__all__"
+
+# class FloorSerializer(serializers.ModelSerializer):  
+#     class Meta:  
+#         model = Floor  
+#         fields = ['flname', 'fldetails', 'flarea']  
+
+# class EngineereditSerializer(serializers.ModelSerializer):  
+#     floors = FloorSerializer(many=True)  
+
+#     class Meta:  
+#         model = EngineerReport  
+#         fields = [  
+#             'id',   
+#             'application_number',   
+#             'name',   
+#             'visit_in_presence',   
+#             'bank_name',   
+#             'case_type',   
+#             'add1',   
+#             'add2',   
+#             'city',   
+#             'region',   
+#             'zip_code',   
+#             'country',   
+#             'east',   
+#             'west',   
+#             'north',   
+#             'south',   
+#             'floors'  
+#         ]  

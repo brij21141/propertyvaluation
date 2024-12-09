@@ -2,10 +2,11 @@ from django.shortcuts import render
 from django.http import JsonResponse, HttpResponse
 from django.contrib.auth.models import User
 import csv,json
-from propval.models import UserDetails,Banks
+from datetime import datetime,time,timedelta
+from propval.models import UserDetails,Banks,Impdoc
 from django.db.models import Count
 from reception.models import ReceptionReport,ArchieveReceptionReport
-from site_engineer.models import EngineerReport,ArchieveEngineerReport
+from site_engineer.models import EngineerReport,ArchieveEngineerReport,HistoryEngineerReport,Floordetails,HistoryFloordetails
 from reporter.models import ReporterReport
 from django.contrib.auth import login, authenticate, logout
 from rest_framework.views import APIView
@@ -29,7 +30,7 @@ from django_rest_passwordreset.models import ResetPasswordToken
 import os
 from django.conf import settings
 from reception.models import Document
-
+from django.db.models import Prefetch
 
 
 # users=User.objects.all().filter(id__gt=1)
@@ -295,13 +296,32 @@ def recepreportpriority(request,uid):
         u=ReceptionReport.objects.get(pk=uid)
         if u.priority:
             u.priority=False
+            msg='Report has been changed to normal report successfully'
         else:
             u.priority=True
+            msg='Report Priority has been changed successfully'
         u.save()
-        return JsonResponse({'success': True,'message': 'Report Priority has been changed successfully'})
+        return JsonResponse({'success': True,'message': msg})
     except ReceptionReport.DoesNotExist:
         # return redirect('home')
         return JsonResponse({'success': False, 'error':'Priority not set yet'})
+def recepreportnpa(request,uid):
+    try:
+        u=ReceptionReport.objects.get(pk=uid)
+        if u.npa:
+            u.npa=False
+            msg='Report has been changed to normal report successfully'
+            npacase=False
+            
+        else:
+            u.npa=True
+            msg='Report has been changed to npa report successfully'
+            npacase=True
+        u.save()
+        return JsonResponse({'success': True,'message': msg,'npacase': npacase})
+    except ReceptionReport.DoesNotExist:
+        # return redirect('home')
+        return JsonResponse({'success': False, 'error':'npa not set yet'})
 
 def engreportstatus(request,status,uid):
       # print (status)
@@ -384,10 +404,11 @@ def engreportstatus(request,status,uid):
                   "engstatus":[]
             }
             dictengstatus["engstatus"].append(totalrequestnumber)
-            dictengstatus["engstatus"].append(totalcompleted) 
+             
             dictengstatus["engstatus"].append(pendingrequest) 
             dictengstatus["engstatus"].append(inprogress) 
-            dictengstatus["engstatus"].append(hold)            
+            dictengstatus["engstatus"].append(hold)
+            dictengstatus["engstatus"].append(totalcompleted)            
 
             return JsonResponse({'success': True,'message': messg,
                                  'msg':msg,
@@ -406,7 +427,7 @@ def reporterreportstatus(request,uid):
       messg='reporter report summary'
       try:
             if uid>0:
-                  er=EngineerReport.objects.get(pk=uid)
+                  er=ReceptionReport.objects.get(pk=uid)
                   if er.reporter is None:
                         er.reporter='InProgress'
                         msg='InProgress'
@@ -429,18 +450,18 @@ def reporterreportstatus(request,uid):
             # print(results)
                         if (userrole == "Admin" or userrole == "Reception"):
                               # receivedrequest=ReceptionReport.objects.exclude(engineer ='Submitted')
-                              totalrequestnumber = EngineerReport.objects.count()
-                              totalcompleted = EngineerReport.objects.filter(reporter='Submitted').count()
-                              inprogress = EngineerReport.objects.filter(reporter='InProgress').count()
-                              hold = EngineerReport.objects.filter(reporter='Hold').count()
+                              totalrequestnumber = ReceptionReport.objects.filter(reportperson__gt=0).count()
+                              totalcompleted = ReceptionReport.objects.filter(reporter='Submitted').count()
+                              inprogress = ReceptionReport.objects.filter(reporter='InProgress').count()
+                              hold = ReceptionReport.objects.filter(reporter='Hold').count()
                               pendingrequest = totalrequestnumber-(totalcompleted+inprogress+hold)
                         else:
                               # receivedrequest=ReceptionReport.objects.exclude(engineer ='Submitted')
                               # totalrequestnumber = ReceptionReport.objects.filter(visitingpersonname=username).count()
-                              totalrequestnumber = EngineerReport.objects.filter(receptionid__reportpersonname=username).count()
-                              totalcompleted = EngineerReport.objects.filter(receptionid__reportpersonname=username, reporter='Submitted').count()
-                              inprogress = EngineerReport.objects.filter(receptionid__reportpersonname=username, reporter='InProgress').count()
-                              hold = EngineerReport.objects.filter(receptionid__reportpersonname=username, reporter='Hold').count()
+                              totalrequestnumber = ReceptionReport.objects.filter(reportpersonname=username).count()
+                              totalcompleted = ReceptionReport.objects.filter(reportpersonname=username, reporter='Submitted').count()
+                              inprogress = ReceptionReport.objects.filter(reportpersonname=username, reporter='InProgress').count()
+                              hold = ReceptionReport.objects.filter(reportpersonname=username, reporter='Hold').count()
                               pendingrequest = totalrequestnumber-(totalcompleted+inprogress+hold)
                               # print(totalrequestnumber-totalcompleted)
             
@@ -448,10 +469,11 @@ def reporterreportstatus(request,uid):
                   "repstatus":[]
             }
             dictrepstatus["repstatus"].append(totalrequestnumber)
-            dictrepstatus["repstatus"].append(totalcompleted) 
+            
             dictrepstatus["repstatus"].append(pendingrequest) 
             dictrepstatus["repstatus"].append(inprogress) 
             dictrepstatus["repstatus"].append(hold) 
+            dictrepstatus["repstatus"].append(totalcompleted) 
 
             return JsonResponse({'success': True,'message': messg,
                                  'msg':msg,
@@ -465,23 +487,35 @@ def reporterreportstatus(request,uid):
             return JsonResponse({'success': False, 'error':'Status not changed yet'})
 def reportassign(request,uid):
     try:
-        recid=EngineerReport.objects.get(pk=uid).receptionid_id
-        print(recid)
-        u=ReceptionReport.objects.get(pk=recid)
+      #   recid=EngineerReport.objects.get(pk=uid).receptionid_id
+      #   u=ReceptionReport.objects.get(pk=recid)
+        u=ReceptionReport.objects.get(pk=uid)
         msg='assigned'
         if request.user.is_authenticated:
             userid = request.user.id
-            # if(UserDetails.objects.filter(user_email=useremail).exists()):
-            #             username = UserDetails.objects.get(user_email=useremail).first_name+" "+UserDetails.objects.get(user_email=useremail).last_name
+            useremail = request.user.email
+        if(UserDetails.objects.filter(user_email=useremail).exists()):
+            username = UserDetails.objects.get(user_email=useremail).first_name+" "+UserDetails.objects.get(user_email=useremail).last_name
                   
             if u.reportperson == 0 or u.reportperson == '':
-                  u.reportperson=userid
-                  msg='assigned'
+                  if UserDetails.objects.filter(user_id=userid,role="Reporter").exists():
+                        u.reportperson=userid
+                        u.reportpersonname=username
+                        msg='assigned'
+                  else: 
+                        tot=ReceptionReport.objects.filter(reportperson=0).count()
+                        msg = 'Reporter not found. You are not allowed to assign as you are not a reporter'
+                        return JsonResponse({'success': False,'message': f'Report {msg} ','msg': msg,'tot': tot})
+            elif u.reportperson != userid:
+                 msg = 'Already assigned to someone else'
+                 
             else:
                   u.reportperson=0
+                  u.reportpersonname = 'Reporter Not Assigned'
                   msg='Unassigned'
             u.save()
-        return JsonResponse({'success': True,'message': 'Report has assigned/unassigned successfully','msg': msg})
+            tot=ReceptionReport.objects.filter(reportperson=0).count()
+        return JsonResponse({'success': True,'message': f'Report {msg} ','msg': msg,'tot': tot})
     except ReceptionReport.DoesNotExist:
         # return redirect('home')
         return JsonResponse({'success': False, 'error':'Report could not be assigned'})
@@ -703,6 +737,14 @@ class ReceptionViewSet(viewsets.ModelViewSet):
           reception_serializer=ReceptionSerializer(engineerjob,many=True,context={'request':request})
           print("getting reception report for a particular engineer" , pk, "engineer")
           return Response(reception_serializer.data)
+     @action(detail=False,methods=['get'])
+     def reporterunassigned(self, request,pk=None):
+          reporterunassigned=ReceptionReport.objects.filter(reportperson=0)
+          reception_serializer=ReceptionSerializer(reporterunassigned,many=True,context={'request':request})
+          return Response({
+               'success':True,
+               'data':reception_serializer.data,
+               },status=status.HTTP_200_OK)
      
 class ResetPasswordRequestView(generics.GenericAPIView):
     serializer_class = ResetPasswordEmailRequestSerializer
@@ -755,7 +797,7 @@ class DocumentUploadView(APIView):
             os.makedirs(upload_dir, exist_ok=True)  
 
             # Define the full path for the file  
-            newfilename = application_number + "_"+str(recid)+"_" + file_data.name
+            newfilename = application_number + "_"+str(recid)+"_"+str(time.time())+'_' + file_data.name
             file_path = os.path.join(upload_dir, newfilename)  
             # Save the uploaded file  
             with open(file_path, 'wb+') as destination:  
@@ -771,8 +813,97 @@ class DocumentUploadView(APIView):
                 usersdetailsid=usersdetailsid,  
                 platform=platform,  
             #     file_path=os.path.join('engineer', file_data.name),  # Save the relative path  
-                file_path=file_path,  
+            #     file_path=file_path,  
+                file_path='engineer/'+newfilename,  
                 file_name=newfilename,  
             )  
 
-        return Response({'message': 'Files uploaded successfully.'}, status=status.HTTP_201_CREATED)            
+        return Response({'message': 'Files uploaded successfully.'}, status=status.HTTP_201_CREATED) 
+
+def homedatefilter(request):
+      stdate_str = request.GET.get('startdate')
+      endate_str = request.GET.get('enddate')
+      
+      
+      # Add one day to endate
+      
+      # endate = datetime.combine(endate, time.max)
+      if stdate_str:
+           stdate = datetime.strptime(stdate_str, "%Y-%m-%d").date()
+           searchresults=ReceptionReport.objects.filter(datecreated__gte=stdate)
+      if endate_str:
+           endate = datetime.strptime(endate_str, "%Y-%m-%d").date()
+           endate = endate + timedelta(days=1)
+           searchresults=ReceptionReport.objects.filter(datecreated__lte=endate)
+      if (stdate_str and endate_str):
+           stdate = datetime.strptime(stdate_str, "%Y-%m-%d").date()
+           endate = datetime.strptime(endate_str, "%Y-%m-%d").date()
+           endate = endate + timedelta(days=1)
+           searchresults=ReceptionReport.objects.filter(datecreated__range=(stdate,endate))
+      if not (stdate_str and endate_str):
+           searchresults=ReceptionReport.objects.all()
+      # searchresults=ReceptionReport.objects.filter(datecreated__range=(stdate,endate))
+      # searchresults=ReceptionReport.objects.filter(Q(datecreated__gte=stdate) & Q(datecreated__lte=endate))
+      serializer_result=ReceptionSerializer(searchresults,many=True,context={'request':request}) 
+      # print(serializer_result)
+      return JsonResponse({'success':True, 'data':serializer_result.data}, status=status.HTTP_201_CREATED)  
+
+def engineereditedview(request,recid):  
+      
+      # print(recid) 
+      reports = EngineerReport.objects.filter(pk=recid).values(  
+      'id', 'applicationnumber', 'name', 'visitinpresence',   
+      'bankname', 'casetype', 'add1', 'add2', 'city', 'region',  
+      'zip', 'country', 'east', 'west', 'north', 'south',  
+      'propertyage', 'landrate', 'Occupant', 'rented',   
+      'landmark', 'roadwidth', 'hightensionline',   
+      'railwayline', 'nala', 'river', 'pahad',   
+      'roadcomesunderroadbinding', 'propertyaccessissue',   
+      'othercheck', 'others', 'remark', 'lat', 'lng'  
+      ).first()  # Retrieve the single report if you know recid is unique  
+
+# To include floordetails in the result, you can also serialize the data  
+      if reports:  
+                  floor_details = list(Floordetails.objects.filter(engreportid=recid).values(  
+        'floorname', 'floordetail', 'floorarea'))  
+        
+      # Combine the results  
+      reports['floors'] = floor_details  
+      keys_list = list(reports.items()) 
+      # else:  
+      #       engineer_report = None  # Handle case where no record is found  
+      # print(reports)
+     
+#     reports = list(EngineerReport.objects.values('id','applicationnumber', 'name','visitinpresence','bankname','casetype','add1','add2','city',
+#                                             'region','zip','country','east','west','north','south',
+#                                             'propertyage','landrate','Occupant','rented','landmark','roadwidth','hightensionline',
+#                                             'railwayline','nala','river','pahad','roadcomesunderroadbinding','propertyaccessissue','othercheck',
+#                                             'others','remark','lat','lng').filter(pk=recid))  
+      histories = HistoryEngineerReport.objects.values('id','applicationnumber', 'name','visitinpresence','bankname','casetype','add1','add2','city',
+                                                'region','zip','country','east','west','north','south',
+                                                'propertyage','landrate','Occupant','rented','landmark','roadwidth','hightensionline',
+                                                'railwayline','nala','river','pahad','roadcomesunderroadbinding','propertyaccessissue','othercheck',
+                                                'others','remark','lat','lng').filter(engreport_id=recid).order_by('id') 
+      # print(keys_list)
+      floorhistories=[]
+      for history in histories:
+            history['floors'] = list(HistoryFloordetails.objects.filter(historyengreportid_id=history.get('id')).values(  
+            'floorname', 'floordetail', 'floorarea'))
+            print(history)
+            floorhistories.append(history)
+            # floorhistories += history
+      #       floorhistories[history.get('id')] = history
+      floorhistories.append(reports) 
+      print(floorhistories)
+      #     enghistory = reports.union(histories) 
+      
+      enghistory =  floorhistories 
+      #     serializer_result=EngineerCreateSerializer(enghistory,many=True,context={'request':request})   
+      #     print(serializer_result.data)
+      return JsonResponse({'success':True, 'data':enghistory}, status=status.HTTP_201_CREATED)   
+
+# @api_view(['GET'])  
+# def application_list(request):  
+#     applications = Application.objects.all()  
+#     serializer = ApplicationSerializer(applications, many=True)  
+#     return Response({"success": True, "data": serializer.data})  

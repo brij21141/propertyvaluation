@@ -25,6 +25,7 @@ urlpatterns = [
     path('reportercompletedexport',views.reportercompletedexport,name='reportercompletedexport'),
     path('rolewiseuser',views.rolewiseuser,name='rolewiseuserapi'),
     path('recepreportpriority/<int:uid>',views.recepreportpriority,name='recepreportpriority'),
+    path('recepreportnpa/<int:uid>',views.recepreportnpa,name='recepreportnpa'),
     path('engreportstatus/<str:status>/<int:uid>',views.engreportstatus,name='engreportstatus'),
     path('reporterreportstatus/<int:uid>',views.reporterreportstatus,name='reporterreportstatus'),
     path('reportassign/<int:uid>',views.reportassign,name='reportassign'),
@@ -33,5 +34,7 @@ urlpatterns = [
     path('api/password_reset/', include('django_rest_passwordreset.urls', namespace='password_resetapi')),
     path('request-reset-password/', ResetPasswordRequestView.as_view(), name='request-reset-password'),
     path('reset-password/', ResetPasswordConfirmView.as_view(), name='reset-password'),
+    path('homedatefilter/', views.homedatefilter, name='homedatefilter'),
+    path('engineereditedview/<int:recid>/', views.engineereditedview, name='engineereditedview'),
     path('', include(router.urls)),
 ]

@@ -26,9 +26,9 @@
           <div class="col-md-3 float-end">
             <a data-mdb-ripple-init class="btn btn-light text-capitalize border-0" data-mdb-ripple-color="dark" onclick="printbill()"><i
                 class="fas fa-print text-primary"></i> Print</a>
-            <a data-mdb-ripple-init class="btn btn-light text-capitalize" data-mdb-ripple-color="dark" href="{% url 'billinpdf' %}"><i
-                class="far fa-file-pdf text-danger"></i> Export</a>
-          </div>
+                <a data-mdb-ripple-init class="btn btn-light text-capitalize" data-mdb-ripple-color="dark" href="{% url 'billinpdf' %}"><i
+                  class="far fa-file-pdf text-danger"></i> Export</a>
+            </div>
           <hr>
         </div>
         <div id="mn">
@@ -111,9 +111,7 @@
                   <td>{{param.bankid.internalrate|multiply:9|divide:100|multiply:2|sum:param.bankid.internalrate}}</td>
                 </tr>
                 
-                  <!-- {% with total=total|sum:param.bankid.internalrate %} 
-                  {% endwith %} -->
-                
+                  
                 {% endfor %}
                 <!-- {% endwith %} -->
                 

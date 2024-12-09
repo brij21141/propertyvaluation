@@ -32,16 +32,16 @@ fetch('/api/rolewiseuser')
           borderWidth: 1
         }]
       },
-      options: {
-        responsive: true,
-        scales: {
-          y: {
-            // suggestedMin: 1,
-            // beginAtZero: true,
-            stepSize: 1,
-            
-          }
-        }
+      options: {  
+        responsive: true,  
+        scales: {  
+          y: {  
+            beginAtZero: true,  // Ensure that the y-axis starts at 0  
+            ticks: {  
+              stepSize: 1       // Set step size to 1  
+            }  
+          }  
+        }  
       }
     });
 
@@ -53,37 +53,39 @@ fetch('/api/rolewiseuser')
     new Chart(repchart, {
       type: 'line',
       data: {
-        labels: ['Total', 'completed', 'pending', 'Inprogress','Hold'],
+        labels: ['Total', 'pending', 'Inprogress','Hold', 'completed'],
         datasets: [{
           label: '# of reporter Jobs',
           data: data.data,
           backgroundColor: [
-        'rgba(75, 192, 192, 0.2)',
+        
         'rgba(54, 162, 235, 0.2)',    
         'rgba(255, 99, 132, 0.2)',
         'rgba(75, 192, 192, 0.2)',
         'rgba(255, 159, 64, 0.2)',
+        'rgba(75, 192, 192, 0.2)',
         ],
       borderColor: [
-        'rgb(75, 192, 192)',
+        
         'rgb(54, 162, 235)',
         'rgb(255, 99, 132)',
         'rgb(54, 162, 235)',
         'rgb(255, 159, 64)',
+        'rgb(75, 192, 192)',
         ],
           borderWidth: 1
         }]
       },
-      options: {
-        responsive: true,
-        scales: {
-          y: {
-            // suggestedMin: 1,
-            // beginAtZero: true,
-            stepSize: 1,
-            
-          }
-        }
+      options: {  
+        responsive: true,  
+        scales: {  
+          y: {  
+            beginAtZero: true,  // Ensure that the y-axis starts at 0  
+            ticks: {  
+              stepSize: 1       // Set step size to 1  
+            }  
+          }  
+        }  
       }
     });
 
@@ -94,41 +96,74 @@ fetch('/api/rolewiseuser')
     new Chart(engchart, {
       type: 'line',
       data: {
-        labels: ['Total', 'completed', 'pending', 'Inprogress','Hold'],
+        labels: ['Total', 'pending', 'Inprogress','Hold', 'completed'],
         datasets: [{
           label: '# of engineer Jobs',
           data: data.data,
           backgroundColor: [
-        'rgba(75, 192, 192, 0.2)',
+        
         'rgba(54, 162, 235, 0.2)',    
         'rgba(255, 99, 132, 0.2)',
         'rgba(75, 192, 192, 0.2)',
         'rgba(255, 159, 64, 0.2)',
+        'rgba(75, 192, 192, 0.2)',
         ],
       borderColor: [
-        'rgb(75, 192, 192)',
+        
         'rgb(54, 162, 235)',
         'rgb(255, 99, 132)',
         'rgb(54, 162, 235)',
         'rgb(255, 159, 64)',
+        'rgb(75, 192, 192)',
         ],
           borderWidth: 1
         }]
       },
-      options: {
-        responsive: true,
-        scales: {
-          y: {
-            // suggestedMin: 1,
-            // beginAtZero: true,
-            stepSize: 1,
-            
-          }
-        }
+      options: {  
+        responsive: true,  
+        scales: {  
+          y: {  
+            beginAtZero: true,  // Ensure that the y-axis starts at 0  
+            ticks: {  
+              stepSize: 1       // Set step size to 1  
+            }  
+          }  
+        }  
       }
     });
 
   });
+
+
+  function addimpdoc(doc) {
+    addbtn=document.getElementById("addimpdoc");
+    impdocaddbtn=document.getElementById("impdocaddbtn");
+    impdocsave=document.getElementById("impdocsave");
+    impdoccancel=document.getElementById("impdoccancel");
+    addbtn.style.display="block";
+    impdocaddbtn.disabled = true;
+    
+
+  }
+  // function makeEditable(cell) {  
+  //   console.log(cell)
+  //   var input = document.createElement("input");  
+  //   input.value = cell.innerText;  
+  //   cell.innerText = '';  
+  //   cell.appendChild(input);  
+    
+  //   input.addEventListener('blur', function() {  
+  //     cell.innerText = input.value;  
+  //   });  
+    
+  //   input.focus();  
+  //   if(cell.id == 'doclink') {
+      
+  //   }
+  //   console.log(cell.id);
+  // } 
+
+  
 
   // fetch('/api/rolewiseuser')
   // .then(res =>res.json())
@@ -286,7 +321,7 @@ $(document).ready(function() {
 
   const data = document.currentScript.dataset;
   const userdata =data.username;
-   console.log(data);
+  //  console.log(data);
   //  console.log(userdata);
   const userdatatable = document.getElementById("userTable");
 // const userlist = [];
@@ -354,48 +389,4 @@ $(document).ready(function() {
   console.log("bank table");
 } );
 
-
-
-// const dataTable = new simpleDatatables.DataTable("#userTable", {
-// 	searchable: true,
-// 	fixedHeight: true,
-//     data:{
-//         headings: ["Id","User","Email","SuperUser","Date Created "]
-//     }
-
-// });
-
-
-// fetch('../api/all-users')
-//   .then(res =>res.json())
-//   .then(data =>{ 
-//   dataTable.insert({data: data.allusers})
-// });
-
-
-
-// let rows = dataTable.rows;
-// // let newRow = ["columnA", "columnB", "columnC", "columnD"];
-// let newRow = userdata[0];
-// rows.add(newRow);
-// let newRows1 = [
-//     ['column1', 'column2', 'column3', 'column4'],
-//     ['column1', "column2", "column3", "column4"],
-//     ['column1', "column2", "column3", "column4"],
-//     ['column1', "column2", "column3", "column4"],
-
-// ];
-// // let newRows1= userdata;
-
-// console.log(newRows1);
-//  dataTable.insert({data: newRows1})
-
-//dataTable.rows.add(
-// [
-//      ["column1", "column2", "column3", "column4"],
-//     ["column1", "column2", "column3", "column4"],
-//     ["column1", "column2", "column3", "column4"],
-//     ["column5", "column2", "column3", "column4"],
-// ]
-   
 

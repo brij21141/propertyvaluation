@@ -5,12 +5,12 @@
 {% load static %}
 
 {% block content %}
-    
+<script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.1/moment.min.js"></script>
 <div class="container-fluid">
-  <div class="container my-3" style="display: block; background: #f6f6f6; padding: 40px 20px 37px;">
+  <div class="container my-2" style="display: block; background: #f6f6f6; padding: 20px 20px 20px;">
 
-  <div class="container my-3">
-      <div class="row my-3">
+  <div class="container my-2">
+      <div class="row my-2" style="height: 100px;">
           <div class="col-md-2">
               <div class="card text-center widget-card border-light shadow-sm" style="background-image: url('{% static "img/cardprog.jpg" %}'); ">
                   <div class="card-body">
@@ -47,21 +47,43 @@
                 </div>
           </div>
           <div class="col-md-2">
+            <div class="row">
             <a class="" style="color:white; font-weight:bold;" id="btnmap" href="/reporter/geomap">
-            <div class="card text-center widget-card border-light shadow-sm" style="background-image: url('{% static "img/mapbg.png" %}'); ">
-                <div class="card-body">
+            <div class="card text-center widget-card border-light shadow-sm " style="background-image: url('{% static "img/mapbg.png" %}');height:50px;  ">
+                <div class="card-body ">
                 
-                  <i class="fa-solid fa-map-location-dot"></i><br><br><span style="font-weight:500;">View map</span>
+                  <i class="fa-solid fa-map-location-dot me-2" style="color: #0E223E;background-color: white;"></i><span style="color: #0E223E;font-weight: bold; background-color: white;" >View map</span>
                 
                 </div></a>
-              </div>
+            </div>
+            </div>
+            <div class="row mt-2">
+              <!-- <a href="#" id="repunassigned" type="button"  data-bs-toggle="modal" data-bs-target="#myModal"> <i class="fa-regular fa-eye fa-2x float-end"></i></a> -->
+              <a class="" style=" font-weight:bold;" id="repunassigned" href="#" type="button">
+            <div class="card text-center widget-card border-light shadow-sm " style="background-image: url('{% static "img/cardprog.jpg" %}');height:50px;  ">
+                
+              <div class="card-body d-flex justify-content-center" >
+                  
+                  <span id="totunassign" class="circle" style="margin-right:5px;margin-bottom:5px;margin-top:-5px;">{{totunassigned}}  </span><h6 ms-2>Unassigned</h6>
+                </div>
+            </div></a>
+          </div>
+          
         </div>
       </div>
   </div>
-  
+  <div class="ms-2 mt-3" style="display: flex;align-items: center;"><h4>Important document links</h4><span class="ms-2"><a href="" data-bs-toggle="modal" data-bs-target="#impdocpopup">View all</a></span></div>
+  <div class="container my-1">
+    
+  <div id="scrollContainer"> 
+    {% for impdoc in impdocs %} 
+    <div class="item"><a href="{{impdoc.linkurl}}" target="_blank"> {{impdoc.narration}}</a></div>  
+    {% endfor %}
+</div> 
+</div> 
   <!-- Global search table -->
-
-  <div class="container my-2" id="globalengtablediv" style="display:none; background-color:#30527b; padding:80px 10px 10px;">
+{% include 'globalsearchtemplate.html' %}
+  <!-- <div class="container my-2" id="globalengtablediv" style="display:none; background-color:#30527b; padding:80px 10px 10px;">
     <div class="row">
       <div class="col-md-12">
         <div class="card">
@@ -71,7 +93,6 @@
               <thead>
                 <tr>
                   <th scope="col">#</th>
-                  <!-- <th scope="col">APP.DATE</th> -->
                   <th scope="col">APP.NO.</th>
                   <th scope="col">NAME</th>
                   <th scope="col">Visit in presence</th>
@@ -113,10 +134,7 @@
                          <i class="fa-regular fa-clock fa-2x" style="color: blue;"></i>
                          {% endif %}
                         </a>
-                        {% if recrep.receptionid.reportperson == 0  %}
-                        &nbsp;&nbsp;<a class="reportassign" data-url="{% url 'reportassign' recrep.id %}" href="#" title="Assign yourself"><i class="fas fa-tasks fa-2x" style="color: gray;"></i></a>
-                        {% endif %}
-                      {% endif %}
+                       {% endif %}
                     </td>
                 </tr>
                 
@@ -129,7 +147,7 @@
       </div>
     </div>
   </div>
-  
+   -->
   <div class="container my-2" style="display:block; background-color:#f6f6f6; padding:20px 20px 20px;">
     <p>Request Received</p>
             
@@ -147,36 +165,40 @@
                   <!-- <th scope="col">APP.DATE</th> -->
                   <th scope="col">APP.NO.</th>
                   <th scope="col">NAME</th>
-                  <th scope="col">Visit in presence</th>
+                  
                   <th scope="col">BANK NAME</th>
                   <th scope="col">Case type</th>
                   <th scope="col">Engineer</th>
                   <th scope="col">Reason for hold</th>
+                  <th scope="col">Engineer Status</th>
                   <th scope="col">Action</th>
                 </tr>
               </thead>
               <tbody>
                 {% for recrep in requestreceived %}
-                <tr {% if recrep.receptionid.priority%}  class="table-danger" {%else%} class=""{% endif %}>
+                <tr {% if recrep.receptionid.priority%}  class="table-danger" {% elif recrep.npa%} class="table-warning" {%else%} class=""{% endif %}>
                   <td scope="row">{{forloop.counter}}</td>
                   <!-- <td >{{recrep.id}}</td> -->
                   <!-- <td >{{recrep.applicationdate}}</td> -->
                   <td >{{recrep.applicationnumber}}</td>
                   <td >{{recrep.name}}</td>
-                  <td >{{recrep.visitinpresence}}</td>
+                  
                   <td >{{recrep.bankname}}</td>
-                  <td >{{recrep.casetype}}</td>
+                  <td >{{recrep.bankvertical}}</td>
                   <!-- <td >{{recrep.add1}}</td>
                   <td >{{recrep.city}}</td> -->
-                  <td >{{recrep.receptionid.visitingpersonname}}</td>
+                  <td >{{recrep.visitingpersonname}}</td>
                   <td >{{recrep.reporterholdcause}}</td>
-                  <!-- <td >{{recrep.reportperson}}</td> -->
-                  <!-- <td><a href="/reception/deletereceptionreport/{{recrep.id}}" class="btn btn-danger btn-sm">Delete</a></td>  -->
-                  <!-- <td><a href="/reception/updatereceptionreport/{{recrep.id}}" class="btn btn-warning btn-sm">Upload</a></td>   -->
-                    <td><a class="btn-sm"  href="/reporter/reporter/{{recrep.id}}"><i class="fa-solid fa-circle-plus fa-2x"></i></a>&nbsp;&nbsp;
-                      <!-- <a class="btn btn-success btn-sm"  href="/engineer/engineer/{{recrep.id}}"></a> -->
-                      
-                      <!-- <a class="reporterstatusupdate" id="{{recrep.id}}" data-url="{% url 'reporterreportstatus' recrep.id %}" onclick="confirm" href="#"  title="Set Status" data-bs-toggle="modal" data-bs-target="#holdcausepopup"> -->
+                  {% if recrep.engineer  %}
+                  <td >{{recrep.engineer}}</td>
+                  {% else %}
+                  <td >Pending</td>
+                  {% endif %}
+                  {% if recrep.engid is not null %}
+                    <td><a class="btn-sm"  href="/reporter/reporter/{{recrep.engid}}"><i class="fa-solid fa-circle-plus fa-2x"></i></a>&nbsp;&nbsp;
+                  {% else %}
+                    <td><a class="btn-sm"  href="/reporter/reporter/{{recrep.engid}}" style="pointer-events: none; color: grey;"><i class="fa-solid fa-circle-plus fa-2x"></i></a>&nbsp;&nbsp;
+                  {% endif %}
                         <a class="reporterstatusupdate" id="p{{recrep.id}}" data-url="{% url 'reporterreportstatus' recrep.id %}" href="#"  title="Set Status">
                           {% if recrep.reporter == 'InProgress' %}
                           <i class="fa-solid fa-spinner fa-2x" style="color: green;"></i> 
@@ -186,9 +208,9 @@
                          <i class="fa-regular fa-clock fa-2x" style="color: blue;"></i>
                          {% endif %}
                         </a>
-                        {% if recrep.receptionid.reportperson == 0  %}
-                        &nbsp;&nbsp;<a class="reportassign" data-url="{% url 'reportassign' recrep.id %}" href="#" title="Assign yourself"><i class="fas fa-tasks fa-2x" style="color: gray;"></i></a>
-                        {% endif %}
+                        <!-- {% if recrep.receptionid.reportperson == 0  %}
+                        &nbsp;&nbsp;<a class="reportassign1" data-url="{% url 'reportassign' recrep.id %}" href="#" title="Assign yourself"><i class="fas fa-tasks fa-2x" style="color: gray;"></i></a>
+                        {% endif %} -->
                     </td>
                 </tr>
                 
@@ -232,7 +254,7 @@
       </div>
     </div>
   </div>
-    <div class="container my-2" style="display:block; background-color:#f6f6f6; padding:40px 20px 37px;">
+    <div class="container my-2" style="display:block; background-color:#f6f6f6; padding:20px 20px 20px;">
       <p>Completed Reports</p>
       <div class="row">
         <div class="col-md-12">
@@ -272,7 +294,7 @@
                     <!-- <td >{{reqcom.reportperson}}</td> -->
                     <!-- <td><a href="/reception/deletereceptionreport/{{recrep.id}}" class="btn btn-danger btn-sm">Delete</a></td>  -->
                     <!-- <td><a href="/reception/updatereceptionreport/{{recrep.id}}" class="btn btn-warning btn-sm">Upload</a></td>   -->
-                      <td><a href="/reporter/updatereporterreport/{{reqcom.id}}" class="btn btn-warning btn-sm"><i class="fa fa-pencil" aria-hidden="true"></i></a>
+                      <td><a href="/reporter/updatereporterreport/{{reqcom.id}}" id="repedit"  class="btn btn-warning btn-sm repedit"><i class="fa fa-pencil"></i></a>
                       </td>
                   </tr>
                   
@@ -286,6 +308,80 @@
     </div>
   
   
+</div>
+<div class="modal" id="myModal">
+  <div class="modal-dialog modal-dialog-scrollable modal-xl modal-dialog-centered">
+    <div class="modal-content">
+
+      <!-- Modal Header -->
+      <div class="modal-header">
+        <h4 id="modhead" class="modal-title">Unassigned to reporter</h4>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+
+      <!-- Modal body for engineer -->
+      <div class="modal-body">
+        <div class="container my-2" style="display:block; background-color:#f6f6f6; padding:10px 10px 10px;">
+          <div class="row">
+            <div class="col-md-12">
+              <div class="card">
+                <div class="card-body">
+                  <table  class="table table-hover table-striped tavle-bordered" style="font-size: 90%;">
+                    <thead>
+                      <tr>
+                        <th scope="col">#</th>
+                        <th scope="col">APP.DATE</th>
+                        <th scope="col">APP.NO.</th>
+                        <th scope="col">NAME</th>
+                        <th scope="col">BANK NAME</th>
+                        <th scope="col">Address</th>
+                        <th  scope="col">City</th>
+                        <th scope="col">Phone No.</th>
+                        <th scope="col">UnAssigned</th>
+                      </tr>
+                    </thead>
+                    <tbody id="repunassignedtable">
+                      <div class="text-center">
+                        <div id="engspinner" class="spinner-border text-primary" role="status"></div>
+                        </div>
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Modal footer -->
+      <div class="modal-footer">
+        <button type="button" class="btn btn-danger" data-bs-dismiss="modal" onclick="reportrefresh()">Close</button>
+      </div>
+
+    </div>
+  </div>
+</div>
+<!-- important document popup -->
+<div class="modal fade" id="impdocpopup" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+  <div class="modal-dialog  modal-dialog-scrollable">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h1 class="modal-title fs-5" id="staticBackdropLabel">Modal title</h1>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        
+            {% for impdoc in impdocs %} 
+            <div class="item"><a href="{{impdoc.linkurl}}" target="_blank"> {{impdoc.narration}}</a></div>  
+            {% endfor %}
+        
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+        
+      </div>
+    </div>
+  </div>
 </div>
 {% if messages %}  
     <script>  
@@ -301,6 +397,12 @@
 
 {% endblock %}
 {% block scripts%}
+<script type="text/javascript">
+  var apiBaseUrl = "{{ context.api_base_url }}";
+  var token = "{{ context.token }}";
+  // console.log(apiBaseUrl);
+</script>
+<Script type="text/javascript" src="{% static 'js/reception.js' %}" > </Script>
 <Script type="text/javascript" src="{% static 'js/engineer.js' %}" > </Script>
 <Script type="text/javascript" src="{% static 'js/reporter.js' %}" > </Script>
 <Script type="text/javascript" src="{% static 'js/sidebartoggle.js' %}"> </Script>

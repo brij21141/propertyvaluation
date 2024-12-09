@@ -1,0 +1,103 @@
+
+{% extends "sidebar.html" %}
+{% include 'bootstrap_link.html' %}
+{% block title %}Important Document{% endblock %}
+{% load static %}
+
+{% block content %}
+<script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.1/moment.min.js"></script>
+<div class="container-fluid my-2" >
+  <div class="container" style="display:block; background-color:#f6f6f6; padding:20px 20px 20px;">
+
+    <div class="row">
+      <div class="col-md-12">
+        <div class="card">
+          <div class="card-body">
+            
+            <!-- <a class="btn btn-success btn-sm float-end" href="/api/receptiongenreportexport">Export to Excel</a> -->
+            <a class="btn btn-primary btn-sm" id="impdocaddbtn" onclick="addimpdoc()">Add Report</a>
+            
+            <hr>
+            <div class="item" id="addimpdoc" style="display: none;">
+                <!-- <label for="bankname">Bank Detail</label> -->
+                <form action="" method="post" class="mx-1 mx-md-4">{% csrf_token %}
+             <div class="row">
+                <div class="col-md-5">
+                <input  id="narration" name="narration" type="text" class="form-control " placeholder="Enter narration" style="display: inline-block;"
+                value="" />
+                 </div>
+                <div class="col-md-5">
+                <input id="link" name="link" type="text" class="form-control" placeholder="Enter link url"
+                value=""/>
+                
+            </div>
+        
+                <div class="col-md-1 justify-content-end">
+                    <button id="impdocsave" type="submit" class="btn btn-primary btn-sm float-end" href="">Save</button>
+                    <!-- <a class="btn btn-primary btn-sm" href="/reception/receptio">Cancel</a> -->
+                </div>
+                <div class="col-md-1">
+                    <a id="impdoccancel" class="btn btn-primary btn-sm" href="">Cancel</a>
+                </div>
+            </div>
+            </form>
+            </div>
+            <input  id="editnarration" name="editnarration" type="text" class="form-control " placeholder="Enter narration" style="display: inline-block;"
+                value="" hidden />
+                <input id="editlink" name="editlink" type="text" class="form-control" placeholder="Enter link url"
+                value="" hidden />
+            <hr>
+            <table id="impdoctable" class="table table-hover table-striped table-bordered" style="font-size: 90%;">
+              
+              <thead>
+                <tr>
+                  <th scope="col">#</th>
+                  <th scope="col">Narration</th>
+                  <th scope="col">Link/url</th>
+                  <th scope="col">Created date</th>
+                  <th scope="col">Action </th>
+                   
+                </tr>
+              </thead>
+              <tbody>
+                {% for recrep in impdocs %}
+                  <tr id="imp{{recrep.id}}" > 
+                  <td  scope="row">{{forloop.counter}}</td>
+                  <td id="docnarration" class="docnarration" >{{recrep.narration}}</td>
+                  <td id="doclink" class="doclink" >{{recrep.linkurl}}</td>
+                  <td  >{{recrep.timestamp|date:"d-m-Y"}}</td>
+                
+                  <td><a class="impdocdelete" data-url="{% url 'impdocdelete' recrep.id %}" href="" title="Delete">
+                    <i class="fa fa-trash" aria-hidden="true"></i></a>&nbsp;&nbsp;
+                    <a type="button"  class="edit-btn" title="Edit" id="" >
+                      <i class="fas fa-edit action-icon " ></i>
+                    </a>&nbsp;&nbsp;
+                    <a type="button"  onclick="updateimpdoc({{recrep.id}})" class="save-btn" title="Save" id="updateimpdoc-btn" style="display:none;">
+                      <i class="fas fa-save action-icon save-icon"></i>
+                    </a>&nbsp;&nbsp;
+                    <a type="button" href="impdoc"  class="cancel-btn" title="Cancel" style="display:none;" >
+                      <i class="fa-solid fa-xmark"></i>
+                    </a>
+                     
+                  </td> 
+                  </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+{% endblock %}
+{% block scripts%}
+<script type="text/javascript">
+  var apiBaseUrl = "{{ context.api_base_url }}";
+  console.log(apiBaseUrl+'hjgj');
+</script>
+<Script type="text/javascript" src="{% static 'js/reception.js' %}" > </Script>
+<Script type="text/javascript" src="{% static 'js/sidebartoggle.js' %}"> </Script>
+<Script type="text/javascript" src="{% static 'js/datatables.js' %}" > </Script>
+{% endblock scripts%}

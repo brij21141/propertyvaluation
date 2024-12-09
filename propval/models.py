@@ -91,4 +91,12 @@ class UserActivity(models.Model):
     useremail=models.CharField(max_length=80,null=True)
     action_type = models.CharField(max_length=50)  # e.g. "login", "logout", "login_failed"  
     timestamp = models.DateTimeField(auto_now_add=True)  
-    ip_address = models.GenericIPAddressField(null=True, blank=True)  # Optional  
+    ip_address = models.GenericIPAddressField(null=True, blank=True)  # Optional
+
+class Impdoc(models.Model):  
+    narration=models.CharField(max_length=200,null=True)
+    linkurl=models.CharField(max_length=200,null=True)
+    userdetails = models.ForeignKey(UserDetails, on_delete=models.DO_NOTHING,null=True)
+    active = models.BooleanField(default=True) 
+    timestamp = models.DateTimeField(auto_now_add=True)  
+    

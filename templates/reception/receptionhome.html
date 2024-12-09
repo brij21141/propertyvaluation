@@ -68,68 +68,17 @@
     </div>
             
   </div>
-  <div class="container my-2" id="globalengtablediv" style="display:none; background-color:#30527b; padding:80px 10px 10px;">
+  <div class="ms-2 mt-3" style="display: flex;align-items: center;"><h4>Important document links</h4><span class="ms-2"><a href="" data-bs-toggle="modal" data-bs-target="#impdocpopup">View all</a></span></div>
+  <div class="container my-1">
+    
+  <div id="scrollContainer"> 
+    {% for impdoc in impdocs %} 
+    <div class="item"><a href="{{impdoc.linkurl}}" target="_blank"> {{impdoc.narration}}</a></div>  
+    {% endfor %}
+</div> 
+</div>
 
-    <div class="row">
-      <div class="col-md-12">
-        <div class="card">
-          <div class="card-body">
-            <!-- <a class="btn btn-success btn-sm float-end" href="/api/receptiongenreportexport">Export to Excel</a> -->
-            <!-- <h6>All Task with status</h6> -->
-            
-            <!-- <a class="btn btn-success " href="/reception/reception">Add Report</a> -->
-            
-            <table id="globalsearchengineertable" class="table table-hover table-striped table-bordered " style="font-size: 90%;">
-              <thead>
-                <tr>
-                  <th scope="col">#</th>
-                  <th scope="col">APP.DATE</th>
-                  <th scope="col">APP.NO.</th>
-                  <th scope="col">NAME</th>
-                  <th scope="col">BANK NAME</th>
-                  <th scope="col">VERTICAL</th>
-                  <th scope="col">PHONE</th>
-                  <th scope="col">ASSIGNED VISITOR</th>
-                  <th scope="col">Status</th>
-                  <th scope="col">Hold reason</th>
-                  
-                </tr>
-              </thead>
-              <tbody>
-                {% for recrep in allreports %}
-                <tr {% if recrep.priority%}  class="table-danger" {%else%} class=""{% endif %}>
-                  <td scope="row">{{forloop.counter}}</th>
-                  <td >{{recrep.applicationdate|date:"d-m-Y"}}</td>
-                  <td >{{recrep.applicationnumber}}</td>
-                  <td >{{recrep.name}}</td>
-                  <td >{{recrep.bankname}}</td>
-                  <td >{{recrep.bankvertical}}</td>
-                  <td >{{recrep.phonenumber}}</td>
-                  <td >{{recrep.visitingpersonname}}</td>
-                  <td {% if recrep.engineer != "Submitted" %} class="tablred my-2 mx-1" {% else %} class="tablgreen my-2 mx-1" {% endif %}  >
-                    {% if recrep.engineer == "Submitted" %} Completed
-                    {% elif recrep.engineer is none %} Pending
-                    {% else %} {{recrep.engineer}}
-                    {% endif %}
-                    
-                  </td>
-                  <td >
-                    {% if recrep.engineerholdcause is none %} 
-                    {%else%}
-                    {{recrep.engineerholdcause}}
-                    {% endif %}
-                  </td>
-                    
-                </tr>
-                {% endfor %}
-              </tbody>
-              <tfoot><h6 class="blink">Search Result</h6></tfoot>
-            </table>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
+  {% include 'globalsearchtemplate.html' %}
         <div class="row my-2">
           <div class="col-md-3">
               <div class="card text-center">
@@ -220,8 +169,17 @@
             
             <a class="btn btn-success btn-sm float-end" href="/api/receptiongenreportexport">Export to Excel</a>
             <a class="btn btn-success btn-sm" href="/reception/reception">Add Report</a>
+            <div class="d-flex justify-content-end my-2">
+              Hint: &nbsp;
+              <i class="fa fa-trash" aria-hidden="true" style="align-self: center;color: blue;"></i>&nbsp;&nbsp;Delete&nbsp;
+              <i class="fa-solid fa-gauge-high"style="align-self: center; color:red" ></i> &nbsp;&nbsp;Set Priority&nbsp;
+              <label class="switch">
+                <input type="checkbox1" id="toggle2">  
+                <span class="slider round"></span>  </label>  &nbsp;&nbsp; NPA
+              </div>
             <hr>
             <table id="receptiontable" class="table table-hover table-striped table-bordered" style="font-size: 90%;">
+              
               <thead>
                 <tr>
                   <th scope="col">#</th>
@@ -235,12 +193,15 @@
                   <th scope="col">PHONE</th>
                   <th scope="col">ASSIGNED VISITOR</th>
                   <th scope="col">ASSIGNED REPORTER</th>
-                  <th scope="col">Action</th>
+                  <th scope="col">Engineer Status</th>
+                  <th scope="col">Reporter Status</th>
+                  <th scope="col">Action <br>
+                   </th>
                 </tr>
               </thead>
               <tbody>
                 {% for recrep in recpreports %}
-                  <tr {% if recrep.priority%}  class="table-danger" {%else%} class=""{% endif %}> 
+                  <tr id="row-{{recrep.id}}" {% if recrep.priority%}  class="table-danger"{% elif recrep.npa%} class="table-warning" {%else%} class=""{% endif %}> 
                   <td scope="row">{{forloop.counter}}</td>
                   <!-- <td >{{recrep.id}}</td> -->
                   <td >{{recrep.applicationdate|date:"d-m-Y"}}</td>
@@ -253,13 +214,22 @@
                   <td >{{recrep.phonenumber}}</td>
                   <td >{{recrep.visitingpersonname}}</td>
                   <td >{{recrep.reportpersonname}}</td>
+                  <td >{{recrep.engineer}}</td>
+                  <td >{{recrep.reporter}}</td>
                   <td><a class="recdelete" data-url="{% url 'deletereceptionreport' recrep.id %}" href="/reception/deletereceptionreport/{{recrep.id}}" title="Delete">
                     <i class="fa fa-trash" aria-hidden="true"></i></a>&nbsp;&nbsp;
-                    <a href="/reception/updatereceptionreport/{{recrep.id}}" class="" title="Edit">
+                    <a href="/reception/updatereceptionreport/{{recrep.id}}" class="recedit" title="Edit" id="recedit" >
                       <i class="fa fa-pencil" aria-hidden="true"></i></a>&nbsp;&nbsp;
                     <a class="priorit" data-url="{% url 'recepreportpriority' recrep.id %}" href="#"  {% if recrep.priority%}  style="color: red;" {%else%} style="color: green;"{% endif %} title="Set High Priority">
                       <i class="fa-solid fa-gauge-high" ></i></a>
-                    
+                      <label class="switch">  
+                        {% if recrep.npa %}
+                        <input type="checkbox" checked data-url="{% url 'recepreportnpa' recrep.id %}" id="toggle" class="toggle" onchange="toggleFunction(this.checked,{{recrep.id}})">
+                        {% else %}  
+                        <input type="checkbox" data-url="{% url 'recepreportnpa' recrep.id %}" id="toggle" class="toggle" onchange="toggleFunction(this.checked,{{recrep.id}})"> 
+                        {% endif %} 
+                        <span class="slider round"></span>  
+                      </label> 
                   </td> 
                   </tr>
                 {% endfor %}
@@ -295,7 +265,7 @@
                   <!-- <hr> -->
                   <table  class="table table-hover table-striped tavle-bordered" style="font-size: 90%;">
                     <thead>
-                      <tr>
+                      <tr >
                         <th scope="col">#</th>
                         <!-- <th scope="col">APP.DATE</th> -->
                         <th scope="col">APP.NO.</th>
@@ -376,14 +346,35 @@
 </div>
 </div>
 </div>
-
+<!-- important document popup -->
+<div class="modal fade" id="impdocpopup" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+  <div class="modal-dialog  modal-dialog-scrollable">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h1 class="modal-title fs-5" id="staticBackdropLabel">Modal title</h1>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        
+            {% for impdoc in impdocs %} 
+            <div class="item"><a href="{{impdoc.linkurl}}" target="_blank"> {{impdoc.narration}}</a></div>  
+            {% endfor %}
+        
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+        
+      </div>
+    </div>
+  </div>
+</div>
   
 
 {% endblock %}
 {% block scripts%}
 <script type="text/javascript">
   var apiBaseUrl = "{{ context.api_base_url }}";
-  console.log(apiBaseUrl);
+  // console.log(apiBaseUrl);
 </script>
 <Script type="text/javascript" src="{% static 'js/reception.js' %}" > </Script>
 <Script type="text/javascript" src="{% static 'js/sidebartoggle.js' %}"> </Script>

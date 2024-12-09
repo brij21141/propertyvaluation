@@ -3,7 +3,7 @@ from django.contrib.auth.models import User
 from django.contrib.auth import login, authenticate, logout,update_session_auth_hash
 from django.contrib.auth.decorators import login_required
 from django.core.serializers.json import DjangoJSONEncoder
-import datetime, os,requests
+import datetime, os,requests,json
 from django.http import JsonResponse
 from reception.models import ReceptionReport,ArchieveReceptionReport
 from reporter.models import ReporterReport
@@ -21,7 +21,7 @@ from xhtml2pdf import pisa
 from django.views import View
 from django.db.models import OuterRef, Subquery
 from rest_framework import viewsets  
-from .models import UserActivity  
+from .models import UserActivity, Impdoc
 from .serializers import UserActivitySerializer
 
 
@@ -125,7 +125,8 @@ def Home(request):
         #         print(engId.id,engId.name)
         #     print(engId)
         allreports = ReceptionReport.objects.all()
-        return render (request,'home.html',{'userdata':userdetails,'usno':dictusersno,'recpreports':recpreport,'totrep':totrep,'context':context,'repwise':queryset,'allreports':allreports})
+        impdocs= Impdoc.objects.all()
+        return render (request,'home.html',{'userdata':userdetails,'usno':dictusersno,'recpreports':recpreport,'totrep':totrep,'context':context,'repwise':queryset,'allreports':allreports,'impdocs':impdocs})
     elif user_details.role == 'Engineer':
         return redirect('/engineer/engineerhome/')
     elif user_details.role == 'Reception':
@@ -135,7 +136,7 @@ def Home(request):
 
     
     return render (request,'home.html',{'userdata':userdetails})
-    
+@login_required(login_url='login')    
 def Signup(request):
     if request.method=='POST':
         ufname = request.POST.get('firstname')
@@ -241,18 +242,22 @@ def profile(request, uid=0):
             return redirect(next_url) 
         else:
             return redirect('home')
-    response = requests.get("https://cdn-api.co-vin.in/api/v2/admin/location/states")
-    if response.status_code == 200:  
-        allstates = response.json()  
-        states=allstates.get('states')
-    else:  
+    try:
+        response = requests.get("https://cdn-api.co-vin.in/api/v2/admin/location/states")
+    
+        if response.status_code == 200:  
+            allstates = response.json()  
+            states=allstates.get('states')
+        else:  
+            states=[{'state_name':'Madhya Pradesh','state_id':20}, {'state_name':'Uttar Pradesh'}, {'state_name':'Rajsthan'}, {'state_name':'Delhi'}]
+    except requests.ConnectionError:
         states=[{'state_name':'Madhya Pradesh','state_id':20}, {'state_name':'Uttar Pradesh'}, {'state_name':'Rajsthan'}, {'state_name':'Delhi'}]
     return render (request,'profile.html',{'userdata':userdetails,'uid':uid,'states':states})
 
 
 # @require_POST
 def del_user(request,uid,udid):
-    print (uid,udid)
+    # print (uid,udid)
     u=User.objects.get(pk=uid)
     u.last_name='deleted'
     u.save()
@@ -317,12 +322,16 @@ def company_profile_view(request):
         # return redirect('companyprofile')
         next_url = request.GET.get('next', '/default-url/')
         return redirect(next_url)
-    response = requests.get("https://cdn-api.co-vin.in/api/v2/admin/location/states")
-    if response.status_code == 200:  
-        allstates = response.json()  
-        states=allstates.get('states')
-    else:  
-        states=[{'state_name':'Madhya Pradesh','state_id':20}, {'state_name':'Uttar Pradesh'}, {'state_name':'Rajsthan'}, {'state_name':'Delhi'}] 
+    try:
+        response = requests.get("https://cdn-api.co-vin.in/api/v2/admin/location/states")
+    
+        if response.status_code == 200:  
+            allstates = response.json()  
+            states=allstates.get('states')
+        else:  
+            states=[{'state_name':'Madhya Pradesh','state_id':20}, {'state_name':'Uttar Pradesh'}, {'state_name':'Rajsthan'}, {'state_name':'Delhi'}]
+    except requests.ConnectionError:
+        states=[{'state_name':'Madhya Pradesh','state_id':20}, {'state_name':'Uttar Pradesh'}, {'state_name':'Rajsthan'}, {'state_name':'Delhi'}]
     return render(request, 'company_profile.html', {'profile': profile, 'states': states})
 
 def banks(request,uid=None):
@@ -375,11 +384,15 @@ def banks(request,uid=None):
         # return redirect('companyprofile')
         # next_url = request.GET.get('next', '/default-url/')
         return redirect('bankmanage') 
-    response = requests.get("https://cdn-api.co-vin.in/api/v2/admin/location/states")
-    if response.status_code == 200:  
-        allstates = response.json()  
-        states=allstates.get('states')
-    else:  
+    try:
+        response = requests.get("https://cdn-api.co-vin.in/api/v2/admin/location/states")
+    
+        if response.status_code == 200:  
+            allstates = response.json()  
+            states=allstates.get('states')
+        else:  
+            states=[{'state_name':'Madhya Pradesh','state_id':20}, {'state_name':'Uttar Pradesh'}, {'state_name':'Rajsthan'}, {'state_name':'Delhi'}]
+    except requests.ConnectionError:
         states=[{'state_name':'Madhya Pradesh','state_id':20}, {'state_name':'Uttar Pradesh'}, {'state_name':'Rajsthan'}, {'state_name':'Delhi'}]
     return render(request, 'banks.html', {'bank': bank,'states': states})
 
@@ -396,17 +409,29 @@ def generatebill(request):
 def bill(request, uid):
     # bills=ReceptionReport.objects.filter(reporter='Submitted')
     bills=ReporterReport.objects.filter(pk=uid)
-    print(bills)
+    # print(bills)
     # print(ReporterReport.objects.get(pk=uid).bankid_id)
-    banks=Banks.objects.get(pk=ReporterReport.objects.get(pk=uid).bankid_id)
+    try:
+        banks=Banks.objects.get(pk=ReporterReport.objects.get(pk=uid).bankid_id)
+    except Exception as e:
+        print(f"Error: {e}")
+        banks=Banks.objects.first()
     company = CompanyProfile.objects.first()
     # appdate=bills.applicationdate.strftime("%Y-%m-%d")
     return render(request, 'bills/bill.html',{'bills': bills,'banks': banks,'company':company})
 def bills(request,uid=None):
-    print(uid)
+    # print(uid)
     # bills=ReceptionReport.objects.filter(reporter='Submitted')
-    bills=ReporterReport.objects.filter(bankid=uid)
-    banks=Banks.objects.get(pk=uid)
+    try:
+        bills=ReporterReport.objects.filter(bankid=uid)
+    except Exception as e:
+        
+        print(f"Error: {e}")
+        bills=None
+    try:
+        banks=Banks.objects.get(pk=uid)
+    except Exception as e:
+        banks=Banks.objects.first()
     company = CompanyProfile.objects.first()
     # print(company.name)
     # appdate=bills.applicationdate.strftime("%Y-%m-%d")
@@ -417,20 +442,25 @@ def render_to_pdf(template_src, params):
 	template = get_template(template_src)
 	html  = template.render(params)
 	result = BytesIO()
-	pdf = pisa.pisaDocument(BytesIO(html.encode("ISO-8859-1")), result)
+	# pdf = pisa.pisaDocument(BytesIO(html.encode("ISO-8859-1")), result)
+	pdf = pisa.pisaDocument(BytesIO(html.encode("utf-8")), result)
 	if not pdf.err:
 		return HttpResponse(result.getvalue(), content_type='application/pdf')
 	return None
 
 class billinpdf(View):
-	def get(self, request, *args, **kwargs):
-            data=ReceptionReport.objects.filter(reporter='Submitted')
-            bills=list(data)
-            data_dict = {'items': bills}
-            itemss =data_dict.get('items')
+	def get(self, request,pk=None, *args, **kwargs):
+            print(f"Received uid: {pk}")
+            data=ReporterReport.objects.filter(bankid=pk)
+            print(f"Data: {data}")
+            banks=Banks.objects.all()
+            company = CompanyProfile.objects.first()
+            # bills=list(data)
+            # data_dict = {'items': bills}
+            # itemss =data_dict.get('items')
             params = {
                 'today': datetime.date.today(),
-                'bills':data
+                'bills':data,'banks': banks,'company':company
             }
             # print(params.get('bills')['items'][0]['name'])
             # print(data_dict.get('items')[0]['name'])
@@ -456,6 +486,48 @@ def Userlog(request):
 def Archive(request):
     archives = ArchieveReceptionReport.objects.all()
     return render(request, 'archive.html', {'archives': archives})
+
+def impdoc(request):
+    context = {
+        'api_base_url': settings.API_BASE_URL,
+    }
+    if request.method == 'POST':
+        impdocadd = Impdoc()
+        impdocadd.narration =request.POST.get('narration')
+        impdocadd.linkurl = request.POST.get('link')
+        impdocadd.userdetails = UserDetails.objects.filter(user_email=request.user.email).first()
+        impdocadd.save()
+        return redirect('impdoc')
+
+    try:  
+        impdocs = Impdoc.objects.all()  
+        if not impdocs.exists():  # Check if there are any records  
+            print("No records found.")  
+    except Exception as e:  
+        impdocs=[]
+        print(f"An error occurred: {e}")  
+    print(impdocs)
+    return render(request, 'impdoc.html', {'impdocs': impdocs,'context': context})
+
+def impdocdelete(request,uid,):
+    # print (uid,udid)
+    impdoc=Impdoc.objects.get(pk=uid)
+    impdoc.delete()
+    # impdoc.save()
+    
+    return JsonResponse({'success': True,'message': 'Link deleted successfully'})
+def impdocupdate(request,uid,):
+    # print (uid,udid)
+    impdoc=Impdoc.objects.get(pk=uid)
+    if request.method == 'PUT':  
+        data = json.loads(request.body)
+        impdoc.narration = data.get('narration')
+        impdoc.linkurl = data.get('linkurl')
+        impdoc.save()
+        return JsonResponse({'success':True, 'message':"Record updated successfully."})  
+    return JsonResponse({'success':False,'message':"Record could not update"})  
+   
+
 
 # def update_employee(id, userdetailsid):
 #     conn = sqlite3.connect('db.sqlite3')

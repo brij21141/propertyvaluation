@@ -1,0 +1,78 @@
+<div class="container my-2" id="globalengtablediv" style="display:none; background-color:#30527b; padding:80px 10px 10px;">
+
+    <div class="row">
+      <div class="col-md-12">
+        <div class="card">
+          <div class="card-body">
+            
+            <table id="globalsearchengineertable" class="table table-hover table-striped table-bordered " style="font-size: 90%;">
+              <thead>
+                <tr>
+                  <th scope="col">#</th>
+                  <th scope="col">APP.DATE</th>
+                  <th scope="col">APP.NO.</th>
+                  <th scope="col">NAME</th>
+                  <th scope="col">BANK NAME</th>
+                  <th scope="col">VERTICAL</th>
+                  <th scope="col">PHONE</th>
+                  <th scope="col">ASSIGNED VISITOR</th>
+                  <th scope="col">Status</th>
+                  <th scope="col">Archived</th>
+                  <th scope="col">Hold reason</th>
+                  <!-- <th scope="col">View</th> -->
+                  
+                </tr>
+              </thead>
+              <tbody id="homedatefilt">
+                {% for recrep in allreports %}
+                <tr {% if recrep.priority%}  class="table-danger" {%else%} class=""{% endif %}>
+                  <td scope="row">{{forloop.counter}}</th>
+                  <td >{{recrep.applicationdate|date:"d-m-Y"}}</td>
+                  <td >{{recrep.applicationnumber}}</td>
+                  <td >{{recrep.name}}</td>
+                  <td >{{recrep.bankname}}</td>
+                  <td >{{recrep.bankvertical}}</td>
+                  <td >{{recrep.phonenumber}}</td>
+                  <td >{{recrep.visitingpersonname}}</td>
+                  <td {% if recrep.engineer != "Submitted" %} class="tablred my-2 mx-1" {% else %} class="tablgreen my-2 mx-1" {% endif %}  >
+                    {% if recrep.engineer == "Submitted" %} Completed
+                    {% elif recrep.engineer is none %} Pending
+                    {% else %} {{recrep.engineer}}
+                    {% endif %}
+                    
+                  </td>
+                  <td >
+                    {% if recrep.archieved %} True
+                    {%else%}
+                    False
+                    {% endif %}
+                  </td>
+                  <td >
+                    {% if recrep.engineerholdcause is none %} 
+                    {%else%}
+                    {{recrep.engineerholdcause}}
+                    {% endif %}
+                   </tr>
+                
+                {% endfor %}
+              </tbody>
+              <tfoot>
+                <div style="display: flex; justify-content: space-between; align-items: center;">  
+                  <h6 class="blink">Search Result</h6>  
+                  <div style="display: flex; align-items: center;"> 
+                      <label for="stdate">from</label> 
+                      <input type="date" id="stdate" placeholder="Start Date" />  
+                      <label for="endate">to</label>
+                      <input type="date" id="endate" placeholder="End Date" /> &nbsp;&nbsp;
+                      <a type="button" class="homedatefilter" id="homedatefilter" ><i class="fa-solid fa-filter fa-2x"></i></a> &nbsp;&nbsp;
+                      <a type="button" class="clearhomedatefilter" id="clearhomedatefilter" ><i class="fa-solid fa-brush fa-2x"></i></a> &nbsp;&nbsp;
+                      <a type="button" onclick="clearsearch()"> <i class="fa-solid fa-xmark fa-2x"></i> </a>
+                  </div>  
+              </div>
+              </tfoot>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>

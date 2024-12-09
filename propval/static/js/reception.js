@@ -3,12 +3,6 @@ $(document).ready(function() {
         event.preventDefault();
         var button = $(this);
         var url = button.data('url');
-        //console.log(button.text());
-       
-
-        // Perform an AJAX request (example)
-        
-       // console.log(url);
         $.ajax({
             url: url,
             type: 'GET',
@@ -17,46 +11,89 @@ $(document).ready(function() {
             },
             success: function(response) {
                 if (response.success) {
-                    // if((button.text()).trim()=="InActive"){
-                    //   button.html('<i class="fa-solid fa-user"></i> Active');
-                    //   }else{
                         var currentColor = button.css('color');
-                        
-                
-                        // Set a new color for the anchor element
                         if(currentColor==='rgb(0, 128, 0)'){
                             console.log('Current colour:', currentColor);
                             button.css('color', 'red');
                             button.closest('tr').css('color','red');
                             var row = button.closest('tr');
-                            // Set the background color of the row
                             row.addClass('table-danger');
-                            
+                            if (response.success) {
+                              swal({  
+                                title: "Confirmation", 
+                                text: response.message ,  
+                                icon: "success",  
+                                button: "Okay",  
+                            // }).then((willReload) => {  
+                            //   if (willReload) {  
+                            //       location.reload();  // This will reload the current page  
+                            //   }  
+                          });
+                        }
                         }else{
                             console.log('Current color:', currentColor);
                             button.css('color', 'green');
                             var row = button.closest('tr');
-        
-                            // Set the background color of the row
-                            // row.css('background-color', 'yellow');
                             row.removeClass('table-danger');
                             row.addClass('');
-                            // row.addClass('table-secondary');
-                            
+                            swal({  
+                              title: "Confirmation", 
+                              text: response.message ,  
+                              icon: "success",  
+                              button: "Okay",  
+                          // }).then((willReload) => {  
+                          //   if (willReload) {  
+                          //       location.reload();  // This will reload the current page  
+                          //   }  
+                        });
                         }
-                          
-                        
-                    //   button.html('<i class="fa-solid fa-gauge-high"></i>');
-                    //   }
-                    // button.style.cssText = "color: red; background-color: yellow;";
-                  } else {
+                      }  
+                   else {
                     alert('Error: ' + response.error);
                 }
             }
+          
         });
     });
 });
 
+function toggleFunction(isChecked,recid) {  
+  var fullApiUrl = apiBaseUrl + 'recepreportnpa/'+recid;
+  console.log(fullApiUrl); 
+  var row = $('#row-' + recid);
+  $.ajax({
+  url: fullApiUrl,
+  type: 'GET',
+  data: {
+      csrfmiddlewaretoken: '{{ csrf_token }}'
+  },
+  success: function(response) {
+    // var row = document.getElementById('row-' + recid);  
+      
+      if (response.success) {
+        if (response.npacase) {
+        row.addClass('table-warning');
+        }
+        else {
+          row.removeClass('table-warning');
+        }
+        swal({  
+          title: "Confirmation", 
+          text: response.message ,  
+          icon: "success",  
+          button: "Okay",  
+      // }).then((willReload) => {  
+      //   if (willReload) {  
+      //       location.reload();  // This will reload the current page  
+      //   }  
+    });
+        } else {
+          alert('Error: ' + response.error);
+      }
+  }
+});
+   
+} 
 
 fetch('/api/engreportstatus/a/0')
   .then(res =>res.json())
@@ -162,7 +199,34 @@ $(document).ready(function() {
         '</select> results'
       }
     })  
-    console.log("reception table");
+    // console.log("reception table");
+  } );
+  $(document).ready(function() {
+  
+    $('#impdoctable').DataTable({
+      //disable sorting on last column
+      pageLength: 5,
+      "columnDefs": [
+        { "orderable": false, "targets": 4 }
+        
+      ],
+      
+      language: {
+        //customize pagination prev and next buttons: use arrows instead of words
+        'paginate': {
+          'previous': '<span class="fa fa-chevron-left"></span>',
+          'next': '<span class="fa fa-chevron-right"></span>'
+        },
+        //customize number of elements to be displayed
+        "lengthMenu": 'Display <select class="form-control input-sm">'+
+        '<option value="5">5</option>'+
+        '<option value="10">10</option>'+
+        '<option value="20">20</option>'+
+        '<option value="-1">All</option>'+
+        '</select> results'
+      }
+    })  
+    // console.log("reception table");
   } );
 // eye view of reception dasboard modal heading fix here modhead---->modal head
   let modhead=document.getElementById('modhead');  
@@ -452,9 +516,13 @@ function buildreppendinprogtable(data,id) {
 
   //   global search for home and reception
 $(document).ready(function() {  
-    
+  $.fn.dataTable.ext.errMode = 'throw'; // Optional, to throw descriptive errors  
+  if ($.fn.dataTable.isDataTable('#globalsearchengineertable')) {  
+      $('#globalsearchengineertable').DataTable().clear().destroy();  
+  } 
   var globalengtable = $('#globalsearchengineertable').DataTable({
-    pageLength: 5,
+    // pageLength: 5,
+    paginate:false,
     "columnDefs": [
       { "orderable": false, "targets": 5 }
       
@@ -469,16 +537,68 @@ $(document).ready(function() {
       behavior: 'smooth'   
   });
       var searchValue = this.value;
-      if (searchValue.length > 0) {  
-          // $('#myTable').show(); // Show the table 
-          console.log('checkscroll2'); //
+      // if (searchValue.length > 0) {  
           document.getElementById("globalengtablediv").style.display = "block"; 
           document.getElementById('globalengtablediv').scrollIntoView({ behavior: 'smooth' }); 
-      } else {  
-          // $('#myTable').hide(); // Hide the table  
-          document.getElementById("globalengtablediv").style.display = "none";
-      }  
-      document.getElementById("")
+      // } else {  
+      //     document.getElementById("globalengtablediv").style.display = "none";
+      // }  
+      // document.getElementById("")
+      $('#homedatefilter').click(function(event) {
+        const input1 = document.getElementById("stdate").value;  
+        const input2 = document.getElementById("endate").value;
+        console.log("homedatefilter clicked"+input1+" "+input2);
+          var fullApiUrl = apiBaseUrl + 'homedatefilter/';
+          var homedatefilter=[];
+          // var globalengtable = $('#globalsearchengineertable').DataTable();
+          $.ajax({
+              url: fullApiUrl,
+              
+              data: {
+                  'startdate': input1,
+                  'enddate': input2
+              },
+              success: function(response) {
+                  if (response.success) {
+                    homedatefilter = response.data;
+                    homedatefiltertable(homedatefilter,globalengtable);
+      
+    //   $('#searchquery').on('keyup', function() {
+    //     document.getElementById("globalengtablediv").style.display = "block"; 
+    //     globalengtable.search(this.value).draw();
+    // });
+                    // $('#homedatefilt').html(data); // Update table body with new data  
+                  } else {
+                      alert('Error: ' + response.error);
+                  }
+              }
+          });
+      });
+      $('#clearhomedatefilter').click(function(event) {
+        document.getElementById("stdate").value ="";  
+        document.getElementById("endate").value="";
+        const input1 = document.getElementById("stdate").value;  
+        const input2 = document.getElementById("endate").value;
+          var fullApiUrl = apiBaseUrl + 'homedatefilter/';
+          var homedatefilter=[];
+          $.ajax({
+              url: fullApiUrl,
+              
+              data: {
+                  'startdate': input1,
+                  'enddate': input2
+              },
+              success: function(response) {
+                  if (response.success) {
+                    homedatefilter = response.data;
+                    homedatefiltertable(homedatefilter,globalengtable);
+      
+                  } else {
+                      alert('Error: ' + response.error);
+                  }
+              }
+          });
+      });
       
       globalengtable.search(this.value).draw();  
   });  
@@ -487,5 +607,206 @@ $(document).ready(function() {
 function clearsearch() {
   document.getElementById('searchquery').value = '';
   document.getElementById("globalengtablediv").style.display = "none";
+}
+
+$(document).ready(function() {
+  $('.impdocdelete').click(function(event) {
+    console.log("impdocdelete clicked");
+      event.preventDefault();
+      var button = $(this);
+      var url = button.data('url');
+      swal({  
+        title: "Are you sure?",  
+        text: "You will not be able to recall this record!",  
+        icon: "warning",  
+        buttons: true,  
+        dangerMode: true,  
+    }).then((willDelete) => {  
+        if (willDelete) {  
+      $.ajax({
+          url: url,
+          type: 'GET',
+          data: {
+              csrfmiddlewaretoken: '{{ csrf_token }}'
+          },
+          success: function(response) {
+              if (response.success) {
+                button.closest('tr').remove();
+               } else {
+                swal({  
+            
+                  text: response.message,  
+                  
+                  button: "Okay",  
+              });
+                // alert('Error: ' + response.message);
+              }
+          }
+      });
+    } else {  
+      // Optionally do something when cancelled  
+      swal("Record is safe!");  
+  }  
+});  
+  });
+});
+
+$(document).ready(function() {
+  $('.edit-btn').on('click', function() {
+      var $row = $(this).closest('tr');
+      let i=0;
+      $row.find('td').each(function() {
+        i=i+1 ;
+          var $cell = $(this);
+          if ($cell.hasClass('docnarration') || $cell.hasClass('doclink')) {
+            if ($cell.hasClass('docnarration')){
+              document.getElementById("editnarration").value=$cell.text();  
+            }else{
+              document.getElementById("editlink").value=$cell.text();
+            }
+            
+              var content = $cell.text();
+              var cellClass = $cell.attr('class');
+              $cell.html('<input type="text" value="' + content + '" onkeyup="syncText(this)" class="' + cellClass + '" id="input-' + i + '">');
+              console.log(cellClass);
+          }
+      });
+      
+      // $(this).removeClass('edit-btn').addClass('save-btn');
+      // $(this).addClass('save-btn');
+      $(this).hide();
+      $row.find('.save-btn').show();
+      $row.find('.cancel-btn').show();
+  });
+
+
+});
+function syncText(cell) {  
+  console.log(cell.id);
+  // var text = cell.text();
+if(cell.id =='input-2') {
+  document.getElementById("editnarration").value = cell.value; 
+} else {
+  document.getElementById("editlink").value = cell.value;  
+} 
+}  
+
+function updateimpdoc(recid){ 
+   
+  const input1 = document.getElementById("editnarration").value;  
+  const input2 = document.getElementById("editlink").value;  
+  apiBaseUrl = apiBaseUrl.replace('/api/', '/');
+  var fullApiUrl = apiBaseUrl + 'propval/impdocupdate/'+recid;
+  const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+  fetch(fullApiUrl, {  
+      method: 'PUT',  
+      headers: {  
+          'Content-Type': 'application/json',  
+          'X-CSRFToken': csrfToken  
+      },  
+      body: JSON.stringify({ narration: input1, linkurl: input2 })  
+  })  
+  .then(response => response.json())
+      
+  // .then(data => console.log(data.message))  
+  .then(data =>(data.success
+     ?  swal({  
+      title: "Confirmation", 
+      text: data.message ,  
+      icon: "success",  
+      button: "Okay",  
+  }).then((willReload) => {  
+    if (willReload) {  
+        location.reload();  // This will reload the current page 
+        // window.location.href = apiBaseUrl+'impdoc';  
+           
+    }  
+})
+      : alert(data.message)
+  )
+
+)  
+  .catch((error) => console.error('Error:', error));  
+  
+}  
+
+$(document).ready(function() {
+  // document.getElementById("globalengtablediv").style.display = "block"; 
+//   $('#homedatefilter').click(function(event) {
+//     const input1 = document.getElementById("stdate").value;  
+//     const input2 = document.getElementById("endate").value;
+//     console.log("homedatefilter clicked"+input1+" "+input2);
+//       var fullApiUrl = apiBaseUrl + 'homedatefilter/';
+//       var homedatefilter=[];
+//       var globalengtable = $('#globalsearchengineertable').DataTable();
+//       $.ajax({
+//           url: fullApiUrl,
+          
+//           data: {
+//               'startdate': input1,
+//               'enddate': input2
+//           },
+//           success: function(response) {
+//               if (response.success) {
+//                 homedatefilter = response.data;
+//                 homedatefiltertable(homedatefilter,globalengtable);
+  
+//   $('#searchquery').on('keyup', function() {
+//     document.getElementById("globalengtablediv").style.display = "block"; 
+//     globalengtable.search(this.value).draw();
+// });
+//                 // $('#homedatefilt').html(data); // Update table body with new data  
+//               } else {
+//                   alert('Error: ' + response.error);
+//               }
+//           }
+//       });
+//   });
+});
+function homedatefiltertable(data,gltable) {
+gltable.clear().draw(); // Clear existing data 
+var table =  document.getElementById('homedatefilt');
+console.log(table);
+var row=`<tr></tr>`
+table.innerHTML = row
+for (var i=0; i<data.length; i++) { console.log(data[i].id);
+  var engineerStatus;  
+if (data[i].engineer === "Submitted") {  
+    engineerStatus = "Completed";  
+} else if (data[i].engineer === null) {  
+    engineerStatus = "Pending";  
+} else {  
+    engineerStatus = data[i].engineer;  
+}
+var archive = data[i].archive? 'Yes' : 'No';
+//   var row = `<tr>
+//   <td scope="row">${i+1}</td>
+//   <td>${moment((data[i].applicationdate).split('T')[0]).format('DD-MM-YYYY')}</td>
+//   <td scope="col">${data[i].applicationnumber}</td>
+//   <td scope="col">${data[i].name}</td>
+//   <td scope="col">${data[i].bankname}</td>
+//   <td scope="col">${data[i].bankvertical}</td>
+//   <td scope="col">${data[i].phonenumber}</td>
+//   <td scope="col">${data[i].visitingpersonname}</td>
+//   <td >${engineerStatus}</td>
+//   <td >${archive}</td>
+//  <td scope="col">${data[i].reporterholdcause}</td>
+//   </tr>`
+//   table.innerHTML += row
+gltable.row.add([
+  i + 1,
+  moment((data[i].applicationdate).split('T')[0]).format('DD-MM-YYYY'),
+  data[i].applicationnumber,
+  data[i].name,
+  data[i].bankname,
+  data[i].bankvertical,
+  data[i].phonenumber,
+  data[i].visitingpersonname,
+  engineerStatus,
+  archive,
+  data[i].reporterholdcause
+]).draw(false);
+  }
+  
 }
 

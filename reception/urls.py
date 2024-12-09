@@ -12,4 +12,5 @@ urlpatterns = [
     path('delete_file/<int:doc_id>/', views.delete_file, name='delete_file'),
     path('engcompreportpdf/<int:doc_id>/', views.engcompreportpdf, name='engcompreportpdf'),
     path('repcompreportpdf/<int:doc_id>/', views.repcompreportpdf, name='repcompreportpdf'),
+    path('download-image/<str:file_ids>/', views.download_image, name='download_image'),
 ]

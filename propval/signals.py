@@ -17,6 +17,8 @@ def log_user_login(sender, user, request, **kwargs):
 def log_user_login_failed(sender, request,credentials, **kwargs):
     # print(credentials)
     # print('User {} failed to log in through page {}'.format(credentials['username'],request.META.get('HTTP_REFERER')))
+    uname=None
+    uemail=None
     ip_address = request.META.get('REMOTE_ADDR') 
     try: 
         userobject = User.objects.get(username=credentials['username'])
@@ -27,6 +29,7 @@ def log_user_login_failed(sender, request,credentials, **kwargs):
         userdetail =UserDetails.objects.get(user_email=credentials['username']) 
     except UserDetails.DoesNotExist:
         userdetail=None
+        uname=credentials['username']
         uemail=credentials['username']
     UserActivity.objects.create(user=userobject,username=uname,userdetails=userdetail,useremail=uemail, action_type='login_failed', ip_address=ip_address)  
 @receiver(user_logged_out)

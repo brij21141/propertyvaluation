@@ -1,14 +1,36 @@
 
-<!-- {% extends "sidebar.html" %} -->
-{% include 'bootstrap_link.html' %}
-{% block title %}Reporter report{% endblock %}
-{% load static %}
-
-{% block content %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>Reporter report</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    {% include 'bootstrap_link.html' %}
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'css/sidebarstyle.css' %}">
+    <link rel="stylesheet" href="{% static 'css/formstyle.css' %}">
+</head>
+<body>
 
   <div class="testbox col-md-8 offset-md-2">
         
       <form action="">{% csrf_token %}
+        <div class="row d-flex align-items-baseline">
+          <div class="col-md-6">
+            <!-- <a data-mdb-ripple-init class="btn btn-light text-capitalize" style="text-align: center;" data-mdb-ripple-color="dark" href="{% url 'generatebill' %}">
+              <i class="fa-solid fa-arrow-left"></i> Back</a> -->
+          </div>
+          <div class="col-md-6 d-flex justify-content-end">
+            <a data-mdb-ripple-init class="btn btn-light text-capitalize border-0" data-mdb-ripple-color="dark" onclick="printbill()"><i
+                class="fas fa-print text-primary"></i> Print</a>
+            <a data-mdb-ripple-init class="btn btn-light text-capitalize" data-mdb-ripple-color="dark" href="{% url 'billinpdf' %}"><i
+                class="far fa-file-pdf text-danger"></i> Export</a>
+            <a data-mdb-ripple-init class="btn btn-light text-capitalize" data-mdb-ripple-color="dark" href="{% url 'billinpdf' %}"><i
+                class="fa fa-download text-primary"></i> Download</a>
+          </div>
+          <hr>
+        </div>
+        <div id="mn" mr-2 ml-2>
         <div class="banner">
             <h1>Reporter Property Report</h1>
         </div>
@@ -393,9 +415,30 @@
       </form>
       
   </div>
-  
-{% endblock %}
-{% block scripts%}
+</div>
 <Script type="text/javascript" src="{% static 'js/reporter.js' %}" > </Script>
 <Script type="text/javascript" src="{% static 'js/sidebartoggle.js' %}"> </Script>
-{% endblock scripts%}
+<script src='https://code.jquery.com/jquery-3.7.0.js'></script>
+<!-- Data Table JS -->
+<script src='https://cdn.datatables.net/1.13.5/js/jquery.dataTables.min.js'></script>
+<script src='https://cdn.datatables.net/responsive/2.1.0/js/dataTables.responsive.min.js'></script>
+<script src='https://cdn.datatables.net/1.13.5/js/dataTables.bootstrap5.min.js'></script>   
+</body>
+<Script type="text/javascript" src="{% static 'js/sidebartoggle.js' %}"> </Script>
+
+<Script type="text/javascript" src="{% static 'js/tableattribute.js' %}"> </Script>
+
+{% block scripts%}
+  <script type="text/javascript" >
+    function printbill(){
+        var b=document.body.innerHTML;
+        var d=document.getElementById('mn').innerHTML;
+        document.body.innerHTML=d;
+        window.print();
+        document.body.innerHTML=b;
+    }
+  </script>
+  {% endblock scripts%}
+  
+
+</html>
