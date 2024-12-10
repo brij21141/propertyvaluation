@@ -12,7 +12,7 @@ from django.contrib.auth import login, authenticate, logout
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from .serializers import LoginSerializer,UserSerializer,EngineerSerializer,ReceptionSerializer,UserdetailSerializer,EngineerCreateSerializer,ReporterSerializer,UserProfileSerializer
-from .serializers import ResetPasswordEmailRequestSerializer,ResetPasswordSerializer,BankSerializer
+from .serializers import ResetPasswordEmailRequestSerializer,ResetPasswordSerializer,BankSerializer,FileUploadSerializer
 from rest_framework.authtoken.models import Token
 from rest_framework.permissions import IsAuthenticated
 from rest_framework import viewsets
@@ -521,6 +521,7 @@ def reportassign(request,uid):
         return JsonResponse({'success': False, 'error':'Report could not be assigned'})
     
 #Apis
+
 class EngineerViewSet(viewsets.ModelViewSet):
      queryset = EngineerReport.objects.all()
 #      for report in queryset:
@@ -819,6 +820,19 @@ class DocumentUploadView(APIView):
             )  
 
         return Response({'message': 'Files uploaded successfully.'}, status=status.HTTP_201_CREATED) 
+    
+class DocumentgetView(APIView):
+     def get(self, request, appno,recid):
+          try:
+            queryset =  Document.objects.filter(application_number=appno,reception_idno=recid, platform = 'engineer')
+            if queryset.exists():
+                  serializer = FileUploadSerializer(queryset, many=True,context={'request':request})
+                  return JsonResponse({'success':True, 'message':"file/files found",'data':serializer.data}, status=status.HTTP_200_OK)
+            else:
+                 return JsonResponse({'success':True, 'message':"no file found"}, status=status.HTTP_200_OK)
+          except Exception as e:
+            return JsonResponse({'success':False,'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)  
+            
 
 def homedatefilter(request):
       stdate_str = request.GET.get('startdate')
@@ -846,7 +860,7 @@ def homedatefilter(request):
       # searchresults=ReceptionReport.objects.filter(Q(datecreated__gte=stdate) & Q(datecreated__lte=endate))
       serializer_result=ReceptionSerializer(searchresults,many=True,context={'request':request}) 
       # print(serializer_result)
-      return JsonResponse({'success':True, 'data':serializer_result.data}, status=status.HTTP_201_CREATED)  
+      return JsonResponse({'success':True, 'data':serializer_result.data}, status=status.HTTP_200_OK)  
 
 def engineereditedview(request,recid):  
       

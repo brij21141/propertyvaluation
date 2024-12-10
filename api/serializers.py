@@ -72,7 +72,8 @@ class ResetPasswordSerializer(serializers.Serializer):
     token = serializers.CharField()
     password = serializers.CharField()
 
-class FileUploadSerializer(serializers.Serializer):  
+class FileUploadSerializer(serializers.ModelSerializer): 
+    id = serializers.ReadOnlyField() 
     class Meta:
         model = Document
         fields = "__all__"
