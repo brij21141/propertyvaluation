@@ -521,6 +521,9 @@ def reportassign(request,uid):
         return JsonResponse({'success': False, 'error':'Report could not be assigned'})
     
 #Apis
+class EngAttendanceViewSet(viewsets.ModelViewSet):
+     queryset = EngAttendance.objects.all()
+     serializer_class=EngineerAttendanceSerializer
 
 class EngineerViewSet(viewsets.ModelViewSet):
      queryset = EngineerReport.objects.all()
@@ -544,23 +547,7 @@ class EngineerViewSet(viewsets.ModelViewSet):
         
             return Response({'success': True, 'data': serializer_class.data}, status=status.HTTP_201_CREATED)  
           return Response(serializer_class.errors, status=status.HTTP_400_BAD_REQUEST)  
-class EngAttendanceViewSet(viewsets.ModelViewSet):
-     queryset = EngAttendance.objects.all()
-     serializer_class=EngineerAttendanceSerializer
-
-#http://127.0.0.1:8000/api/engattendance/engattendance/     
-#      @action(detail=False, methods=['post'])
-#      def engattendance(self, request, pk=None):
-#           serializer_class=EngineerCreateSerializer(data=request.data,context={'request':request})
-#           if serializer_class.is_valid():  
-#             serializer_class.save()  
-#             print(request.data.get('receptionid').split('/')[-2] ) 
-#             queryset=ReceptionReport.objects.get(id=request.data.get('receptionid').split('/')[-2])
-#             print(queryset)
-#             queryset.engineer='Submitted'
-#             queryset.save()
-#             return Response({'success': True, 'data': serializer_class.data}, status=status.HTTP_201_CREATED)  
-#           return Response(serializer_class.errors, status=status.HTTP_400_BAD_REQUEST)  
+ 
 #http://127.0.0.1:8000/api/engineer/updateengreport/     updating record of eng report api
      @action(detail=True, methods=['put'])
      def updateengreport(self, request, pk=None):
