@@ -1,11 +1,12 @@
 from django.urls import path,include 
 from . import views
 from .views import LoginAPI, LogoutAPI,EngineerViewSet,UserViewSet,ReceptionViewSet,ReporterViewSet,UserProfileUpdateView,UserdetailViewSet
-from .views import ResetPasswordRequestView, ResetPasswordConfirmView,BankViewSet,DocumentUploadView,DocumentgetView
+from .views import ResetPasswordRequestView, ResetPasswordConfirmView,BankViewSet,DocumentUploadView,DocumentgetView,EngAttendanceViewSet
 from rest_framework import routers
 
 router = routers.DefaultRouter()
 router.register(r'engineer',EngineerViewSet)
+router.register(r'engattendance',EngAttendanceViewSet)
 router.register(r'user',UserViewSet)
 router.register(r'reception',ReceptionViewSet)
 router.register(r'reporter',ReporterViewSet)

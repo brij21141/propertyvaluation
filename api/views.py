@@ -1,18 +1,18 @@
 from django.shortcuts import render
 from django.http import JsonResponse, HttpResponse
 from django.contrib.auth.models import User
-import csv,json
-from datetime import datetime,time,timedelta
+import csv,json,time
+from datetime import datetime,timedelta
 from propval.models import UserDetails,Banks,Impdoc
 from django.db.models import Count
 from reception.models import ReceptionReport,ArchieveReceptionReport
-from site_engineer.models import EngineerReport,ArchieveEngineerReport,HistoryEngineerReport,Floordetails,HistoryFloordetails
+from site_engineer.models import EngineerReport,ArchieveEngineerReport,HistoryEngineerReport,Floordetails,HistoryFloordetails,EngAttendance
 from reporter.models import ReporterReport
 from django.contrib.auth import login, authenticate, logout
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from .serializers import LoginSerializer,UserSerializer,EngineerSerializer,ReceptionSerializer,UserdetailSerializer,EngineerCreateSerializer,ReporterSerializer,UserProfileSerializer
-from .serializers import ResetPasswordEmailRequestSerializer,ResetPasswordSerializer,BankSerializer,FileUploadSerializer
+from .serializers import ResetPasswordEmailRequestSerializer,ResetPasswordSerializer,BankSerializer,FileUploadSerializer,EngineerAttendanceSerializer
 from rest_framework.authtoken.models import Token
 from rest_framework.permissions import IsAuthenticated
 from rest_framework import viewsets
@@ -544,6 +544,23 @@ class EngineerViewSet(viewsets.ModelViewSet):
         
             return Response({'success': True, 'data': serializer_class.data}, status=status.HTTP_201_CREATED)  
           return Response(serializer_class.errors, status=status.HTTP_400_BAD_REQUEST)  
+class EngAttendanceViewSet(viewsets.ModelViewSet):
+     queryset = EngAttendance.objects.all()
+     serializer_class=EngineerAttendanceSerializer
+
+#http://127.0.0.1:8000/api/engattendance/engattendance/     
+#      @action(detail=False, methods=['post'])
+#      def engattendance(self, request, pk=None):
+#           serializer_class=EngineerCreateSerializer(data=request.data,context={'request':request})
+#           if serializer_class.is_valid():  
+#             serializer_class.save()  
+#             print(request.data.get('receptionid').split('/')[-2] ) 
+#             queryset=ReceptionReport.objects.get(id=request.data.get('receptionid').split('/')[-2])
+#             print(queryset)
+#             queryset.engineer='Submitted'
+#             queryset.save()
+#             return Response({'success': True, 'data': serializer_class.data}, status=status.HTTP_201_CREATED)  
+#           return Response(serializer_class.errors, status=status.HTTP_400_BAD_REQUEST)  
 #http://127.0.0.1:8000/api/engineer/updateengreport/     updating record of eng report api
      @action(detail=True, methods=['put'])
      def updateengreport(self, request, pk=None):

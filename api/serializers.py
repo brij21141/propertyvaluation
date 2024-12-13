@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from site_engineer.models import EngineerReport
+from site_engineer.models import EngineerReport,EngAttendance
 from django.contrib.auth.models import User
 from reception.models import ReceptionReport,Document
 from propval.models import UserDetails,Banks
@@ -33,6 +33,10 @@ class EngineerCreateSerializer(serializers.HyperlinkedModelSerializer):
     # id = serializers.ReadOnlyField()
     class Meta:
         model=EngineerReport
+        fields = "__all__" 
+class EngineerAttendanceSerializer(serializers.HyperlinkedModelSerializer):
+    class Meta:
+        model=EngAttendance
         fields = "__all__" 
 
 class BankSerializer(serializers.HyperlinkedModelSerializer):

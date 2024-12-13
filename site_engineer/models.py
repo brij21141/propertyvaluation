@@ -194,3 +194,20 @@ class HistoryFloordetails(models.Model):
     def __str__(self):
         return str(self.id)
     
+class EngAttendance(models.Model):
+    applicationnumber = models.CharField(max_length=20)
+    address = models.CharField(max_length=100)
+    city = models.CharField(max_length=30)
+    region = models.CharField(max_length=30)
+    zip = models.CharField(max_length=6)
+    country = models.CharField(max_length=20)
+    lat = models.CharField(max_length=200,null=True,blank=True)
+    lng = models.CharField(max_length=200,null=True,blank=True)
+    placeid = models.CharField(max_length=200,null=True,blank=True)
+    receptionid = models.ForeignKey(ReceptionReport, on_delete=models.DO_NOTHING, null=True, blank=True)
+    userdetailsid = models.ForeignKey(User, on_delete=models.DO_NOTHING, default=0)
+    datecreated = models.DateTimeField(auto_now_add=True)
+    def __str__(self):
+        return str(self.id)
+
+    
