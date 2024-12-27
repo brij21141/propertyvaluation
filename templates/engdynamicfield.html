@@ -1,10 +1,11 @@
 
 {% extends "sidebar.html" %}
 {% include 'bootstrap_link.html' %}
-{% block title %}Important Document{% endblock %}
+{% block title %}Update Engineer Form{% endblock %}
 {% load static %}
 
 {% block content %}
+
 <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.1/moment.min.js"></script>
 <div class="container-fluid my-2" >
   <div class="container" style="display:block; background-color:#f6f6f6; padding:20px 20px 20px;">
@@ -15,7 +16,7 @@
           <div class="card-body">
             
             <!-- <a class="btn btn-success btn-sm float-end" href="/api/receptiongenreportexport">Export to Excel</a> -->
-            <a class="btn btn-primary btn-sm" id="impdocaddbtn" onclick="addimpdoc()">Add Links url</a>
+            <a class="btn btn-primary btn-sm" id="impdocaddbtn" onclick="addimpdoc()">Add Fields</a>
             
             <hr>
             <div class="item" id="addimpdoc" style="display: none;">
@@ -23,23 +24,32 @@
                 <form action="" method="post" class="">{% csrf_token %}
              <div class="row">
                 <div class="col-md-4">
-                <input  id="narration" name="narration" type="text" class="form-control " placeholder="Enter narration" style="display: inline-block;"
+                <input  id="label" name="label" type="text" class="form-control " placeholder="Enter label" style="display: inline-block;"
                 value="" />
                  </div>
                 <div class="col-md-4">
-                <input id="link" name="link" type="text" class="form-control" placeholder="Enter link url"
-                value=""/>
+                 <!-- change also in reception.js file in this function     $('.edit-btn').on('click', function() { -->
+                <select class="form-select" aria-label="Default select example" name="input_type" required>
+                <option value="text" >Text</option>   
+                <option value="number" >Number</option>
+                <option value="date" >Date</option>
+                <option value="email" >Email</option>
+                </select>
+
+                <!-- <input id="input_type" name="input_type" type="text" class="form-control" placeholder="Enter Field type"
+                value=""/> -->
                 
             </div>
-            <div class="col-md-4 d-flex">
-                <div class="">
+                <div class="col-md-4 d-flex">
+                
+                <div class="justify-content-end">
                     <button id="impdocsave" type="submit" class="btn btn-primary btn-sm me-2" href="">Save</button>
                     <!-- <a class="btn btn-primary btn-sm" href="/reception/receptio">Cancel</a> -->
                 </div>
                 <div class="">
                     <a id="impdoccancel" class="btn btn-primary btn-sm" href="">Cancel</a>
                 </div>
-              </div>
+                </div>
             </div>
             </form>
             </div>
@@ -53,30 +63,30 @@
               <thead>
                 <tr>
                   <th scope="col">#</th>
-                  <th scope="col">Narration</th>
-                  <th scope="col">Link/url</th>
+                  <th scope="col">Narration/Label</th>
+                  <th scope="col">Input type</th>
                   <th scope="col">Created date</th>
                   <th scope="col">Action </th>
                    
                 </tr>
               </thead>
               <tbody>
-                {% for recrep in impdocs %}
+                {% for recrep in engdynamicfields %}
                   <tr id="imp{{recrep.id}}" > 
                   <td  scope="row">{{forloop.counter}}</td>
-                  <td id="docnarration" class="docnarration" >{{recrep.narration}}</td>
-                  <td id="doclink" class="doclink" >{{recrep.linkurl}}</td>
+                  <td id="docnarration" class="docnarration" >{{recrep.label}}</td>
+                  <td id="doctype" class="doclink" >{{recrep.input_type}}</td>
                   <td  >{{recrep.timestamp|date:"d-m-Y"}}</td>
                 
-                  <td><a class="impdocdelete" data-url="{% url 'impdocdelete' recrep.id %}" href="" title="Delete">
+                  <td><a class="impdocdelete" data-url="{% url 'engdynamicfielddelete' recrep.id %}" href="" title="Delete">
                     <i class="fa fa-trash" aria-hidden="true"></i></a>&nbsp;&nbsp;
                     <a type="button"  class="edit-btn" title="Edit" id="" >
                       <i class="fas fa-edit action-icon " ></i>
                     </a>&nbsp;&nbsp;
-                    <a type="button"  onclick="updateimpdoc({{recrep.id}})" class="save-btn" title="Save" id="updateimpdoc-btn" style="display:none;">
+                    <a type="button"  onclick="engdynamicfieldupdate({{recrep.id}})" class="save-btn" title="Save" id="updateimpdoc-btn" style="display:none;">
                       <i class="fas fa-save action-icon save-icon"></i>
                     </a>&nbsp;&nbsp;
-                    <a type="button" href="impdoc"  class="cancel-btn" title="Cancel" style="display:none;" >
+                    <a type="button" href="engdynamicfield"  class="cancel-btn" title="Cancel" style="display:none;" >
                       <i class="fa-solid fa-xmark"></i>
                     </a>
                      

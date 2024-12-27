@@ -339,9 +339,10 @@ function clearsearch() {
 
 
 //   document.getElementById("engeditedbutton").onclick = function(event) { 
-$(document).ready(function() {
+$(document).on('click', '.engeditedbutton', function(event) {  
+// $(document).ready(function() {
 
-$('.engeditedbutton').click(function(event) { 
+// $('.engeditedbutton').click(function(event) { 
     // $('#engeditpop').modal('show') 
     event.preventDefault();
             var button = $(this);
@@ -355,9 +356,20 @@ $('.engeditedbutton').click(function(event) {
             let tableBody = document.querySelector('#engeditdataTable tbody');  
             tableBody.innerHTML = ''; // Clear existing data 
             let i=1;  
-            // console.log(data.data[0].name);
+            console.log(data.data[0].dynamicfields);
             // console.log(data.data);
-            
+            const headerRow = document.querySelector('#editheader tr'); 
+            const dynamicHeaders = headerRow.querySelectorAll('.dynamic-header');  
+            dynamicHeaders.forEach(header => {  
+                headerRow.removeChild(header);  
+            }); 
+            // var Header17th = headerRow.children[17]; 
+            data.data[0].dynamicfields.forEach(field =>{ 
+            const newTh = document.createElement('th');
+            newTh.textContent = field.input_field__label;  
+            newTh.classList.add('dynamic-header');
+            headerRow.appendChild(newTh);  
+        })
             data.data.forEach(item => { 
                 let floorCellStyle = '';
                 td = "";   
@@ -397,29 +409,29 @@ $('.engeditedbutton').click(function(event) {
                     caseCellStyle = 'style="background-color: yellow;"'; 
                 } 
                 let add1CellStyle = '';  
-                if (item.add1 != data.data[0].add1) {
+                if (item.add1 != data.data[0].add1 || item.add2 != data.data[0].add2 || item.city != data.data[0].city || item.region != data.data[0].region || item.country != data.data[0].country || item.zip != data.data[0].zip) {
                     add1CellStyle = 'style="background-color: yellow;"'; 
                 } 
-                let add2CellStyle = '';  
-                if (item.add2 != data.data[0].add2) {
-                    add2CellStyle = 'style="background-color: yellow;"'; 
-                } 
-                let cityCellStyle = '';  
-                if (item.city != data.data[0].city) {
-                    cityCellStyle = 'style="background-color: yellow;"'; 
-                } 
-                let regionCellStyle = '';  
-                if (item.region != data.data[0].region) {
-                    regionCellStyle = 'style="background-color: yellow;"'; 
-                } 
-                let zipCellStyle = '';  
-                if (item.zip != data.data[0].zip) {
-                    zipCellStyle = 'style="background-color: yellow;"'; 
-                } 
-                let countryCellStyle = '';  
-                if (item.country != data.data[0].country) {
-                    countryCellStyle = 'style="background-color: yellow;"'; 
-                } 
+                // let add2CellStyle = '';  
+                // if (item.add2 != data.data[0].add2) {
+                //     add2CellStyle = 'style="background-color: yellow;"'; 
+                // } 
+                // let cityCellStyle = '';  
+                // if (item.city != data.data[0].city) {
+                //     cityCellStyle = 'style="background-color: yellow;"'; 
+                // } 
+                // let regionCellStyle = '';  
+                // if (item.region != data.data[0].region) {
+                //     regionCellStyle = 'style="background-color: yellow;"'; 
+                // } 
+                // let zipCellStyle = '';  
+                // if (item.zip != data.data[0].zip) {
+                //     zipCellStyle = 'style="background-color: yellow;"'; 
+                // } 
+                // let countryCellStyle = '';  
+                // if (item.country != data.data[0].country) {
+                //     countryCellStyle = 'style="background-color: yellow;"'; 
+                // } 
                 let eastCellStyle = '';  
                 if (item.east != data.data[0].east) {
                     eastCellStyle = 'style="background-color: yellow;"'; 
@@ -505,19 +517,32 @@ $('.engeditedbutton').click(function(event) {
                 if (item.remark != data.data[0].remark) {
                     remarkCellStyle = 'style="background-color: yellow;"'; 
                 } 
+                console.log(data.data[0].dynamicfields.length)
+                
+                let dyncellStyle = ''; 
+                let dyntd="";
+                let k=0;
+                item.dynamicfields.forEach(dynval=>{
+                    if (i==1){
+                    dyntd+=`<td >${dynval.value}</td>`;
+                    }else{
+                        if(dynval.value!=data.data[0].dynamicfields[k].value)
+                        dyncellStyle = 'style="background-color: yellow;"';
+                        dyntd+=`<td ${dyncellStyle}>${dynval.value}</td>`;
+                        k++;
+                    }
+                });
+                // let td1=`<td >${item.applicationnumber}</td>`;
+                // console.log(dyntd, item.applicationnumber) 
+                let spc="  ";    
                 let row = `<tr>  
                     <td>${i}</td>  
-                    <td >${item.applicationnumber}</td>  
+                    <td >${item.applicationnumber}</td> 
                     <td ${nameCellStyle}>${item.name}</td>  
                     <td ${presenceCellStyle}>${item.visitinpresence}</td>  
                     <td >${item.bankname}</td>  
                     <td ${caseCellStyle}>${item.casetype}</td>  
-                    <td ${add1CellStyle} >${item.add1}</td>  
-                    <td ${add2CellStyle} >${item.add2}</td>  
-                    <td ${cityCellStyle} >${item.city}</td>  
-                    <td ${regionCellStyle} >${item.region}</td>  
-                    <td ${zipCellStyle}>${item.zip}</td>  
-                    <td ${countryCellStyle}>${item.country}</td>  
+                    <td ${add1CellStyle} >${item.add1}${spc}${item.add2}${spc}${item.city}${spc}${item.region}${spc}${item.country}${spc}${item.zip}</td>  
                     <td ${eastCellStyle}>${item.east}</td>  
                     <td ${westCellStyle}>${item.west}</td>  
                     <td ${northCellStyle}>${item.north}</td>  
@@ -528,7 +553,8 @@ $('.engeditedbutton').click(function(event) {
                     <td ${occupantCellStyle}>${item.Occupant}</td>  
                     <td ${rentedCellStyle}>${item.rented}</td>  
                     <td ${landmarkCellStyle}>${item.landmark}</td>  
-                    <td ${roadwidthCellStyle}>${item.roadwidth}</td>  
+                    <td ${roadwidthCellStyle}>${item.roadwidth}</td> 
+                    
                     <td ${hightensionCellStyle}>${item.hightensionline}</td>  
                     <td ${railwayCellStyle}>${item.railwayline}</td>  
                     <td ${nalaCellStyle}>${item.nala}</td>  
@@ -539,7 +565,7 @@ $('.engeditedbutton').click(function(event) {
                     <td ${othercheckCellStyle}>${item.othercheck}</td>  
                     <td ${othersCellStyle}>${item.others}</td>  
                     <td ${remarkCellStyle}>${item.remark}</td>  
-                    
+                    ${dyntd}
                    
                 </tr>`;  
                 tableBody.innerHTML += row;  
@@ -553,10 +579,10 @@ $('.engeditedbutton').click(function(event) {
         // console.log(floorCell);
         // let floorCellStyle = 'background-color: red; width: 200px;';   
         // floorCell.setAttribute('style', floorCellStyle);  
-});  
+// });  
 });  
 
-
+//   }
 
 
 

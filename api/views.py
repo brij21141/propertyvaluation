@@ -2,11 +2,12 @@ from django.shortcuts import render
 from django.http import JsonResponse, HttpResponse
 from django.contrib.auth.models import User
 import csv,json,time
+from django.utils import timezone
 from datetime import datetime,timedelta
 from propval.models import UserDetails,Banks,Impdoc
 from django.db.models import Count
 from reception.models import ReceptionReport,ArchieveReceptionReport
-from site_engineer.models import EngineerReport,ArchieveEngineerReport,HistoryEngineerReport,Floordetails,HistoryFloordetails,EngAttendance
+from site_engineer.models import EngineerReport,ArchieveEngineerReport,HistoryEngineerReport,Floordetails,HistoryFloordetails,EngAttendance,EngDynamicdValue,HistoryEngDynamicdValue
 from reporter.models import ReporterReport
 from django.contrib.auth import login, authenticate, logout
 from rest_framework.views import APIView
@@ -524,6 +525,20 @@ def reportassign(request,uid):
 class EngAttendanceViewSet(viewsets.ModelViewSet):
      queryset = EngAttendance.objects.all()
      serializer_class=EngineerAttendanceSerializer
+     @action(detail=False, methods=['put'])
+     def updateout(self, request, *args, **kwargs):  
+      #   id = kwargs.get('pk')  # Use 'pk' for the primary key in DRF  
+        appno = request.data.get('applicationnumber')  
+        recpid = request.data.get('receptionid')  
+        instance = self.get_queryset().filter(applicationnumber=appno, receptionid_id=recpid).order_by('-indatetinme').first()  
+
+        if instance is None:  
+            return Response({'detail': 'Record not found'}, status=404)  
+
+        instance.outdatetinme = timezone.now()  
+        instance.save(update_fields=['outdatetinme'])  # Only update the outdatetime field  
+        serializer = self.get_serializer(instance)  
+        return Response(serializer.data)  
 
 class EngineerViewSet(viewsets.ModelViewSet):
      queryset = EngineerReport.objects.all()
@@ -884,10 +899,17 @@ def engineereditedview(request,recid):
       if reports:  
                   floor_details = list(Floordetails.objects.filter(engreportid=recid).values(  
         'floorname', 'floordetail', 'floorarea'))  
-        
+                  # dynamicfields = EngDynamicdValue.objects.filter(engreportid=recid)
+                  dynamicfields = list(EngDynamicdValue.objects.filter(engreportid=recid).select_related('input_field').order_by('input_field_id').values('input_field_id','value','input_field__label'))
       # Combine the results  
-      reports['floors'] = floor_details  
-      keys_list = list(reports.items()) 
+      reports['floors'] = floor_details 
+      # dyndata=[]
+      # for dynamicfield in dynamicfields: 
+            # reports[dynamicfield.input_field.label] = dynamicfield.value
+            # dyndata[dynamicfield.input_field.label] = dynamicfield.value
+      # keys_list = list(dynamicfields.items())
+      reports['dynamicfields'] = dynamicfields
+      # keys_list = list(reports.items()) 
       # else:  
       #       engineer_report = None  # Handle case where no record is found  
       # print(reports)
@@ -907,18 +929,22 @@ def engineereditedview(request,recid):
       for history in histories:
             history['floors'] = list(HistoryFloordetails.objects.filter(historyengreportid_id=history.get('id')).values(  
             'floorname', 'floordetail', 'floorarea'))
-            print(history)
+            # dynamicfields = HistoryEngDynamicdValue.objects.filter(hsengreportid_id=history.get('id'))
+            # for dynamicfield in dynamicfields: 
+            #       history[dynamicfield.input_field.label] = dynamicfield.value
+            history['dynamicfields'] = list(HistoryEngDynamicdValue.objects.filter(hsengreportid_id=history.get('id')).select_related('input_field').order_by('input_field_id').values('input_field_id','value','input_field__label'))
+            # print(history)
             floorhistories.append(history)
             # floorhistories += history
       #       floorhistories[history.get('id')] = history
       floorhistories.append(reports) 
-      print(floorhistories)
+      # print(floorhistories)
       #     enghistory = reports.union(histories) 
       
       enghistory =  floorhistories 
       #     serializer_result=EngineerCreateSerializer(enghistory,many=True,context={'request':request})   
       #     print(serializer_result.data)
-      return JsonResponse({'success':True, 'data':enghistory}, status=status.HTTP_201_CREATED)   
+      return JsonResponse({'success':True, 'data':enghistory}, status=status.HTTP_200_OK)   
 
 # @api_view(['GET'])  
 # def application_list(request):  

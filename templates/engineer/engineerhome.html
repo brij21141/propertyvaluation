@@ -292,7 +292,7 @@
                     <a href="#" type="button" data-url="{% url 'engineereditedview' reqcom.id %}" id="engeditedbutton" class="engeditedbutton">Edited</a>
                     {% endif %}
                   </td> 
-                  </tr>
+                </tr>
                 {% endfor %}
               </tbody>
             </table>
@@ -336,7 +336,7 @@
         
         <table id="engeditdataTable" class="table table-hover table-striped table-bordered " style="font-size: 90%;width: 100%;">  
           <!-- Table headers -->  
-          <thead>  
+          <thead id="editheader">  
             <tr>  
               <th>#</th>  
               <th>Application No.</th>  
@@ -344,12 +344,7 @@
               <th>Visit in presence</th>  
               <th>Bank name</th>  
               <th>Case type</th>  
-              <th>Add1</th>  
-              <th>Add2</th>  
-              <th>City</th>  
-              <th>Region</th>  
-              <th>Zip</th>  
-              <th>Country</th>  
+              <th>Address</th>  
               <th>East Boundary</th>  
               <th>West Boundary</th>  
               <th>North Boundary</th>  
@@ -360,7 +355,8 @@
               <th>Occupant</th>  
               <th>Rented</th>  
               <th>Landmark</th>  
-              <th>Road width</th>  
+              <th>Road width</th> 
+
               <th>High tension line</th>  
               <th>Railway line</th>  
               <th>Nala</th>  

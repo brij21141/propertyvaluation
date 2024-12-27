@@ -667,8 +667,20 @@ $(document).ready(function() {
             
               var content = $cell.text();
               var cellClass = $cell.attr('class');
+              var cellid = $cell.attr('id');
+              if(cellid=='doctype'){
+                $cell.html('<select class="' + cellClass + '" id="select-' + i + '" onchange="syncText(this)">' +
+                  '<option value="text" >Text</option>' +
+                  '<option value="number" >Number</option>' +
+                  '<option value="date" >Date</option>' +
+                  '<option value="email" >Email</option>' +
+                  '</select>');
+              }
+              else{
               $cell.html('<input type="text" value="' + content + '" onkeyup="syncText(this)" class="' + cellClass + '" id="input-' + i + '">');
-              console.log(cellClass);
+            }
+                  
+              console.log(cellid);
           }
       });
       
@@ -688,13 +700,15 @@ if(cell.id =='input-2') {
   document.getElementById("editnarration").value = cell.value; 
 } else {
   document.getElementById("editlink").value = cell.value;  
-} 
+}
+console.log(cell.value);
 }  
 
 function updateimpdoc(recid){ 
    
   const input1 = document.getElementById("editnarration").value;  
   const input2 = document.getElementById("editlink").value;  
+  
   apiBaseUrl = apiBaseUrl.replace('/api/', '/');
   var fullApiUrl = apiBaseUrl + 'propval/impdocupdate/'+recid;
   const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]').value;
@@ -705,6 +719,45 @@ function updateimpdoc(recid){
           'X-CSRFToken': csrfToken  
       },  
       body: JSON.stringify({ narration: input1, linkurl: input2 })  
+  })  
+  .then(response => response.json())
+      
+  // .then(data => console.log(data.message))  
+  .then(data =>(data.success
+     ?  swal({  
+      title: "Confirmation", 
+      text: data.message ,  
+      icon: "success",  
+      button: "Okay",  
+  }).then((willReload) => {  
+    if (willReload) {  
+        location.reload();  // This will reload the current page 
+        // window.location.href = apiBaseUrl+'impdoc';  
+           
+    }  
+})
+      : alert(data.message)
+  )
+
+)  
+  .catch((error) => console.error('Error:', error));  
+  
+}  
+function engdynamicfieldupdate(recid){ 
+  
+  const input1 = document.getElementById("editnarration").value;  
+  const input2 = document.getElementById("editlink").value; 
+  console.log(input1);  
+  apiBaseUrl = apiBaseUrl.replace('/api/', '/');
+  var fullApiUrl = apiBaseUrl + 'propval/engdynamicfieldupdate/'+recid;
+  const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+  fetch(fullApiUrl, {  
+      method: 'PUT',  
+      headers: {  
+          'Content-Type': 'application/json',  
+          'X-CSRFToken': csrfToken  
+      },  
+      body: JSON.stringify({ label: input1, input_type: input2 })  
   })  
   .then(response => response.json())
       

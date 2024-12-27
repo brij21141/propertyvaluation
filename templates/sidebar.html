@@ -114,6 +114,12 @@
                         <li class="sidebar-item">
                             <a href="{% url 'impdoc' %}" class="sidebar-link">Add important doc.</a>
                         </li>
+                        <li class="sidebar-item">
+                            <a href="{% url 'engattendance' %}" class="sidebar-link">Engineer Attendance</a>
+                        </li>
+                        <li class="sidebar-item">
+                            <a href="{% url 'engdynamicfield' %}" class="sidebar-link">Update Engineer Form</a>
+                        </li>
                     </ul>
                     
                 </li>
@@ -145,7 +151,7 @@
               <nav class="topnavbar navbar d-flex navbar-expand-lg navbar-light " style="padding-top: inherit;padding-bottom: inherit;">
                 <div class="container-fluid">
                     <img src="{% static 'img/logo.png' %}" alt="" width="35" height="35" class="">
-                  <a class="navbar-brand" style="color: white;" href="../home">&nbsp;&nbsp;   bnc</a>
+                  <a class="navbar-brand" style="color: white;" href="{% url 'home' %}">&nbsp;&nbsp;   bnc</a>
                   <button class="navbar-toggler" style="background-color: white;" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
                     <span class="navbar-toggler-icon"></span>
                   </button>

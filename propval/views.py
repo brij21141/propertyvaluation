@@ -7,6 +7,7 @@ import datetime, os,requests,json
 from django.http import JsonResponse
 from reception.models import ReceptionReport,ArchieveReceptionReport
 from reporter.models import ReporterReport
+from site_engineer.models import EngAttendance
 from .models import UserDetails, CompanyProfile,Banks
 from django.db.models import Count
 from django.views.decorators.http import require_POST
@@ -21,9 +22,9 @@ from xhtml2pdf import pisa
 from django.views import View
 from django.db.models import OuterRef, Subquery
 from rest_framework import viewsets  
-from .models import UserActivity, Impdoc
+from .models import UserActivity, Impdoc,EngDynamicField
 from .serializers import UserActivitySerializer
-
+from geopy.geocoders import Nominatim
 
 # Create your views here.
 #from django.views.decorators.csrf import ensure_csrf_cookie
@@ -508,15 +509,41 @@ def impdoc(request):
         print(f"An error occurred: {e}")  
     print(impdocs)
     return render(request, 'impdoc.html', {'impdocs': impdocs,'context': context})
+def engdynamicfield(request):
+    context = {
+        'api_base_url': settings.API_BASE_URL,
+    }
+    if request.method == 'POST':
+        # print(request.POST)
+        engdynamicfields = EngDynamicField()
+        engdynamicfields.label =request.POST.get('label')
+        engdynamicfields.input_type = request.POST.get('input_type')
+        engdynamicfields.save()
+        return redirect('engdynamicfield')
+
+    try:  
+        engdynamicfields = EngDynamicField.objects.exclude(active=False)  
+        if not engdynamicfields.exists():  # Check if there are any records  
+            print("No records found.")  
+    except Exception as e:  
+        engdynamicfields=[]
+        print(f"An error occurred: {e}")  
+    print(engdynamicfields)
+    return render(request, 'engdynamicfield.html', {'engdynamicfields': engdynamicfields,'context': context})
 
 def impdocdelete(request,uid,):
     # print (uid,udid)
     impdoc=Impdoc.objects.get(pk=uid)
     impdoc.delete()
-    # impdoc.save()
+def engdynamicfielddelete(request,uid,):
+    # print (uid,udid)
+    engdynamicfield=EngDynamicField.objects.get(pk=uid)
+    # engdynamicfield.delete()
+    engdynamicfield.active=False
+    engdynamicfield.save()
     
     return JsonResponse({'success': True,'message': 'Link deleted successfully'})
-def impdocupdate(request,uid,):
+def impdocupdate(request,uid):
     # print (uid,udid)
     impdoc=Impdoc.objects.get(pk=uid)
     if request.method == 'PUT':  
@@ -526,7 +553,103 @@ def impdocupdate(request,uid,):
         impdoc.save()
         return JsonResponse({'success':True, 'message':"Record updated successfully."})  
     return JsonResponse({'success':False,'message':"Record could not update"})  
-   
+def engdynamicfieldupdate(request,uid):
+    print (request.POST)
+    engdynamicfield=EngDynamicField.objects.get(pk=uid)
+    if request.method == 'PUT':  
+        data = json.loads(request.body)
+        engdynamicfield.label = data.get('label')
+        engdynamicfield.input_type = data.get('input_type')
+        engdynamicfield.save()
+        return JsonResponse({'success':True, 'message':"Record updated successfully."})  
+    return JsonResponse({'success':False,'message':"Record could not update"})  
+def engattendance(request):
+   key =settings.GOOGLE_MAPS_API_KEY
+   engattendance = EngAttendance.objects.select_related('userdetailsid').order_by('userdetailsid')
+  #    engemployees = User.objects.prefetch_related('attendance_set').all()
+
+#    below 6 line code is for without api but it is limited 
+#    geolocator = Nominatim(user_agent="myGeocoder") 
+#    for engattendence in engattendance :
+#        latitude, longitude = engattendence.lat, engattendence.lng
+#        location = geolocator.reverse((latitude, longitude), exactly_one=True)
+#        engattendence.address = location.address
+#        engattendence.save()
+#        print(location.region)
+   for attendence in engattendance :
+        if attendence.address is None:
+            address_info = get_address_details(key, attendence.lat, attendence.lng)
+            if address_info:
+                attendence.address = address_info.get('address')
+                attendence.city = address_info.get('city')
+                attendence.country = address_info.get('country')
+                attendence.zip = address_info.get('zip_code')
+                attendence.region = address_info.get('state')
+                attendence.save()  
+            # print(address_info)
+    # if address_info:  
+    #     return JsonResponse(address_info)  # Return the address details as JSON response  
+    # else:  
+    #     return JsonResponse({'error': 'Unable to fetch address details.'}, status=500)  
+   return render(request, 'engineerattendance.html', {'engattendances':engattendance})
+
+def get_address_details(api_key, latitude, longitude):  
+    # Google Maps Geocoding API endpoint  
+    base_url = "https://maps.googleapis.com/maps/api/geocode/json"  
+    
+    # Construct the API request URL  
+    params = {  
+        'latlng': f"{latitude},{longitude}",  
+        'key': api_key  
+    }  
+
+    # Send the request to Google Maps API  
+    response = requests.get(base_url, params=params)  
+    
+    # Check for a successful response  
+    if response.status_code != 200:  
+        return None  
+    
+    # Parse the JSON response  
+    results = response.json().get('results', [])  
+    
+    if not results:  
+        return None  
+
+    # Extract address components  
+    formatted_address = results[0].get('formatted_address')
+    address_components = results[0].get('address_components', [])  
+    address_info = { 
+        'address': None, 
+        'city': None,  
+        'country': None,  
+        'zip_code': None,  
+        'state': None,  
+    }  
+
+    for component in address_components:  
+        if 'locality' in component['types']:  # City  
+            address_info['city'] = component['long_name']  
+        elif 'administrative_area_level_1' in component['types']:  # State  
+            address_info['state'] = component['long_name']  
+        elif 'country' in component['types']:  # Country  
+            address_info['country'] = component['long_name']  
+        elif 'postal_code' in component['types']:  # Zip code  
+            address_info['zip_code'] = component['long_name'] 
+    address_without_details = formatted_address  
+    if address_info['city']:  
+        address_without_details = address_without_details.replace(address_info['city'], '').strip()  
+    if address_info['zip_code']:  
+        address_without_details = address_without_details.replace(address_info['zip_code'], '').strip()  
+    if address_info['state']:  
+        address_without_details = address_without_details.replace(address_info['state'], '').strip()  
+    if address_info['country']:  
+        address_without_details = address_without_details.replace(address_info['country'], '').strip()  
+
+    address_info['address'] = address_without_details.strip(', ')
+    # print( address_without_details.strip(', ')  ) 
+
+    return address_info     
 
 
 # def update_employee(id, userdetailsid):

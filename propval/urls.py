@@ -25,8 +25,12 @@ urlpatterns = [
     path('userlog',views.Userlog,name='userlog'),
     path('archive',views.Archive,name='archive'),
     path('impdoc',views.impdoc,name='impdoc'),
+    path('engdynamicfield',views.engdynamicfield,name='engdynamicfield'),
+    path('engattendance',views.engattendance,name='engattendance'),
     path('impdocdelete/<int:uid>',views.impdocdelete,name='impdocdelete'),
+    path('engdynamicfielddelete/<int:uid>',views.engdynamicfielddelete,name='engdynamicfielddelete'),
     path('impdocupdate/<int:uid>',views.impdocupdate,name='impdocupdate'),
+    path('engdynamicfieldupdate/<int:uid>',views.engdynamicfieldupdate,name='engdynamicfieldupdate'),
     path('', include(router.urls)),
 ]+ static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
   

@@ -1,6 +1,6 @@
 from django.db import models
 from reception.models import ReceptionReport,ArchieveReceptionReport
-from propval.models import UserDetails
+from propval.models import UserDetails,EngDynamicField
 from django.contrib.auth.models import User
 
 # Create your models here.
@@ -194,19 +194,39 @@ class HistoryFloordetails(models.Model):
     def __str__(self):
         return str(self.id)
     
+class EngDynamicdValue(models.Model):  
+    input_field = models.ForeignKey(EngDynamicField, on_delete=models.DO_NOTHING)  
+    value = models.TextField()  # Use TextField to accommodate various input lengths.  
+    engreportid = models.ForeignKey(EngineerReport, on_delete=models.DO_NOTHING,null=True, blank=True, related_name='engdynamic')
+    submitted_at = models.DateTimeField(auto_now_add=True)  
+
+    def __str__(self):  
+        return f"{self.input_field.label}: {self.value}"
+    
+class HistoryEngDynamicdValue(models.Model):  
+    input_field = models.ForeignKey(EngDynamicField, on_delete=models.DO_NOTHING)  
+    value = models.TextField()  # Use TextField to accommodate various input lengths.  
+    engreportid = models.ForeignKey(EngineerReport, on_delete=models.DO_NOTHING,null=True, blank=True, related_name='hsengdynamic')
+    hsengreportid = models.ForeignKey(HistoryEngineerReport, related_name='hsengdynamic', on_delete=models.CASCADE)
+    submitted_at = models.DateTimeField(auto_now_add=True)  
+
+    def __str__(self):  
+        return f"{self.input_field.label}: {self.value}"
+    
 class EngAttendance(models.Model):
     applicationnumber = models.CharField(max_length=20)
-    address = models.CharField(max_length=100)
-    city = models.CharField(max_length=30)
-    region = models.CharField(max_length=30)
-    zip = models.CharField(max_length=6)
-    country = models.CharField(max_length=20)
+    address = models.CharField(max_length=100,null=True, blank=True)
+    city = models.CharField(max_length=30,null=True, blank=True)
+    region = models.CharField(max_length=30,null=True, blank=True)
+    zip = models.CharField(max_length=6,null=True, blank=True)
+    country = models.CharField(max_length=20,null=True, blank=True)
     lat = models.CharField(max_length=200,null=True,blank=True)
     lng = models.CharField(max_length=200,null=True,blank=True)
     placeid = models.CharField(max_length=200,null=True,blank=True)
     receptionid = models.ForeignKey(ReceptionReport, on_delete=models.DO_NOTHING, null=True, blank=True)
     userdetailsid = models.ForeignKey(User, on_delete=models.DO_NOTHING, default=0)
-    datecreated = models.DateTimeField(auto_now_add=True)
+    indatetinme = models.DateTimeField(auto_now_add=True)
+    outdatetinme = models.DateTimeField(null=True, blank=True)
     def __str__(self):
         return str(self.id)
 

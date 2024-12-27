@@ -98,5 +98,44 @@ class Impdoc(models.Model):
     linkurl=models.CharField(max_length=200,null=True)
     userdetails = models.ForeignKey(UserDetails, on_delete=models.DO_NOTHING,null=True)
     active = models.BooleanField(default=True) 
-    timestamp = models.DateTimeField(auto_now_add=True)  
+    timestamp = models.DateTimeField(auto_now_add=True) 
+
+class EngDynamicField(models.Model): 
+    INPUT_CHOICES = [
+        ('text', 'Text'),
+        ('textarea', 'Textarea'),
+        # ('dropdown', 'Dropdown'),
+        # ('checkbox', 'Checkbox'),
+        # ('radio', 'Radio'),
+        # ('file', 'File'),
+        # ('date', 'Date'),
+        ('datetime', 'DateTime'),
+        ('email', 'Email'),
+        ('number', 'Number'),
+        # ('password', 'Password'),
+        # ('url', 'URL'),
+        # ('hidden', 'Hidden'),
+        # ('color', 'Color'),
+        # ('range', 'Range'),
+        # ('tel', 'Tel'),
+        # ('search', 'Search'),
+        # ('week', 'Week'),
+        # ('month', 'Month'),
+        # ('time', 'Time'),
+        # ('datetime-local', 'DateTime-Local'),
+        # ('month-year', 'Month-Year'),
+        # ('week-year', 'Week-Year'),
+        # ('email-address', 'Email-Address'),
+        # ('image', 'Image'),
+    ] 
+    label = models.CharField(max_length=100)  
+    input_type = models.CharField(max_length=50)
+    active = models.BooleanField(default=True)
+    timestamp = models.DateTimeField(auto_now_add=True) 
+    # input_type = models.CharField(max_length=50,choices=INPUT_CHOICES,default='text')  # E.g. 'text', 'textarea', etc.  
+    def __str__(self):  
+        return self.label 
+    
+  
+ 
     

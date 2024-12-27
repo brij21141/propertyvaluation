@@ -1,8 +1,8 @@
 from django.shortcuts import render, redirect,get_object_or_404
-from site_engineer.models import EngineerReport,HistoryEngineerReport,Floordetails,HistoryFloordetails
+from site_engineer.models import EngineerReport,HistoryEngineerReport,Floordetails,HistoryFloordetails,EngDynamicdValue,HistoryEngDynamicdValue
 from reception.models import ReceptionReport,Document
 from datetime import datetime
-from propval.models import UserDetails,Banks,Impdoc
+from propval.models import UserDetails,Banks,Impdoc,EngDynamicField
 from django.contrib import messages
 from django.core.files.storage import default_storage
 from django.http import HttpResponseRedirect,JsonResponse
@@ -13,6 +13,7 @@ from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from rest_framework.authtoken.models import Token
 from django.db import transaction
+from django.utils.text import slugify
 
 # Create your views here.
 
@@ -26,7 +27,14 @@ def add_report(request,repid):
                 userrole = UserDetails.objects.get(user_email=useremail).role
                 uid = UserDetails.objects.get(user_email=useremail).user_id
         
+        try: 
+            engdynamicfields=EngDynamicField.objects.exclude(active=False)
+        except:
+            engdynamicfields=[]
+        
         if request.method == "POST":
+            # print (request.POST)
+            
             app_number = request.POST.get("appno")
             app_name = request.POST.get("name")
             visitinpresence = request.POST.get("presence")
@@ -152,6 +160,13 @@ def add_report(request,repid):
 
                 Floordetails.objects.create(floorname=floor_value, floordetail=detail_value, floorarea=area_value,engreportid = floorsengid)  
 
+            form_data = {}
+            for field in engdynamicfields:  
+            # Get the submitted value from request.POST  
+                field_value = request.POST.get(field.label.replace(' ', '-').lower())  
+                form_data[field.label] = field_value  
+                EngDynamicdValue.objects.create(input_field=field,value=field_value,engreportid=floorsengid)
+            # print (form_data)
 
             uploaded_files = request.FILES.getlist('engineerFiles') 
             for uploaded_file in uploaded_files:
@@ -196,7 +211,8 @@ def add_report(request,repid):
                 states=[{'state_name':'Madhya Pradesh','state_id':20}, {'state_name':'Uttar Pradesh'}, {'state_name':'Rajsthan'}, {'state_name':'Delhi'}]
         except requests.ConnectionError:
             states=[{'state_name':'Madhya Pradesh','state_id':20}, {'state_name':'Uttar Pradesh'}, {'state_name':'Rajsthan'}, {'state_name':'Delhi'}]
-        return render(request,"engineer/engineersiteform.html",{'requestreceived':rr,'banks':banks,'states':states})
+        
+        return render(request,"engineer/engineersiteform.html",{'requestreceived':rr,'engdynamicfields':engdynamicfields, 'banks':banks,'states':states})
 @login_required(login_url='login')
 def engineerhome(request):
     if request.user.is_authenticated:
@@ -271,6 +287,7 @@ def update_report(request,repid):
                 username = UserDetails.objects.get(user_email=useremail).first_name+" "+UserDetails.objects.get(user_email=useremail).last_name
                 userrole = UserDetails.objects.get(user_email=useremail).role
                 uid = UserDetails.objects.get(user_email=useremail).id
+            engdynamicvalues=EngDynamicdValue.objects.filter(engreportid=repid)
             with transaction.atomic():  # Start the transaction  if transactions fails it will rollback data
                 if request.method == "POST":
                     app_number = request.POST.get("appno")
@@ -364,6 +381,7 @@ def update_report(request,repid):
                     old_record.save()  
                     oldrecid = old_record.id
                     # copying floor records to history floor records
+                    historyengreportid = HistoryEngineerReport.objects.get(pk=oldrecid)
                     floors = Floordetails.objects.filter(engreportid=repid)
                     for floor in floors:
                         old_floor = HistoryFloordetails(  
@@ -371,7 +389,8 @@ def update_report(request,repid):
                         floordetail = floor.floordetail,
                         floorarea = floor.floorarea,
                         engreportid = floor.engreportid,
-                        historyengreportid = HistoryEngineerReport.objects.get(pk=oldrecid)
+                        historyengreportid = historyengreportid
+                        # historyengreportid = HistoryEngineerReport.objects.get(pk=oldrecid)
                         )
                         old_floor.save()
                     # deleting existing floor details and inserting updated 
@@ -387,6 +406,31 @@ def update_report(request,repid):
                         area_value = floor_areas[i] 
 
                         Floordetails.objects.create(floorname=floor_value, floordetail=detail_value, floorarea=area_value,engreportid = floorsengid)      
+                    # copying dynamic fields records to history dynamic field records
+                    dynamicfields = EngDynamicdValue.objects.filter(engreportid=repid)
+                    for dynamic in dynamicfields:
+                        old_dynamic = HistoryEngDynamicdValue(  
+                        input_field = dynamic.input_field,
+                        value = dynamic.value,
+                        engreportid = dynamic.engreportid,
+                        hsengreportid = historyengreportid
+                        )
+                        old_dynamic.save()
+                    # deleting existing dynamic values details and inserting updated 
+                    EngDynamicdValue.objects.filter(engreportid=repid).delete()
+                    # floorsengid = EngineerReport.objects.get(pk = repid)
+                    # saving dynamic fields details
+                    try: 
+                        engdynamicfields=EngDynamicField.objects.all()
+                    except:
+                        engdynamicfields=[]
+                    form_data = {}
+                    for field in engdynamicfields:  
+                    # Get the submitted value from request.POST  
+                        field_value = request.POST.get(field.label.replace(' ', '-').lower())  
+                        if field_value: 
+                            form_data[field.label] = field_value  
+                            EngDynamicdValue.objects.create(input_field=field,value=field_value,engreportid=floorsengid)
                                 
                     recid=er.receptionid_id
                     er.applicationnumber = app_number
@@ -499,7 +543,7 @@ def update_report(request,repid):
                 states=[{'state_name':'Madhya Pradesh','state_id':20}, {'state_name':'Uttar Pradesh'}, {'state_name':'Rajsthan'}, {'state_name':'Delhi'}]
         except requests.ConnectionError:
             states=[{'state_name':'Madhya Pradesh','state_id':20}, {'state_name':'Uttar Pradesh'}, {'state_name':'Rajsthan'}, {'state_name':'Delhi'}]
-        return render(request,'engineer/engineersiteform.html',{'recptreport':rr,'documents':documents,'banks':banks,'states':states,'floors':floors})
+        return render(request,'engineer/engineersiteform.html',{'recptreport':rr,'engdynamicvalues':engdynamicvalues, 'documents':documents,'banks':banks,'states':states,'floors':floors})
 
 def delete_file(request, doc_id):
     try:

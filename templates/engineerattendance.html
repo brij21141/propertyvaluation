@@ -1,0 +1,76 @@
+
+{% extends "sidebar.html" %}
+{% include 'bootstrap_link.html' %}
+{% block title %}Engineer Attendance{% endblock %}
+{% load static %}
+
+{% block content %}
+<script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.1/moment.min.js"></script>
+<div class="container-fluid my-2" >
+  <div class="container" style="display:block; background-color:#f6f6f6; padding:20px 20px 20px;">
+    <!-- <div class="row"> -->
+      <div class="col-md-12">
+        <div class="card">
+          <div class="card-body">
+            
+            <!-- <a class="btn btn-success btn-sm float-end" href="/api/receptiongenreportexport">Export to Excel</a> -->
+            <!-- <a class="btn btn-primary btn-sm" id="impdocaddbtn" onclick="addimpdoc()">Add Report</a>
+            
+            <hr> -->
+            
+            <table id="impdoctable" class="table table-hover table-striped table-bordered" style="font-size: 90%;">
+              
+              <thead>
+                <tr>
+                  <th scope="col">#</th>
+                  <th scope="col">Name</th>
+                  <th scope="col">Application #</th>
+                  <th scope="col">Property Address as per lat/lng</th>
+                  <th scope="col">City </th>
+                  <th scope="col">State </th>
+                  <th scope="col">Zip </th>
+                  <th scope="col">Latitude </th>
+                  <th scope="col">Longitude </th>
+                  <th scope="col">In Time </th>
+                  <th scope="col">Out Time </th>
+                   
+                </tr>
+              </thead>
+              <tbody>
+                {% for engattendance in engattendances %}
+                <!-- {{ engattendance}} -->
+                  <tr > 
+                  <td  scope="row">{{forloop.counter}}</td>
+                  <td id="name" class="" >{{engattendance.userdetailsid.userdetails.first_name}}  {{engattendance.userdetailsid.userdetails.last_name}}</td>
+                  <td id="appno" class="" >{{engattendance.applicationnumber}}</td>
+                  <td id="address" class="" >{{engattendance.address}}</td>
+                  <td id="city" class="" >{{engattendance.city}}</td>
+                  <td id="state" class="" >{{engattendance.region}}</td>
+                  <td id="zip" class="" >{{engattendance.zip}}</td>
+                  <td id="lat" class="" >{{engattendance.lat}}</td>
+                  <td id="lng" class="" >{{engattendance.lng}}</td>
+                  <td  >{{engattendance.indatetinme|date:"d-m-Y H:i:s"}}</td>
+                  <td  >{{engattendance.outdatetinme|date:"d-m-Y H:i:s"}}</td>
+                
+                  <!-- </td>  -->
+                  </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+{% endblock %}
+{% block scripts%}
+<script type="text/javascript">
+  var apiBaseUrl = "{{ context.api_base_url }}";
+  console.log(apiBaseUrl+'hjgj');
+</script>
+<Script type="text/javascript" src="{% static 'js/reception.js' %}" > </Script>
+<Script type="text/javascript" src="{% static 'js/sidebartoggle.js' %}"> </Script>
+<Script type="text/javascript" src="{% static 'js/datatables.js' %}" > </Script>
+{% endblock scripts%}

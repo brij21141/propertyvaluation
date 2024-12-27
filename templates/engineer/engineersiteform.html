@@ -284,7 +284,20 @@
           value="{{recptreport.roadwidth}}"
           {% endif %}/>
         </div>
-
+        
+    {% if engdynamicvalues %}
+    {% for field in engdynamicvalues %}
+        <label>{{ field.input_field.label }}</label>
+        <input type="{{ field.input_field.input_type }}" name="{{ field.input_field.label|slugify }}" value="{{field.value}}">
+        <br>
+    {% endfor %}
+    {% else %}
+    {% for field in engdynamicfields %}  
+        <label>{{ field.label }}</label>  
+        <input type="{{ field.input_type }}" name="{{ field.label|slugify }}">  
+        <br>  
+    {% endfor %}
+    {% endif %}
       <label for="hazard">Hazards:</label>
     <div class="form-check">
       <input type="checkbox" class="form-check-input" id="hightension" name="hightension" value="" {% if recptreport.hightension %} checked {% endif %}>
