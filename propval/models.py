@@ -96,6 +96,7 @@ class UserActivity(models.Model):
 class Impdoc(models.Model):  
     narration=models.CharField(max_length=200,null=True)
     linkurl=models.CharField(max_length=200,null=True)
+    pdf_file = models.FileField(upload_to='impdocpdfs/',null=True, blank=True)  
     userdetails = models.ForeignKey(UserDetails, on_delete=models.DO_NOTHING,null=True)
     active = models.BooleanField(default=True) 
     timestamp = models.DateTimeField(auto_now_add=True) 

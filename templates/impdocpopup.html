@@ -1,0 +1,26 @@
+<!-- important document popup -->
+<div class="modal fade" id="impdocpopup" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+    <div class="modal-dialog  modal-dialog-scrollable">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h1 class="modal-title fs-5" id="staticBackdropLabel">Important documents</h1>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          
+              {% for impdoc in impdocs %} 
+              {% if impdoc.pdf_file %}
+            <div class="item"><a href="{{impdoc.pdf_file.url}}" target="_blank"> {{impdoc.narration}}</a></div> 
+            {% else %}
+            <div class="item"><a href="{{impdoc.linkurl}}" target="_blank"> {{impdoc.narration}}</a></div> 
+            {% endif %}
+              {% endfor %}
+          
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+          
+        </div>
+      </div>
+    </div>
+  </div>

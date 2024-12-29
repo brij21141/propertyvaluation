@@ -493,11 +493,15 @@ def impdoc(request):
         'api_base_url': settings.API_BASE_URL,
     }
     if request.method == 'POST':
+        # print(request.FILES['imppdfFile'].name)
         impdocadd = Impdoc()
         impdocadd.narration =request.POST.get('narration')
         impdocadd.linkurl = request.POST.get('link')
+        if 'imppdfFile' in request.FILES:
+            impdocadd.pdf_file = request.FILES['imppdfFile']
+            impdocadd.linkurl = request.FILES['imppdfFile'].name
         impdocadd.userdetails = UserDetails.objects.filter(user_email=request.user.email).first()
-        impdocadd.save()
+        # impdocadd.save()
         return redirect('impdoc')
 
     try:  
@@ -507,7 +511,7 @@ def impdoc(request):
     except Exception as e:  
         impdocs=[]
         print(f"An error occurred: {e}")  
-    print(impdocs)
+    # print(impdocs)
     return render(request, 'impdoc.html', {'impdocs': impdocs,'context': context})
 def engdynamicfield(request):
     context = {

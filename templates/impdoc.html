@@ -20,20 +20,25 @@
             <hr>
             <div class="item" id="addimpdoc" style="display: none;">
                 <!-- <label for="bankname">Bank Detail</label> -->
-                <form action="" method="post" class="">{% csrf_token %}
+                <form action="" method="post" class="" enctype="multipart/form-data">{% csrf_token %}
              <div class="row">
-                <div class="col-md-4">
+                <div class="col-md-3">
                 <input  id="narration" name="narration" type="text" class="form-control " placeholder="Enter narration" style="display: inline-block;"
                 value="" />
                  </div>
-                <div class="col-md-4">
+                <div class="col-md-3">
                 <input id="link" name="link" type="text" class="form-control" placeholder="Enter link url"
-                value=""/>
+                value=""/> 
                 
             </div>
-            <div class="col-md-4 d-flex">
+            <div class="col-md-6 d-flex">
+              <div class="me-4" style="font-size: large; font-weight: bold;"><span>or</span></div>
+                <div class="me-2">
+                  <!-- <label for="imppdffile" class="form-label">Upload Pdf</label> -->
+                  <input class="form-control" type="file" name="imppdfFile" id="imppdffile">
+                  </div>
                 <div class="">
-                    <button id="impdocsave" type="submit" class="btn btn-primary btn-sm me-2" href="">Save</button>
+                    <button id="impdocsave" type="submit" class="btn btn-primary btn-sm me-2" style="max-width: 100px;">Save</button>
                     <!-- <a class="btn btn-primary btn-sm" href="/reception/receptio">Cancel</a> -->
                 </div>
                 <div class="">

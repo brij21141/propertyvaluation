@@ -72,7 +72,7 @@
         </div>
       </div>
   </div>
-  <div class="ms-2 mt-3" style="display: flex;align-items: center;"><h4>Important document links</h4><span class="ms-2"><a href="" data-bs-toggle="modal" data-bs-target="#impdocpopup">View all</a></span></div>
+  <!-- <div class="ms-2 mt-3" style="display: flex;align-items: center;"><h4>Important document links</h4><span class="ms-2"><a href="" data-bs-toggle="modal" data-bs-target="#impdocpopup">View all</a></span></div>
   <div class="container my-1">
     
   <div id="scrollContainer"> 
@@ -80,7 +80,7 @@
     <div class="item"><a href="{{impdoc.linkurl}}" target="_blank"> {{impdoc.narration}}</a></div>  
     {% endfor %}
 </div> 
-</div> 
+</div>  -->
   <!-- Global search table -->
 {% include 'globalsearchtemplate.html' %}
   <!-- <div class="container my-2" id="globalengtablediv" style="display:none; background-color:#30527b; padding:80px 10px 10px;">
@@ -372,7 +372,11 @@
       <div class="modal-body">
         
             {% for impdoc in impdocs %} 
-            <div class="item"><a href="{{impdoc.linkurl}}" target="_blank"> {{impdoc.narration}}</a></div>  
+            {% if impdoc.pdf_file %}
+          <div class="item"><a href="{{impdoc.pdf_file.url}}" target="_blank"> {{impdoc.narration}}</a></div> 
+          {% else %}
+          <div class="item"><a href="{{impdoc.linkurl}}" target="_blank"> {{impdoc.narration}}</a></div> 
+          {% endif %}
             {% endfor %}
         
       </div>
