@@ -6,59 +6,67 @@
 
 {% block content %}
 <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.1/moment.min.js"></script>
-<div class="container-fluid">
+<!-- <div class="container-fluid"> -->
   <div class="container my-2" style="display: block; background: #f6f6f6; padding: 20px 20px 20px;">
 
-  <div class="container my-2">
-      <div class="row my-2" style="height: 100px;">
-          <div class="col-md-2">
+  <!-- <div class="container my-2"> -->
+      <div class="row" style="height: 100px;">
+          <div class="col-md-2" onclick="filtpending('all')" style="cursor: pointer;height:100px;overflow:hidden;">
               <div class="card text-center widget-card border-light shadow-sm" style="background-image: url('{% static "img/cardprog.jpg" %}'); ">
                   <div class="card-body">
                     <span id="totreq" class="circle">{{totreq}}</span> <br><h6>Request Received</h6>
                   </div>
                 </div>
           </div>
-          <div class="col-md-2">
+          <div class="col-md-2" onclick="filtpending('pending')" style="cursor: pointer;height:100px;overflow:hidden;">
+            
               <div class="card text-center widget-card border-light shadow-sm" style="background-image: url('{% static "img/cardprog.jpg" %}'); ">
                   <div class="card-body">
                     <span id="pending" class="circle">{{pending}}</span> <br><h6>Request Pending</h6>
                   </div>
-                </div>
+          
           </div>
-          <div class="col-md-2">
+          </div>
+          <!-- <div class="col-md-2">
               <div class="card text-center widget-card border-light shadow-sm" style="background-image: url('{% static "img/cardprog.jpg" %}'); ">
                   <div class="card-body">
                     <span id="inprogress" class="circle">{{inprogress}}</span> <br><h6>Request in Progress</h6>
                   </div>
                 </div>
-          </div>
-          <div class="col-md-2">
+          </div> -->
+          <div class="col-md-2" onclick="filtpending('hold')" style="cursor: pointer;height:100px;overflow:hidden;">
             <div class="card text-center widget-card border-light shadow-sm" style="background-image: url('{% static "img/cardprog.jpg" %}'); ">
                 <div class="card-body">
-                  <span id="hold" class="circle">{{hold}}</span> <br><h6>Request on hold</h6>
+                  <span id="rehold" class="circle">{{hold}}</span> <br><h6>Request on hold</h6>
                 </div>
               </div>
         </div>
-          <div class="col-md-2">
+          <div class="col-md-2" style="height:100px;overflow:hidden;" >
               <div class="card text-center widget-card border-light shadow-sm" style="background-image: url('{% static "img/cardprog.jpg" %}'); ">
                   <div class="card-body">
                   <span id="compreq" class="circle">{{compreq}}</span> <br><h6>Request Completed</h6>
                   </div>
                 </div>
           </div>
-          <div class="col-md-2">
-            <div class="row">
+          <div class="col-md-2" id="repunassigned" style="cursor: pointer;height:100px;overflow:hidden;">
+              <div class="card text-center widget-card border-light shadow-sm" style="background-image: url('{% static "img/cardprog.jpg" %}'); ">
+                  <div class="card-body">
+                    <span id="totunassign" class="circle" >{{totunassigned}}  </span> <br><h6 ms-2>Unassigned</h6>
+                  </div>
+                </div>
+          </div>
+          
+          
+          <div class="col-md-2" style="height:100px;overflow:hidden;">
             <a class="" style="color:white; font-weight:bold;" id="btnmap" href="/reporter/geomap">
-            <div class="card text-center widget-card border-light shadow-sm " style="background-image: url('{% static "img/mapbg.png" %}');height:50px;  ">
+            <div class="card text-center widget-card border-light shadow-sm " style="background-image: url('{% static "img/mapbg.png" %}'); ">
                 <div class="card-body ">
                 
-                  <i class="fa-solid fa-map-location-dot me-2" style="color: #0E223E;background-color: white;"></i><span style="color: #0E223E;font-weight: bold; background-color: white;" >View map</span>
+                  <i class="fa-solid fa-map-location-dot me-2" style="color: #0E223E;background-color: white;"></i><br><br> <span style="color: #0E223E;font-weight: bold; background-color: white;" >View map</span>
                 
                 </div></a>
             </div>
-            </div>
-            <div class="row mt-2">
-              <!-- <a href="#" id="repunassigned" type="button"  data-bs-toggle="modal" data-bs-target="#myModal"> <i class="fa-regular fa-eye fa-2x float-end"></i></a> -->
+            <!-- <div class="row mt-2">
               <a class="" style=" font-weight:bold;" id="repunassigned" href="#" type="button">
             <div class="card text-center widget-card border-light shadow-sm " style="background-image: url('{% static "img/cardprog.jpg" %}');height:50px;  ">
                 
@@ -67,11 +75,11 @@
                   <span id="totunassign" class="circle" style="margin-right:5px;margin-bottom:5px;margin-top:-5px;">{{totunassigned}}  </span><h6 ms-2>Unassigned</h6>
                 </div>
             </div></a>
-          </div>
+          </div> -->
           
         </div>
       </div>
-  </div>
+  <!-- </div>  -->
   <!-- <div class="ms-2 mt-3" style="display: flex;align-items: center;"><h4>Important document links</h4><span class="ms-2"><a href="" data-bs-toggle="modal" data-bs-target="#impdocpopup">View all</a></span></div>
   <div class="container my-1">
     
@@ -169,8 +177,10 @@
                   <th scope="col">BANK NAME</th>
                   <th scope="col">Case type</th>
                   <th scope="col">Engineer</th>
+                  <th scope="col">Reporter</th>
                   <th scope="col">Reason for hold</th>
                   <th scope="col">Engineer Status</th>
+                  <th scope="col">Reporter Status</th>
                   <th scope="col">Action</th>
                 </tr>
               </thead>
@@ -188,9 +198,15 @@
                   <!-- <td >{{recrep.add1}}</td>
                   <td >{{recrep.city}}</td> -->
                   <td >{{recrep.visitingpersonname}}</td>
+                  <td >{{recrep.reportpersonname}}</td>
                   <td >{{recrep.reporterholdcause}}</td>
-                  {% if recrep.engineer  %}
+                  {% if recrep.engineer == "Submitted" or recrep.engineer == "Hold"   %}
                   <td >{{recrep.engineer}}</td>
+                  {% else %}
+                  <td >Pending</td>
+                  {% endif %}
+                  {% if recrep.reporter == "Submitted" or recrep.reporter == "Hold"  %}
+                  <td >{{recrep.reporter}}</td>
                   {% else %}
                   <td >Pending</td>
                   {% endif %}
@@ -387,6 +403,7 @@
     </div>
   </div>
 </div>
+
 {% if messages %}  
     <script>  
         window.onload = function() {  
@@ -395,9 +412,35 @@
                 swal("Fail!", "{{ message }}", "error");  
             {% endfor %}  
         };  
+
+  
     </script>  
+   
 {% endif %} 
- 
+<script>
+  //     document.getElementById('rep-pending').addEventListener('click', function(event) {
+  // event.preventDefault();
+  function filtpending(cse) {
+  // console.log(event.target);
+  var table = $('#engineertable').DataTable();
+  switch(cse){
+    case 'pending':
+    table.search('pending').draw();
+    break;
+    case 'hold':
+    table.search('hold').draw();
+    break;
+    case 'all':
+    table.search('').draw();
+    break;
+    default:
+    table.search('').draw();
+    break;
+  }
+  
+  }
+// });
+    </script> 
 
 {% endblock %}
 {% block scripts%}

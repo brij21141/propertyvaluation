@@ -18,7 +18,7 @@
       var infoWindow = []
        
       map = new google.maps.Map(document.getElementById("map"),{
-          center: { lat:firstLocation.lat, lng:firstLocation.lng }, 
+          center: { lat:firstLocation.replat, lng:firstLocation.replng }, 
           zoom: 18,
           mapTypeId:'satellite'
           // mapId:'satellite'
@@ -29,7 +29,7 @@
         
           var marker = new google.maps.Marker({
             //  var marker = new google.maps.marker.AdvancedMarkerElement({
-              position: {lat: maplocation.lat, lng: maplocation.lng}, 
+              position: {lat: maplocation.replat, lng: maplocation.replng}, 
               map: map, 
               icon: {  
                   url: '{% static "img/homemapicontrp.png" %}', // URL of the icon  
@@ -44,10 +44,10 @@
               '<br><strong>Address:</strong> ' + maplocation.add1 +  
               '<br><strong>City:</strong> ' + maplocation.city +  
               '<br><strong>Inspection date:</strong> ' + maplocation.inpdate +  
-              '<br><strong>Latitude:</strong> ' + maplocation.lat +  
-              '<br><strong>Longitude:</strong> ' + maplocation.lng +  
-             '<br><strong>Governemnt approved rate:</strong> ' + maplocation.govrate +  
-             '<br><strong>Recommended rate:</strong> ' + maplocation.recomrate + 
+              '<br><strong>Latitude:</strong> ' + maplocation.replat +  
+              '<br><strong>Longitude:</strong> ' + maplocation.replng +  
+             '<br><strong>Land Value:</strong> ' + maplocation.landvalue +  
+             '<br><strong>Land rate:</strong> ' + maplocation.recomrate + 
              '<br><strong>Land area:</strong> ' + maplocation.landarea + 
              '<br><strong>Bank:</strong> ' + maplocation.bank + 
              '<br><a href="../../reception/repcompreportpdf/'+maplocation.id+'" target="_blank">Click here for more info</a>' +   
@@ -82,15 +82,17 @@
   </div>
   <div class="col-md-8" style="position: relative; display: inline-block;">
       <input id="latid" type="text" list="maplocations" placeholder="Search property" class="form-control d-flex float-end" style="width: auto;" onchange="resetMap()">
+      
       <!-- <a type="button" style=" position: absolute; right: 15px; top: 40%; transform: translateY(-50%);" onclick="document.getElementById('latid').value = '';">  
         &times; 
       </a>   -->
       <button type="button" style="position: absolute; right: 12px; top: 20%; transform: translateY(-50%); font-size: 24px;color: gray; width: 25px; height: 25px; background: transparent; border: none; cursor: pointer;" onclick="document.getElementById('latid').value = '';">  
         &times; <!-- X character -->  
     </button> 
+    To search a location enter value in this format latitude-longitude
           <datalist id="maplocations">
             {% for location in locations %}
-            <option value="{{location.lat }}-{{location.lng }}">{{location.name}}/{{location.city}}/{{location.lat}}/{{location.lng}}</option>
+            <option value="{{location.replat }}-{{location.replng }}">{{location.name}}/{{location.city}}/{{location.replat}}/{{location.replng}}</option>
             {% endfor %}
           </datalist>
         </div>
@@ -178,14 +180,18 @@
             // console.log(parts[1]); // Output: ["26.1990356", "78.2218759"] 
             lati=parseFloat(parts[0]) ;
             lngi=parseFloat(parts[1]) ;
-            const maplocationarray = maplocations.filter(location =>location.lat === lati && location.lng === lngi );
+            const maplocationarray = maplocations.filter(location =>location.replat === lati && location.replng === lngi );
             const maplocation=maplocationarray[0];
-            // console.log(maplocation); 
+            // console.log(maplocationarray); 
             map = new google.maps.Map(document.getElementById("map"),{
             center: { lat:lati, lng:lngi }, 
             zoom: 18,
             mapTypeId:'satellite'
         }); 
+        if(maplocation)
+        title=maplocation.name
+      else
+      title=lati+'-'+lngi
         var marker = new google.maps.Marker({
             //  var marker = new google.maps.marker.AdvancedMarkerElement({
               position: {lat: lati, lng:lngi}, 
@@ -195,7 +201,8 @@
                   scaledSize: new google.maps.Size(30, 30) // Scale the icon size if needed  
               } ,
               
-              title: maplocation.name
+              //  title: maplocation.name
+              title: title
               
           });
           var infowindow = new google.maps.InfoWindow({
@@ -203,10 +210,10 @@
               '<br><strong>Address:</strong> ' + maplocation.add1 +  
               '<br><strong>City:</strong> ' + maplocation.city +  
               '<br><strong>Inspection date:</strong> ' + maplocation.inpdate +  
-              '<br><strong>Latitude:</strong> ' + maplocation.lat +  
-              '<br><strong>Longitude:</strong> ' + maplocation.lng +  
-             '<br><strong>Governemnt approved rate:</strong> ' + maplocation.govrate +  
-             '<br><strong>Recommended rate:</strong> ' + maplocation.recomrate + 
+              '<br><strong>Latitude:</strong> ' + maplocation.replat +  
+              '<br><strong>Longitude:</strong> ' + maplocation.replng +  
+             '<br><strong>Land Value:</strong> ' + maplocation.landvalue +  
+             '<br><strong>Land rate:</strong> ' + maplocation.recomrate + 
              '<br><strong>Land area:</strong> ' + maplocation.landarea + 
              '<br><strong>Bank:</strong> ' + maplocation.bank + 
              '<br><a href="../../reception/repcompreportpdf/'+maplocation.id+'" target="_blank">Click here for more info</a>' +   

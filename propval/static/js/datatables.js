@@ -135,16 +135,119 @@ fetch('/api/rolewiseuser')
   });
 
 
-  function addimpdoc(doc) {
+  function addimpdoc() {
     addbtn=document.getElementById("addimpdoc");
     impdocaddbtn=document.getElementById("impdocaddbtn");
-    impdocsave=document.getElementById("impdocsave");
-    impdoccancel=document.getElementById("impdoccancel");
-    addbtn.style.display="block";
+    // impdocsave=document.getElementById("impdocsave");
+    // impdoccancel=document.getElementById("impdoccancel");
     impdocaddbtn.disabled = true;
-    
-
+    addbtn.style.display="block";
   }
+  function addoptionvalue(label,id) {
+    // console.log(label,id);
+    document.getElementById("dummyid").value = id;
+    addopbtn=document.getElementById("addoptions");
+    addbtn=document.getElementById("addimpdoc");
+    dropdownname=document.getElementById("dropdownname");
+    dropdownname.innerHTML=label;
+    addbtn.style.display="none";
+    addopbtn.style.display="block";
+  }
+  function addsuboptionvalue(label,id) {
+     console.log(label,id);
+    document.getElementById("dummysubid").value = id;
+    addsubopbtn=document.getElementById("addsuboptions");
+    addbtn=document.getElementById("addimpdoc");
+    dropdownname=document.getElementById("dropsuboption");
+    dropdownname.innerHTML=label;
+    addbtn.style.display="none";
+    addsubopbtn.style.display="block";
+    const selectElement = document.getElementById('subopt');
+    selectElement.innerHTML = '';
+
+    options.forEach(opt => {
+      if (opt.eng_dynamic_field_id === id) {
+          const option = document.createElement('option');
+          option.value = opt.id;
+          option.textContent = opt.opt_value;
+          selectElement.appendChild(option);
+      }
+  });
+  }
+  function addimpdoccancel() {
+    addopbtn=document.getElementById("addimpdoc");
+    addopbtn.style.display="none";
+  }
+  function addoptioncancel() {
+    addopbtn=document.getElementById("addoptions");
+    addsubopbtn=document.getElementById("addsuboptions");
+    addopbtn.style.display="none";
+    addsubopbtn.style.display="none";
+  }
+  document.getElementById("addoptionvalbtn").onclick = function() {
+    // $(document).on('click', '.addoptionvalbtn', function(event) {   
+    console.log("clclick");
+    var newRow = document.createElement("div");  
+    newRow.className = "row mb-2";
+  
+    var optionsvaldiv = document.createElement("div");  
+    optionsvaldiv.className = "col-md-6 d-flex align-items-center";  
+    
+    var optionvalInput = document.createElement("input");  
+    optionvalInput.type = "text";  
+    optionvalInput.name = "optionval[]";
+    optionvalInput.className = "form-control col-md-6";  
+    optionvalInput.placeholder = "Add options";  
+    
+    // var removeBtn = document.createElement("button");
+    // removeBtn.className = "btn btn-danger btn-sm ms-2";
+    // removeBtn.innerHTML = "-";
+    // removeBtn.onclick = function() {
+    //     newRow.remove();
+    // };
+    var removeLink = document.createElement("a");
+    removeLink.className = "btn btn-danger btn-sm ms-2 circle";
+    // removeLink.innerHTML = '<i class="fa-solid fa-circle-minus"></i>';
+    removeLink.innerHTML = '<b>-</b>'
+    removeLink.href = "#";
+    removeLink.onclick = function(event) {
+        event.preventDefault();
+        newRow.remove();
+    };
+    optionsvaldiv.appendChild(optionvalInput); 
+    optionsvaldiv.appendChild(removeLink); 
+    newRow.appendChild(optionsvaldiv); 
+     
+    document.getElementById("optioncontainer").appendChild(newRow);  
+  };
+  document.getElementById("addsuboptionvalbtn").onclick = function() {
+    console.log("clclick");
+    var newRow = document.createElement("div");  
+    newRow.className = "row mb-2";
+  
+    var optionsvaldiv = document.createElement("div");  
+    optionsvaldiv.className = "col-md-6 d-flex align-items-center";  
+    
+    var optionvalInput = document.createElement("input");  
+    optionvalInput.type = "text";  
+    optionvalInput.name = "suboptionval[]";
+    optionvalInput.className = "form-control col-md-6";  
+    optionvalInput.placeholder = "Add sub options";  
+    
+    var removeLink = document.createElement("a");
+    removeLink.className = "btn btn-danger btn-sm ms-2 circle";
+    removeLink.innerHTML = '<b>-</b>'
+    removeLink.href = "#";
+    removeLink.onclick = function(event) {
+        event.preventDefault();
+        newRow.remove();
+    };
+    optionsvaldiv.appendChild(optionvalInput); 
+    optionsvaldiv.appendChild(removeLink); 
+    newRow.appendChild(optionsvaldiv); 
+     
+    document.getElementById("suboptioncontainer").appendChild(newRow);  
+  };
   // function makeEditable(cell) {  
   //   console.log(cell)
   //   var input = document.createElement("input");  

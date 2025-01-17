@@ -7,7 +7,7 @@ $(document).ready(function() {
         const id = url.split('/').pop(); 
         // console.log('p'+id.trim());
         // const ii="p"+id.trim();
-        // console.log(url);
+        console.log(url);
         // var idd=document.getElementById(ii);
         // console.log(idd);
         var buttonId = button.attr('id');  
@@ -583,6 +583,7 @@ $(document).on('click', '.engeditedbutton', function(event) {
 });  
 
 //   }
+   
 
 
 

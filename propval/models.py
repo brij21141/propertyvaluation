@@ -131,11 +131,25 @@ class EngDynamicField(models.Model):
     ] 
     label = models.CharField(max_length=100)  
     input_type = models.CharField(max_length=50)
+    suboption = models.BooleanField(default=False)
+    form_type = models.CharField(max_length=50)
     active = models.BooleanField(default=True)
     timestamp = models.DateTimeField(auto_now_add=True) 
     # input_type = models.CharField(max_length=50,choices=INPUT_CHOICES,default='text')  # E.g. 'text', 'textarea', etc.  
     def __str__(self):  
         return self.label 
+
+class EngFormOptionValues(models.Model):
+    eng_dynamic_field = models.ForeignKey(EngDynamicField, on_delete=models.DO_NOTHING, related_name='options')
+    opt_value = models.CharField(max_length=40, blank=True, null=True)
+    def __str__(self):
+        return self.opt_value
+class EngFormsubOptionValues(models.Model):
+    main_option = models.ForeignKey(EngFormOptionValues, on_delete=models.CASCADE, related_name='sub_options')  
+    name = models.CharField(max_length=100,null=True,blank=True)  
+
+    def __str__(self):  
+        return self.name
     
   
  

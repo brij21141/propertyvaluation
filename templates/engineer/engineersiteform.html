@@ -109,9 +109,9 @@
                             <option value="">{% if requestreceived %} {{requestreceived.region}} {% else %} {{recptreport.region}} {% endif %}</option>
                             {% for state in states %}
                               {% if state.state_id == 20 %}
-                                <option value={{state.state_name}}  selected   >{{state.state_name}}</option>
+                                <option value="{{state.state_name}}"  selected   >{{state.state_name}}</option>
                               {% else %}
-                                <option value={{state.state_name}}   >{{state.state_name}}</option>
+                                <option value="{{state.state_name}}"   >{{state.state_name}}</option>
                               {%endif%}
                             {% endfor %}
                           </select>
@@ -129,7 +129,13 @@
                               </select>
                           </div>
                         </div>
-
+          <!-- <div class="item col-md-6">
+            <p>Property Address:</p>
+          <div class="city-item">
+            
+            <textarea id="propaddress" name="propaddress" rows="4" cols="30">{{requestreceived.add1}} {{requestreceived.add2}} {{requestreceived.city}} {{requestreceived.region}} {{requestreceived.zip}} {{requestreceived.country}}</textarea>
+          </div>
+          </div> -->
                         <p>BOUNDARIES AS PER SITE</p>
                         <div class="item">
                           <label for="east">East</label>
@@ -162,6 +168,49 @@
                     value="{{recptreport.south}}"
                     {% endif %}/>
                   </div>
+                  <div class="item">
+                    <label for="occupant">Occupant</label>
+                    {% if occupants %}
+                    <div class="city-item">
+                        <select name="occupancy" id="occupancy" onchange="selectoccupant()">
+                          {% if recptreport.Occupant == "Single Occupancy"  %}
+                          <option value="1" selected>Single Occupancy</option>
+                          <option value="2">Multiple Occupancy</option>
+                          {% else %}
+                          <option value="1" >Single Occupancy</option>
+                          <option value="2" selected>Multiple Occupancy</option>
+                          {%endif%}
+                        </select>
+                        <a type="button" id="addoccupantBtn" class="btn btn-primary btn-sm my-1" {% if recptreport.Occupant == "Single Occupancy"  %} style="display: none;" {%endif%}>Add more rows</a>
+                      </div>
+                      
+                      <div id="occupantContainer" class="item">
+                        {% for occupant in occupants %}
+                        <!-- <input id="occupant" name="occupant" type="text" class="form-control" value="{{occupant.occupantname}}"/> -->
+                        <div class="row" id="occupantGroup{{ forloop.counter }}">  
+                          <div class="col-md-11">
+                          <input id="occupant{{ forloop.counter }}" name="occupant" type="text" class="form-control" value="{{ occupant.occupantname }}"/>  
+                        </div>
+                        <div class="col-md-1">
+                          <button type="button" class="btn btn-danger btn-sm ms-2 circle" onclick="removeOccupant('occupantGroup{{ forloop.counter }}')">-</button>  
+                        </div>
+                        </div> 
+                        {% endfor %}
+                      </div> 
+                    {% else %}
+                    <div class="city-item">
+                    <select name="occupancy" id="occupancy" onchange="selectoccupant()">
+                      <option value="1" selected>Single Occupancy</option>
+                      <option value="2">Multiple Occupancy</option>
+                    </select>
+                    <a type="button" id="addoccupantBtn" class="btn btn-primary btn-sm my-1" style="display: none;">Add more rows</a>
+                  </div>
+                  
+                  <div id="occupantContainer" class="item">
+                    <input id="occupant" name="occupant" type="text" class="form-control" placeholder="Occupant name"/>
+                  </div>
+                  {%endif%}
+                  </div>
                 
                   <div id="floorContainer">  
                     <div class="row">
@@ -169,7 +218,7 @@
                         <label for="floor">FLOOR DETAILS</label> <a type="button" id="addfloorBtn" class="btn btn-primary btn-sm my-1">Add more rows</a></div>
                     {% if floors %}
                     {% for floor in floors %}
-                    <div class="row">
+                    <div id="floorgroup{{forloop.counter}}" class="row">
                       
                       <div class="col-md-4">
                         <input  name="floor[]" type="text" class="form-control" value="{{floor.floorname}}"/>
@@ -177,9 +226,10 @@
                       <div class="col-md-4">
                         <input  name="floordetails[]" type="text" class="form-control" value="{{floor.floordetail}}" />
                       </div>
-                      <div class="col-md-4">
+                      <div class="col-md-3">
                         <input name="floorarea[]" type="text" class="form-control" value="{{floor.floorarea}}"/>
                       </div>
+                      <button type="button" class="btn btn-danger btn-sm ms-2 circle" onclick="removefloor('floorgroup{{ forloop.counter }}')">-</button>  
                     </div>
                     {% endfor %}
                     {% else %}
@@ -253,21 +303,13 @@
                   {% endif %}/>
                 </div>
 
-              <div class="item">
-                <label for="occupant">Occupant</label>
-                <input id="occupant" name="occupant" type="text" class="form-control" placeholder="Enter Occupant"
-                {% if recptreport %}
-                value="{{recptreport.Occupant}}"
-                {% endif %}/>
-              </div>
-
-            <div class="item">
+            <!-- <div class="item">
               <label for="rented">Rented</label>
               <input id="rented" name="rented" type="text" class="form-control" placeholder="Enter Rented"
               {% if recptreport %}
               value="{{recptreport.rented}}"
               {% endif %}/>
-            </div>
+            </div> -->
 
           <div class="item">
             <label for="landmark">Landmark</label>
@@ -286,19 +328,100 @@
         </div>
         
     {% if engdynamicvalues %}
-    {% for field in engdynamicvalues %}
-        <label>{{ field.input_field.label }}</label>
-        <input type="{{ field.input_field.input_type }}" name="{{ field.input_field.label|slugify }}" value="{{field.value}}">
-        <br>
-    {% endfor %}
+      {% for field in engdynamicvalues %}
+        {% if field.input_field.input_type == 'select' %}
+        <div class="item">
+          <label>{{ field.input_field.label }}</label>
+          <div class="city-item">
+            <select id="{{ field.input_field.label|slugify }}" class="form-select" aria-label="Default select example" name="{{ field.input_field.label|slugify }}" onchange="updateSubOptions('{{field.input_field.label|slugify}}')" >
+              <option value="0" >Select {{ field.input_field.label }}</option>
+              {% for optvalue in optvalues %}
+                {% if optvalue.eng_dynamic_field.label == field.input_field.label %}
+                {% if optvalue.opt_value == field.value %}
+                  <option value="{{ optvalue.id }}" selected  >{{ optvalue.opt_value }} </option>
+                {% else %}
+                  <option value="{{ optvalue.id }}"  >{{ optvalue.opt_value }} </option>
+                {% endif %}
+                {% endif %}
+              {% endfor %}
+            </select>
+            <select id="sub{{ field.input_field.label|slugify }}" class="form-select" aria-label="Default select example" name="sub{{ field.input_field.label|slugify }}"  {% if not field.input_field.suboption %} hidden {% endif %} >
+              <option value="0" >Select sub option</option>
+              {% for subopt in suboptions %}
+              {% if subopt.main_option.opt_value == field.value %}
+              {% if subopt.name == field.subvalue %}
+              <option value="{{ subopt.id }}" selected  >{{ subopt.name }} </option>
+              {% else%}
+              <option value="{{ subopt.id }}">{{ subopt.name }} </option>
+              {% endif %}
+              {%endif%}
+              {% endfor %}
+            </select>
+          </div>
+        </div>
+        {% elif field.input_field.input_type == 'checkbox' %}
+          <label for="{{ field.input_field.label }}"> {{ field.input_field.label }}:</label>
+          {% for optvalue in optvalues %}
+            {% if optvalue.eng_dynamic_field.label == field.input_field.label %}
+              <div class="form-check">
+              <input type="checkbox" class="form-check-input" id="{{ optvalue.opt_value }}" name="{{ field.input_field.label|slugify }}" value="{{ optvalue.opt_value }}" {% if optvalue.opt_value in engdynamiccheckvalues %} checked {% endif %}>
+              <label class="form-check-label" for="{{ optvalue.opt_value }}">{{ optvalue.opt_value }}</label>
+              </div>
+              <!-- engdynamiccheckvalues -->
+            {% endif %}
+          {% endfor %}
+        {% else %}
+        <div class="item col-sm-6">
+            <label>{{ field.input_field.label }}</label>
+            <input type="{{ field.input_field.input_type }}" name="{{ field.input_field.label|slugify }}" value="{{field.value}}">
+            {% if field.input_field.input_type == 'date' %}<i class="fas fa-calendar-alt"></i> {% endif %}
+          </div>
+          
+          {%endif%}
+          <!-- <br> -->
+      {% endfor %}
     {% else %}
     {% for field in engdynamicfields %}  
+        {% if field.input_type == 'select' %}
+      <div class="item">
+        <label>{{ field.label }}</label>
+        <div class="city-item">
+        <select id="{{ field.label|slugify }}" class="form-select" aria-label="Default select example" name="{{ field.label|slugify }}" onchange="updateSubOptions('{{ field.label|slugify }}')">
+          <option value="0" >Select {{ field.label }}</option>
+          {% for optvalue in optvalues %}
+            {% if optvalue.eng_dynamic_field.label == field.label %}
+              <option value="{{ optvalue.id }}">{{ optvalue.opt_value }}</option>
+            {% endif %}
+          {% endfor %}
+        </select>
+            <select id="sub{{ field.label|slugify }}" class="form-select" aria-label="Default select example" name="sub{{ field.label|slugify }}"  {% if not field.suboption %} hidden {% endif %} >
+              <option value="0" >Select sub option</option>
+              
+            </select>
+          
+      </div>
+      </div>
+        {% elif field.input_type == 'checkbox' %}
+              <label for="{{ field.label }}"> {{ field.label }}:</label>
+              {% for optvalue in optvalues %}
+                {% if optvalue.eng_dynamic_field.label == field.label %}
+                  <div class="form-check">
+                  <input type="checkbox" class="form-check-input" id="{{ optvalue.opt_value }}" name="{{ field.label|slugify }}" value="{{ optvalue.opt_value }}" >
+                  <label class="form-check-label" for="{{ optvalue.opt_value }}">{{ optvalue.opt_value }}</label>
+                  </div>
+                {% endif %}
+              {% endfor %}
+        {% else %}
+        <div class="item col-sm-6">
         <label>{{ field.label }}</label>  
-        <input type="{{ field.input_type }}" name="{{ field.label|slugify }}">  
-        <br>  
+        <input type="{{ field.input_type }}" name="{{ field.label|slugify }}"> 
+        {% if field.input_type == 'date' %}<i class="fas fa-calendar-alt"></i> {% endif %}
+        </div> 
+        {% endif %}
+        <!-- <br>   -->
     {% endfor %}
     {% endif %}
-      <label for="hazard">Hazards:</label>
+      <!-- <label for="hazard">Hazards:</label>
     <div class="form-check">
       <input type="checkbox" class="form-check-input" id="hightension" name="hightension" value="" {% if recptreport.hightension %} checked {% endif %}>
       <label class="form-check-label" for="hightension">High Tention Line</label>
@@ -337,7 +460,7 @@
     <div class="form-check">
       <input type="checkbox" class="form-check-input" id="otherhazard" name="otherhazard" value="" {% if recptreport.othercheck %} checked {% endif %}>
       <label class="form-check-label" for="otherhazard">Other(Please specify)</label><span><input type="text" name="otherhazarddesc" id="otherhazarddesc"></span>
-    </div>
+    </div> -->
 
       <div class="item">
         <label for="remark">Remarks</label>
@@ -393,6 +516,46 @@
 {% endblock %}
 {% block scripts%}
 <script>
+  function selectoccupant(){
+    var occupant = document.getElementById("occupancy").value;
+    console.log(occupant);
+    if(occupant == 2){
+      document.getElementById("addoccupantBtn").style.display="block";
+    }else{
+      document.getElementById("addoccupantBtn").style.display="none";
+    }
+  }
+  document.getElementById("addoccupantBtn").onclick = function() {  
+  var newoccupantRow = document.createElement("div");  
+  newoccupantRow.className = "row mb-2";
+
+  var occupantDiv = document.createElement("div");  
+  occupantDiv.className = "col-md-6";  
+  
+  var occupantInput = document.createElement("input");  
+  occupantInput.type = "text";  
+  placeholder = "Occupant name "+ (document.getElementById("occupantContainer").children.length + 1);    
+  occupantInput.name = "occupant";
+  occupantInput.id = "occupant"+ (document.getElementById("occupantContainer").children.length + 1);    
+  occupantInput.className = "form-control col-md-6";  
+  occupantInput.placeholder = placeholder;    
+
+  occupantDiv.appendChild(occupantInput);  
+  
+  var removeBtn = document.createElement("button");
+    removeBtn.className = "btn btn-danger btn-sm ms-2 circle";
+    removeBtn.innerHTML = "-";
+    removeBtn.onclick = function() {
+      newoccupantRow.remove();
+    };
+  
+    newoccupantRow.appendChild(occupantDiv);  
+    newoccupantRow.appendChild(removeBtn);
+  
+  document.getElementById("occupantContainer").appendChild(newoccupantRow);  
+};
+</script>
+<script>
 document.getElementById("addfloorBtn").onclick = function() {  
   var newRow = document.createElement("div");  
   newRow.className = "row mb-2";
@@ -402,7 +565,7 @@ document.getElementById("addfloorBtn").onclick = function() {
   var floorDetailDiv = document.createElement("div");  
   floorDetailDiv.className = "col-md-4";  
   var floorAreaDiv = document.createElement("div");  
-  floorAreaDiv.className = "col-md-4";  
+  floorAreaDiv.className = "col-md-4 d-flex";  
 
   var floorInput = document.createElement("input");  
   floorInput.type = "text";  
@@ -429,10 +592,17 @@ document.getElementById("addfloorBtn").onclick = function() {
   floorDetailDiv.appendChild(floorDetailInput);  
   floorAreaDiv.appendChild(floorAreaInput);  
 
+  var removeBtn = document.createElement("button");
+    removeBtn.className = "btn btn-danger btn-sm ms-2 circle";
+    removeBtn.innerHTML = "-";
+    removeBtn.onclick = function() {
+        newRow.remove();
+    };
   
   newRow.appendChild(floorDiv);  
   newRow.appendChild(floorDetailDiv);  
   newRow.appendChild(floorAreaDiv);
+  floorAreaDiv.appendChild(removeBtn);
   
   document.getElementById("floorContainer").appendChild(newRow);  
 };
@@ -465,5 +635,56 @@ document.getElementById("addfloorBtn").onclick = function() {
         }  
     });  
 });  
+</script>
+<script>  
+  function removeOccupant(occupantGroupId) {  
+      const occupantGroup = document.getElementById(occupantGroupId);  
+      if (occupantGroup) {  
+          occupantGroup.remove(); // Remove the input group from the DOM  
+      }  
+  }  
+  function removefloor(floorGroupId) {  
+      const occupantGroup = document.getElementById(floorGroupId);  
+      if (occupantGroup) {  
+          occupantGroup.remove(); // Remove the input group from the DOM  
+      }  
+  }  
+</script>
+<script>
+  function updateSubOptions( nme) {  
+    
+    const suboptionvalues = [
+        {% for optn in suboptions %}
+        {
+            id: '{{ optn.id }}',
+            name: '{{ optn.name }}',
+            main_option_id: '{{ optn.main_option_id }}',
+            main_option_value: '{{ optn.main_option.opt_value }}'
+        },
+        {% endfor %}
+    ];
+    // field_value = field.label.replace(' ', '-').lower()
+            // const elementname=document.getElementsByName()
+    console.log(nme); 
+            // const mainDropdown = document.getElementById('mainoption');  
+            const mainDropdown = document.getElementById(nme); 
+            const selectedMainOptionId = mainDropdown.value;
+            // const selectElement = document.getElementById('suboption');  
+            const selectElement = document.getElementById('sub'+nme);  
+            // const subOptionContainer = document.getElementById('sub-options-container');  
+            // console.log(selectedMainOptionId);
+            // Clear previous inputs  
+            selectElement.innerHTML = ''; 
+            suboptionvalues.forEach(opt => {
+              // console.log(opt.name);
+                if (opt.main_option_id === selectedMainOptionId || opt.main_option_value === selectedMainOptionId) {
+                    const option = document.createElement('option');
+                    option.value = opt.id;
+                    option.textContent = opt.name;
+                    selectElement.appendChild(option);
+                }
+            }); 
+  
+        }  
 </script>
 {% endblock scripts%}

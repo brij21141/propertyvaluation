@@ -23,39 +23,121 @@
                 <!-- <label for="bankname">Bank Detail</label> -->
                 <form action="" method="post" class="">{% csrf_token %}
              <div class="row">
-                <div class="col-md-4">
+                <div class="col-md-3">
                 <input  id="label" name="label" type="text" class="form-control " placeholder="Enter label" style="display: inline-block;"
-                value="" />
+                value="" required />
                  </div>
-                <div class="col-md-4">
-                 <!-- change also in reception.js file in this function     $('.edit-btn').on('click', function() { -->
+                <div class="col-md-3">
+                 <!-- change values also in reception.js file in this function     $('.edit-btn').on('click', function() { -->
                 <select class="form-select" aria-label="Default select example" name="input_type" required>
-                <option value="text" >Text</option>   
+                <option value="text" selected>Text</option>   
                 <option value="number" >Number</option>
                 <option value="date" >Date</option>
                 <option value="email" >Email</option>
+                <option value="select" >Dropdown</option>
+                <option value="checkbox" >checkbox</option>
                 </select>
-
-                <!-- <input id="input_type" name="input_type" type="text" class="form-control" placeholder="Enter Field type"
-                value=""/> -->
-                
-            </div>
-                <div class="col-md-4 d-flex">
+                </div>
+                <div class="col-md-3">
+                <select class="form-select" aria-label="Default select example" name="form_type" required>
+                <option value="Reception form" >Reception form</option>   
+                <option value="Engineer form" selected >Engineer form</option>
+                <option value="Reporter form" >Reporter form</option>
+                </select>
+                </div>
+                <div class="col-md-3 d-flex">
                 
                 <div class="justify-content-end">
-                    <button id="impdocsave" type="submit" class="btn btn-primary btn-sm me-2" href="">Save</button>
+                    <button id="impdocsave" type="submit" name="impdocbtn" class="btn btn-primary btn-sm me-2" href="">Save</button>
                     <!-- <a class="btn btn-primary btn-sm" href="/reception/receptio">Cancel</a> -->
                 </div>
                 <div class="">
-                    <a id="impdoccancel" class="btn btn-primary btn-sm" href="">Cancel</a>
+                    <a id="impdoccancel" class="btn btn-primary btn-sm" onclick="addimpdoccancel()">Cancel</a>
                 </div>
                 </div>
             </div>
             </form>
             </div>
-            <input  id="editnarration" name="editnarration" type="text" class="form-control " placeholder="Enter narration" style="display: inline-block;"
+            <div class="item" id="addoptions" style="display: none;">
+                <!-- <label for="bankname">Bank Detail</label> -->
+                <form action="" method="post" class="">{% csrf_token %}
+            <div class="row">
+              <div class="col-md-6 d-flex">
+              <label for="">Add options to field <span id="dropdownname" style="font-weight: bold; color: blue;">this is name</span> </label>
+              
+              <div class="col-md-6 ms-2 mb-2">
+                <a id="addoptionvalbtn" class="btn btn-primary btn-sm" >Add more</a>
+              </div>
+            </div>
+            </div>
+             <div id="optioncontainer" class="row">
+              <input type="text" id="dummyid" name="dummyid" hidden>
+                <div class= "col-md-6 ">
+                <input  id="optionval" name="optionval[]" type="text" class="form-control " placeholder="Add options" style="display: inline-block;"
+                value="" required />
+              </div>
+              </div>
+              <div class="row">  
+                <div class="d-flex">
+                
+                <div class="justify-content-end">
+                    <button id="" name="optbtn" type="submit" class="btn btn-primary btn-sm me-2" href="">Save</button>
+                    <!-- <a class="btn btn-primary btn-sm" href="/reception/receptio">Cancel</a> -->
+                </div>
+                <div class="">
+                    <a id="addoptioncancel" class="btn btn-primary btn-sm" onclick="addoptioncancel()">Cancel</a>
+                </div>
+                </div>
+            </div>
+            </form>
+            </div>
+            <div class="item" id="addsuboptions" style="display: none;" >
+                <!-- <label for="bankname">Bank Detail</label> -->
+                <form action="" method="post" class="">{% csrf_token %}
+            <div class="row">
+              <div class="col-md-6 d-flex">
+                <input type="text" id="dummysubid" name="dummysubid" hidden>
+              <label for="">Add sub options for <span>
+                  <select name="subopt" id="subopt">
+                    {% for opt in options %}
+                    <option value="{{ opt.id }}">{{ opt.opt_value }}</option>
+                    {% endfor %}
+                  </select>
+              </span> 
+                 of field <span id="dropsuboption" style="font-weight: bold; color: blue;">this is name</span> </label>
+              
+              <div class="col-md-6 ms-2 mb-2">
+                <a id="addsuboptionvalbtn" class="btn btn-primary btn-sm" >Add more</a>
+              </div>
+            </div>
+            </div>
+             <div id="suboptioncontainer" class="row">
+              
+                <div class= "col-md-6 ">
+                <input  id="suboptionval" name="suboptionval[]" type="text" class="form-control " placeholder="Add options" style="display: inline-block;"
+                value="" required />
+              </div>
+              </div>
+              <div class="row">  
+                <div class="d-flex">
+                
+                <div class="justify-content-end">
+                    <button id="" name="suboptbtn" type="submit" class="btn btn-primary btn-sm me-2" href="">Save</button>
+                    <!-- <a class="btn btn-primary btn-sm" href="/reception/receptio">Cancel</a> -->
+                </div>
+                <div class="">
+                    <a id="addoptioncancel" class="btn btn-primary btn-sm" onclick="addoptioncancel()">Cancel</a>
+                </div>
+                </div>
+            </div>
+            </form>
+            </div>
+            
+            <input  id="editnarration" name="editnarration" type="text" class="form-control "  style="display: inline-block;"
                 value="" hidden />
-                <input id="editlink" name="editlink" type="text" class="form-control" placeholder="Enter link url"
+                <input id="editlink" name="editlink" type="text" class="form-control" 
+                value="" hidden />
+                <input id="formeditlink" name="formeditlink" type="text" class="form-control" 
                 value="" hidden />
             
             <table id="impdoctable" class="table table-hover table-striped table-bordered" style="font-size: 90%;">
@@ -65,6 +147,7 @@
                   <th scope="col">#</th>
                   <th scope="col">Narration/Label</th>
                   <th scope="col">Input type</th>
+                  <th scope="col">Form</th>
                   <th scope="col">Created date</th>
                   <th scope="col">Action </th>
                    
@@ -76,6 +159,7 @@
                   <td  scope="row">{{forloop.counter}}</td>
                   <td id="docnarration" class="docnarration" >{{recrep.label}}</td>
                   <td id="doctype" class="doclink" >{{recrep.input_type}}</td>
+                  <td id="formtype" class="formdoclink" >{{recrep.form_type}}</td>
                   <td  >{{recrep.timestamp|date:"d-m-Y"}}</td>
                 
                   <td><a class="impdocdelete" data-url="{% url 'engdynamicfielddelete' recrep.id %}" href="" title="Delete">
@@ -83,13 +167,22 @@
                     <a type="button"  class="edit-btn" title="Edit" id="" >
                       <i class="fas fa-edit action-icon " ></i>
                     </a>&nbsp;&nbsp;
-                    <a type="button"  onclick="engdynamicfieldupdate({{recrep.id}})" class="save-btn" title="Save" id="updateimpdoc-btn" style="display:none;">
+                    <a type="button"  onclick="engdynamicfieldupdate('{{recrep.id}}')" class="save-btn" title="Save" id="updateimpdoc-btn" style="display:none;">
                       <i class="fas fa-save action-icon save-icon"></i>
                     </a>&nbsp;&nbsp;
                     <a type="button" href="engdynamicfield"  class="cancel-btn" title="Cancel" style="display:none;" >
                       <i class="fa-solid fa-xmark"></i>
                     </a>
-                     
+                    {% if recrep.input_type == 'select' or recrep.input_type == 'checkbox' %}
+                    <a type="button"   class="" title="add remove options" onclick="addoptionvalue('{{recrep.label}}','{{recrep.id}}')" >
+                      add options
+                    </a>
+                     {% endif %}
+                    {% if recrep.input_type == 'select'  %}
+                    <a type="button"   class="" title="add remove sub options" onclick="addsuboptionvalue('{{recrep.label}}','{{recrep.id}}')" >
+                      &nbsp;&nbsp; sub options
+                    </a>
+                     {% endif %}
                   </td> 
                   </tr>
                 {% endfor %}
@@ -102,12 +195,25 @@
   </div>
 </div>
 
+<script>
+  const options = [
+        {% for opt in options %}
+        {
+            id: '{{ opt.id }}',
+            opt_value: '{{ opt.opt_value }}',
+            eng_dynamic_field_id: '{{ opt.eng_dynamic_field_id }}'
+        },
+        {% endfor %}
+    ];
+</script>
+
 {% endblock %}
 {% block scripts%}
 <script type="text/javascript">
   var apiBaseUrl = "{{ context.api_base_url }}";
   console.log(apiBaseUrl+'hjgj');
 </script>
+
 <Script type="text/javascript" src="{% static 'js/reception.js' %}" > </Script>
 <Script type="text/javascript" src="{% static 'js/sidebartoggle.js' %}"> </Script>
 <Script type="text/javascript" src="{% static 'js/datatables.js' %}" > </Script>

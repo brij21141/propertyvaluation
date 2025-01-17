@@ -103,6 +103,8 @@ fetch('/api/engreportstatus/a/0')
   $('#pend').text(data.pend);
   $('#inprog').text(data.inprog);
   $('#engcom').text(data.com);
+  $('#hold').text(data.hold);
+  $('#tot').text(data.tot);
 //   console.log(data.com*100/(data.inprog+data.pend+data.com));
   let wd=Math.round(data.com*100/(data.inprog+data.pend+data.com+data.hold))+"%";
   $('#engper').text(wd);
@@ -259,17 +261,7 @@ $(document).ready(function() {
 
 $(document).ready(function() {
   $('#engpend').click(function(event) {
-    // console.log("Clicked on " );
-    //   event.preventDefault();
-    //   var button = $(this);
-    //   var url = button.data('url');
       var fullApiUrl = apiBaseUrl + 'engineer/engineerpendjob/';
-      // console.log(fullApiUrl);
-     
-
-      // Perform an AJAX request (example)
-      
-     // console.log(url);
      var engArray=[];
       $.ajax({
           url: fullApiUrl,
@@ -288,6 +280,58 @@ $(document).ready(function() {
                 buildpendinprogtable(engArray);  
                 engspinner.classList.add('spinnervisibility')
                 modhead.innerHTML='Pending Jobs';
+              } else {
+                  alert('Error: ' + response.error);
+              }
+          }
+      });
+  });
+});
+$(document).ready(function() {
+  $('#engrecrep').click(function(event) {
+      var fullApiUrl = apiBaseUrl + 'engineer/engineerrecjob/';
+     var engArray=[];
+      $.ajax({
+          url: fullApiUrl,
+          type: 'GET',
+          
+          data: {
+              csrfmiddlewaretoken: '{{ csrf_token }}'
+              
+          },
+          
+          success: function(response) {
+              if (response.success) {
+                engArray=response.data;  
+                buildpendinprogtable(engArray);  
+                engspinner.classList.add('spinnervisibility')
+                modhead.innerHTML='Request Received';
+              } else {
+                  alert('Error: ' + response.error);
+              }
+          }
+      });
+  });
+});
+$(document).ready(function() {
+  $('#enghold').click(function(event) {
+      var fullApiUrl = apiBaseUrl + 'engineer/engineerholdjob/';
+     var engArray=[];
+      $.ajax({
+          url: fullApiUrl,
+          type: 'GET',
+          
+          data: {
+              csrfmiddlewaretoken: '{{ csrf_token }}'
+              
+          },
+          
+          success: function(response) {
+              if (response.success) {
+                engArray=response.data;  
+                buildpendinprogtable(engArray);  
+                engspinner.classList.add('spinnervisibility')
+                modhead.innerHTML='Hold task';
               } else {
                   alert('Error: ' + response.error);
               }
@@ -415,10 +459,10 @@ function buildreppendinprogtable(data,id) {
                     <!-- <th scope="col">APP.DATE</th> -->
                     <th scope="col">APP.NO.</th>
                     <th scope="col">NAME</th>
-                    <th scope="col">Visit in presence</th>
+                   <!-- <th scope="col">Visit in presence</th> --!>
                     <th scope="col">BANK NAME</th>
                     <th  scope="col">Engineer</th>
-                    <th  scope="col">Completed by Engineer on</th>
+                  <!--  <th  scope="col">Completed by Engineer on</th> --!>
                     <th scope="col">Reporter</th>
                     <th scope="col">Hold Cause</th>
     </tr>`  
@@ -430,11 +474,11 @@ function buildreppendinprogtable(data,id) {
                   <!-- <th scope="col">APP.DATE</th> -->
                   <th scope="col">APP.NO.</th>
                   <th scope="col">NAME</th>
-                  <th scope="col">Visit in presence</th>
+                <!--  <th scope="col">Visit in presence</th> --!>
                   <th scope="col">BANK NAME</th>
                   <th scope="col">Case type</th>
                   <th  scope="col">Engineer</th>
-                  <th  scope="col">Completed by Engineer on</th>
+                <!--  <th  scope="col">Completed by Engineer on</th>  --!>
                   <th scope="col">Reporter</th>
   </tr>`
   }else if (id=='repcomp'){
@@ -464,16 +508,20 @@ function buildreppendinprogtable(data,id) {
         repmodhead.innerHTML='Reporter received Jobs';
       }
   for (var i=0; i<data.length; i++) {
+    if (data[i].npa) {
+    var casetype = "NPA"
+    }else{
+      var casetype = "Normal"
+    }
     var row = `<tr>
     <td scope="row">${i+1}</td>
     <td scope="col">${data[i].applicationnumber}</td>
     <td scope="col">${data[i].name}</td>
-    <td scope="col">${data[i].visitinpresence}</td>
+   <!-- <td scope="col">${data[i].visitinpresence}</td> --!>
     <td scope="col">${data[i].bankname}</td>
-    <td scope="col">${data[i].casetype}</td>
-    <td scope="col">${data[i].receptionid.visitingpersonname}</td>
-    <td>${moment((data[i].updated_at).split('T')[0]).format('DD-MM-YYYY')}</td>
-    <td scope="col">${data[i].receptionid.reportpersonname}</td>
+    <td scope="col">${casetype}</td>
+    <td scope="col">${data[i].visitingpersonname}</td>
+    <td scope="col">${data[i].reportpersonname}</td>
     </tr>`
     table.innerHTML += row
     }
@@ -483,12 +531,12 @@ function buildreppendinprogtable(data,id) {
       <td scope="row">${i+1}</td>
       <td scope="col">${data[i].applicationnumber}</td>
       <td scope="col">${data[i].name}</td>
-      <td scope="col">${data[i].visitinpresence}</td>
+     <!-- <td scope="col">${data[i].visitinpresence}</td> --!>
       <td scope="col">${data[i].bankname}</td>
-      <td scope="col">${data[i].receptionid.visitingpersonname}</td>
-      <td>${moment((data[i].updated_at).split('T')[0]).format('DD-MM-YYYY')}</td>
-      <td scope="col">${data[i].receptionid.reportpersonname}</td>
-      <td scope="col">${data[i].casetype}</td> 
+      <td scope="col">${data[i].visitingpersonname}</td>
+      <!--<td>${moment((data[i].updated_at).split('T')[0]).format('DD-MM-YYYY')}</td>--!>
+      <td scope="col">${data[i].reportpersonname}</td>
+      <td scope="col">${data[i].reporterholdcause}</td> 
       
       </tr>`
       table.innerHTML += row
@@ -547,7 +595,11 @@ $(document).ready(function() {
       $('#homedatefilter').click(function(event) {
         const input1 = document.getElementById("stdate").value;  
         const input2 = document.getElementById("endate").value;
-        console.log("homedatefilter clicked"+input1+" "+input2);
+        const bankid = document.getElementById("glbankid").value;
+        const engstatus = document.getElementById("engstatus").value;
+        const repstatus = document.getElementById("repstatus").value;
+        const vertical = document.getElementById("vertical").value;
+        console.log("homedatefilter clicked"+input1+" "+input2+" "+bankid+" " +engstatus+" " +repstatus+" " +vertical, typeof(bankid));
           var fullApiUrl = apiBaseUrl + 'homedatefilter/';
           var homedatefilter=[];
           // var globalengtable = $('#globalsearchengineertable').DataTable();
@@ -556,7 +608,11 @@ $(document).ready(function() {
               
               data: {
                   'startdate': input1,
-                  'enddate': input2
+                  'enddate': input2,
+                  'bankid': bankid,
+                  'engstatus': engstatus,
+                 'repstatus': repstatus,
+                 'vertical': vertical
               },
               success: function(response) {
                   if (response.success) {
@@ -577,8 +633,16 @@ $(document).ready(function() {
       $('#clearhomedatefilter').click(function(event) {
         document.getElementById("stdate").value ="";  
         document.getElementById("endate").value="";
+        document.getElementById("glbankid").value="";
+        document.getElementById("engstatus").value="";
+        document.getElementById("repstatus").value="";
+        document.getElementById("vertical").value="";
         const input1 = document.getElementById("stdate").value;  
         const input2 = document.getElementById("endate").value;
+        const bankid = document.getElementById("glbankid").value;
+        const engstatus = document.getElementById("engstatus").value;
+        const repstatus = document.getElementById("repstatus").value;
+        const vertical = document.getElementById("vertical").value;
           var fullApiUrl = apiBaseUrl + 'homedatefilter/';
           var homedatefilter=[];
           $.ajax({
@@ -586,7 +650,11 @@ $(document).ready(function() {
               
               data: {
                   'startdate': input1,
-                  'enddate': input2
+                  'enddate': input2,
+                  'bankid': bankid,
+                  'engstatus': engstatus,
+                  'repstatus': repstatus,
+                  'vertical': vertical
               },
               success: function(response) {
                   if (response.success) {
@@ -658,10 +726,13 @@ $(document).ready(function() {
       $row.find('td').each(function() {
         i=i+1 ;
           var $cell = $(this);
-          if ($cell.hasClass('docnarration') || $cell.hasClass('doclink')) {
+          if ($cell.hasClass('docnarration') || $cell.hasClass('doclink') || $cell.hasClass('formdoclink')) {
             if ($cell.hasClass('docnarration')){
               document.getElementById("editnarration").value=$cell.text();  
-            }else{
+            }else if ($cell.hasClass('formdoclink')){
+              document.getElementById("formeditlink").value=$cell.text();  
+            }
+            else{
               document.getElementById("editlink").value=$cell.text();
             }
             
@@ -670,10 +741,21 @@ $(document).ready(function() {
               var cellid = $cell.attr('id');
               if(cellid=='doctype'){
                 $cell.html('<select class="' + cellClass + '" id="select-' + i + '" onchange="syncText(this)">' +
-                  '<option value="text" >Text</option>' +
-                  '<option value="number" >Number</option>' +
-                  '<option value="date" >Date</option>' +
-                  '<option value="email" >Email</option>' +
+                  '<option value="text" ' + (content === 'text' ? 'selected' : '') + ' >Text</option>' +
+                  '<option value="number" ' + (content === 'number' ? 'selected' : '') + ' >Number</option>' +
+                  '<option value="date" ' + (content === 'date' ? 'selected' : '') + ' >Date</option>' +
+                  '<option value="email" ' + (content === 'email' ? 'selected' : '') + '>Email</option>' +
+                  '<option value="select" ' + (content === 'select' ? 'selected' : '') + '>Dropdown</option>'+
+                  '<option value="checkbox" ' + (content === 'checkbox' ? 'selected' : '') + '>Checkbox</option>'+
+                  '</select>');
+                  
+              }
+              else if(cellid=='formtype'){
+                console.log("TT"+cellid);
+                $cell.html('<select class="' + cellClass + '" id="select-' + i + '" onchange="syncText(this)">' +
+                  '<option value="Reception form" ' + (content === 'Reception form' ? 'selected' : '') + ' >Reception form</option>' +
+                  '<option value="Engineer form" ' + (content === 'Engineer form' ? 'selected' : '') + '>Engineer form</option>' +
+                  '<option value="Reporter form" ' + (content === 'Reporter form' ? 'selected' : '') + '>Reporter form</option>' +
                   '</select>');
               }
               else{
@@ -698,7 +780,9 @@ function syncText(cell) {
   // var text = cell.text();
 if(cell.id =='input-2') {
   document.getElementById("editnarration").value = cell.value; 
-} else {
+} else if(cell.id =='select-4'){
+  document.getElementById("formeditlink").value = cell.value;  
+} else{
   document.getElementById("editlink").value = cell.value;  
 }
 console.log(cell.value);
@@ -747,7 +831,8 @@ function engdynamicfieldupdate(recid){
   
   const input1 = document.getElementById("editnarration").value;  
   const input2 = document.getElementById("editlink").value; 
-  console.log(input1);  
+  const input3 = document.getElementById("formeditlink").value; 
+  console.log(input3);  
   apiBaseUrl = apiBaseUrl.replace('/api/', '/');
   var fullApiUrl = apiBaseUrl + 'propval/engdynamicfieldupdate/'+recid;
   const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]').value;
@@ -757,7 +842,7 @@ function engdynamicfieldupdate(recid){
           'Content-Type': 'application/json',  
           'X-CSRFToken': csrfToken  
       },  
-      body: JSON.stringify({ label: input1, input_type: input2 })  
+      body: JSON.stringify({ label: input1, input_type: input2,form_type:input3 })  
   })  
   .then(response => response.json())
       
@@ -822,14 +907,23 @@ var table =  document.getElementById('homedatefilt');
 console.log(table);
 var row=`<tr></tr>`
 table.innerHTML = row
-for (var i=0; i<data.length; i++) { console.log(data[i].id);
+for (var i=0; i<data.length; i++) { 
+  console.log(data[i].id);
   var engineerStatus;  
 if (data[i].engineer === "Submitted") {  
     engineerStatus = "Completed";  
-} else if (data[i].engineer === null) {  
+} else if (data[i].engineer === null || data[i].engineer === "InProgress") {  
     engineerStatus = "Pending";  
 } else {  
     engineerStatus = data[i].engineer;  
+}
+  var reporterStatus ="";  
+if (data[i].reporter === "Submitted") {  
+  reporterStatus = "Completed";  
+} else if (data[i].reporter === null || data[i].reporter === "InProgress") {  
+  reporterStatus = "Pending";  
+} else {  
+  reporterStatus = data[i].reporter;  
 }
 var archive = data[i].archive? 'Yes' : 'No';
 //   var row = `<tr>
@@ -855,7 +949,9 @@ gltable.row.add([
   data[i].bankvertical,
   data[i].phonenumber,
   data[i].visitingpersonname,
+  data[i].reportpersonname,
   engineerStatus,
+  reporterStatus,
   archive,
   data[i].reporterholdcause
 ]).draw(false);

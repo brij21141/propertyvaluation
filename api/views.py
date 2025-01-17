@@ -389,7 +389,8 @@ def engreportstatus(request,status,uid):
                               totalcompleted = ReceptionReport.objects.filter(engineer='Submitted').count()
                               inprogress = ReceptionReport.objects.filter(engineer='InProgress').count()
                               hold = ReceptionReport.objects.filter(engineer='Hold').count()
-                              pendingrequest = totalrequestnumber-(totalcompleted+inprogress+hold)
+                              # pendingrequest = totalrequestnumber-(totalcompleted+inprogress+hold)
+                              pendingrequest = totalrequestnumber-(totalcompleted+hold)
                               
                         else:
                               # receivedrequest=ReceptionReport.objects.exclude(engineer ='Submitted')
@@ -399,7 +400,8 @@ def engreportstatus(request,status,uid):
                               totalcompleted = ReceptionReport.objects.filter(visitingperson=uid, engineer='Submitted').count()
                               inprogress = ReceptionReport.objects.filter(visitingperson=uid, engineer='InProgress').count()
                               hold = ReceptionReport.objects.filter(visitingperson=uid, engineer='Hold').count()
-                              pendingrequest = totalrequestnumber-(totalcompleted+inprogress+hold)
+                              # pendingrequest = totalrequestnumber-(totalcompleted+inprogress+hold)
+                              pendingrequest = totalrequestnumber-(totalcompleted+hold)
                               
             dictengstatus={
                   "engstatus":[]
@@ -451,19 +453,23 @@ def reporterreportstatus(request,uid):
             # print(results)
                         if (userrole == "Admin" or userrole == "Reception"):
                               # receivedrequest=ReceptionReport.objects.exclude(engineer ='Submitted')
-                              totalrequestnumber = ReceptionReport.objects.filter(reportperson__gt=0).count()
+                              # totalrequestnumber = ReceptionReport.objects.filter(reportperson__gt=0).count()
+                              totalrequestnumber = ReceptionReport.objects.count()
                               totalcompleted = ReceptionReport.objects.filter(reporter='Submitted').count()
                               inprogress = ReceptionReport.objects.filter(reporter='InProgress').count()
                               hold = ReceptionReport.objects.filter(reporter='Hold').count()
-                              pendingrequest = totalrequestnumber-(totalcompleted+inprogress+hold)
+                              # pendingrequest = totalrequestnumber-(totalcompleted+inprogress+hold)
+                              pendingrequest = totalrequestnumber-(totalcompleted+hold)
                         else:
                               # receivedrequest=ReceptionReport.objects.exclude(engineer ='Submitted')
                               # totalrequestnumber = ReceptionReport.objects.filter(visitingpersonname=username).count()
-                              totalrequestnumber = ReceptionReport.objects.filter(reportpersonname=username).count()
+                              totalrequestnumber = ReceptionReport.objects.filter(Q(reportpersonname=username) | Q(reportperson=0)).count()
                               totalcompleted = ReceptionReport.objects.filter(reportpersonname=username, reporter='Submitted').count()
                               inprogress = ReceptionReport.objects.filter(reportpersonname=username, reporter='InProgress').count()
                               hold = ReceptionReport.objects.filter(reportpersonname=username, reporter='Hold').count()
-                              pendingrequest = totalrequestnumber-(totalcompleted+inprogress+hold)
+                              print(hold)
+                              # pendingrequest = totalrequestnumber-(totalcompleted+inprogress+hold)
+                              pendingrequest = totalrequestnumber-(totalcompleted+hold)
                               # print(totalrequestnumber-totalcompleted)
             
             dictrepstatus={
@@ -620,7 +626,7 @@ class EngineerViewSet(viewsets.ModelViewSet):
      @action(detail=False,methods=['get'])
      def engineerpendjob(self, request,pk=None):
       #     engineercompjob=EngineerReport.objects.filter(receptionid__engineer='Submitted').select_related('receptionid').values('receptionid__visitingpersonname', 'receptionid__phonenumber')
-          engineerpendjob=ReceptionReport.objects.filter(Q(engineer=None) | Q(engineer='null'))
+          engineerpendjob=ReceptionReport.objects.filter(Q(engineer=None) | Q(engineer='null') | Q(engineer='InProgress'))
           engineerpendjob_serializer=ReceptionSerializer(engineerpendjob,many=True,context={'request':request})
       #     return Response(engineercompjob_serializer.data)
           return Response({
@@ -638,6 +644,27 @@ class EngineerViewSet(viewsets.ModelViewSet):
             'success': True,
             'data': engineerinprogjob_serializer.data
              }, status=status.HTTP_200_OK)
+#http://127.0.0.1:8000/api/engineer/engineerholdjob/     
+     @action(detail=False,methods=['get'])
+     def engineerholdjob(self, request,pk=None):
+      #     engineercompjob=EngineerReport.objects.filter(receptionid__engineer='Submitted').select_related('receptionid').values('receptionid__visitingpersonname', 'receptionid__phonenumber')
+          engineerholdjob=ReceptionReport.objects.filter(engineer='Hold')  
+          engineerholdjob_serializer=ReceptionSerializer(engineerholdjob,many=True,context={'request':request})
+      #     return Response(engineercompjob_serializer.data)
+          return Response({
+            'success': True,
+            'data': engineerholdjob_serializer.data
+             }, status=status.HTTP_200_OK)
+#http://127.0.0.1:8000/api/engineer/engineerrecjob/     
+     @action(detail=False,methods=['get'])
+     def engineerrecjob(self, request,pk=None):
+          engineerrecjob=ReceptionReport.objects.all()  
+          engineerrecjob_serializer=ReceptionSerializer(engineerrecjob,many=True,context={'request':request})
+      #     return Response(engineercompjob_serializer.data)
+          return Response({
+            'success': True,
+            'data': engineerrecjob_serializer.data
+             }, status=status.HTTP_200_OK)
 #http://127.0.0.1:8000/api/engineer/25/engreportstatus       
      @action(detail=True,methods=['get'])
      def engreportstatus(self,request,pk):
@@ -649,7 +676,8 @@ class EngineerViewSet(viewsets.ModelViewSet):
             totalcompleted = ReceptionReport.objects.filter(visitingperson=pk, engineer='Submitted').count()
             inprogress = ReceptionReport.objects.filter(visitingperson=pk, engineer='InProgress').count()
             hold = ReceptionReport.objects.filter(visitingperson=pk, engineer='Hold').count()
-            pendingrequest = totalrequestnumber-(totalcompleted+inprogress+hold)
+            # pendingrequest = totalrequestnumber-(totalcompleted+inprogress+hold)
+            pendingrequest = totalrequestnumber-(totalcompleted+hold)
             return JsonResponse({'success': True,'message': messg,
                                  'tot':totalrequestnumber,
                                  'com':totalcompleted,
@@ -678,8 +706,8 @@ class ReporterViewSet(viewsets.ModelViewSet):
 # http://127.0.0.1:8000/api/reporter/reporterrecjob/     addin record of eng report api
      @action(detail=False, methods=['get'])
      def reporterrecjob(self, request, pk=None):
-          queryset = EngineerReport.objects.all()
-          queryset_serializer=EngineerSerializer(queryset,many=True,context={'request':request})
+          queryset = ReceptionReport.objects.all()
+          queryset_serializer=ReceptionSerializer(queryset,many=True,context={'request':request})
           return Response({'success': True, 'data': queryset_serializer.data}, status=status.HTTP_200_OK)  
           
 #http://127.0.0.1:8000/api/reporter/reportercomjob/
@@ -697,8 +725,8 @@ class ReporterViewSet(viewsets.ModelViewSet):
      @action(detail=False,methods=['get'])
      def reporterpendjob(self, request,pk=None):
       #     engineercompjob=EngineerReport.objects.filter(receptionid__engineer='Submitted').select_related('receptionid').values('receptionid__visitingpersonname', 'receptionid__phonenumber')
-          reporterpendjob=EngineerReport.objects.filter(Q(reporter=None) | Q(reporter='null'))
-          reporterpendjob_serializer=EngineerSerializer(reporterpendjob,many=True,context={'request':request})
+          reporterpendjob=ReceptionReport.objects.filter(Q(reporter=None) | Q(reporter='null') | Q(reporter='InProgress'))
+          reporterpendjob_serializer=ReceptionSerializer(reporterpendjob,many=True,context={'request':request})
       #     return Response(engineercompjob_serializer.data)
           return Response({
             'success': True,
@@ -708,7 +736,7 @@ class ReporterViewSet(viewsets.ModelViewSet):
      @action(detail=False,methods=['get'])
      def reporterinprogjob(self, request,pk=None):
       #     engineercompjob=EngineerReport.objects.filter(receptionid__engineer='Submitted').select_related('receptionid').values('receptionid__visitingpersonname', 'receptionid__phonenumber')
-          reporterinprogjob=EngineerReport.objects.filter(reporter='InProgress')  
+          reporterinprogjob=ReceptionReport.objects.filter(reporter='InProgress')  
           reporterinprogjob_serializer=EngineerSerializer(reporterinprogjob,many=True,context={'request':request})
       #     return Response(engineercompjob_serializer.data)
           return Response({
@@ -719,8 +747,8 @@ class ReporterViewSet(viewsets.ModelViewSet):
      @action(detail=False,methods=['get'])
      def reporterholdjob(self, request,pk=None):
       #     engineercompjob=EngineerReport.objects.filter(receptionid__engineer='Submitted').select_related('receptionid').values('receptionid__visitingpersonname', 'receptionid__phonenumber')
-          reporterholdjob=EngineerReport.objects.filter(reporter='Hold')  
-          reporterholdjob_serializer=EngineerSerializer(reporterholdjob,many=True,context={'request':request})
+          reporterholdjob=ReceptionReport.objects.filter(reporter='Hold')  
+          reporterholdjob_serializer=ReceptionSerializer(reporterholdjob,many=True,context={'request':request})
       #     return Response(engineercompjob_serializer.data)
           return Response({
             'success': True,
@@ -856,7 +884,10 @@ class DocumentgetView(APIView):
 def homedatefilter(request):
       stdate_str = request.GET.get('startdate')
       endate_str = request.GET.get('enddate')
-      
+      bankid = request.GET.get('bankid')
+      engstatus = request.GET.get('engstatus')
+      repstatus = request.GET.get('repstatus')
+      vertical = request.GET.get('vertical')
       
       # Add one day to endate
       
@@ -864,19 +895,37 @@ def homedatefilter(request):
       if stdate_str:
            stdate = datetime.strptime(stdate_str, "%Y-%m-%d").date()
            searchresults=ReceptionReport.objects.filter(datecreated__gte=stdate)
+           print("A")
       if endate_str:
            endate = datetime.strptime(endate_str, "%Y-%m-%d").date()
            endate = endate + timedelta(days=1)
            searchresults=ReceptionReport.objects.filter(datecreated__lte=endate)
+           print("B")
       if (stdate_str and endate_str):
            stdate = datetime.strptime(stdate_str, "%Y-%m-%d").date()
            endate = datetime.strptime(endate_str, "%Y-%m-%d").date()
            endate = endate + timedelta(days=1)
            searchresults=ReceptionReport.objects.filter(datecreated__range=(stdate,endate))
-      if not (stdate_str and endate_str):
+           print("C")
+      if (not stdate_str and not endate_str):
            searchresults=ReceptionReport.objects.all()
-      # searchresults=ReceptionReport.objects.filter(datecreated__range=(stdate,endate))
-      # searchresults=ReceptionReport.objects.filter(Q(datecreated__gte=stdate) & Q(datecreated__lte=endate))
+           print("D")
+      if bankid:
+            searchresults=searchresults.filter(bankid=bankid)
+      if engstatus:
+            if repstatus == "Pending":
+                  searchresults=searchresults.filter(Q(engineer__isnull=True ) | Q(engineer="InProgress"))
+            else:
+                  searchresults=searchresults.filter(engineer__icontains=engstatus)
+      if repstatus:
+            if repstatus == "Pending":
+                  searchresults=searchresults.filter(Q(reporter__isnull=True ) | Q(reporter="InProgress"))
+            else:
+                  searchresults=searchresults.filter(reporter__icontains=repstatus)
+      if vertical:
+            searchresults=searchresults.filter(bankvertical__icontains=vertical)
+      # other_field1__icontains  icontains is case insensitive and contains is case sensitive  need from django.db.models import Q 
+      
       serializer_result=ReceptionSerializer(searchresults,many=True,context={'request':request}) 
       # print(serializer_result)
       return JsonResponse({'success':True, 'data':serializer_result.data}, status=status.HTTP_200_OK)  

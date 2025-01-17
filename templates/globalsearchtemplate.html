@@ -16,7 +16,9 @@
                   <th scope="col">VERTICAL</th>
                   <th scope="col">PHONE</th>
                   <th scope="col">ASSIGNED VISITOR</th>
-                  <th scope="col">Status</th>
+                  <th scope="col">ASSIGNED REPORTER</th>
+                  <th scope="col">Engineer Status</th>
+                  <th scope="col">Reporter Status</th>
                   <th scope="col">Archived</th>
                   <th scope="col">Hold reason</th>
                   <!-- <th scope="col">View</th> -->
@@ -34,9 +36,18 @@
                   <td >{{recrep.bankvertical}}</td>
                   <td >{{recrep.phonenumber}}</td>
                   <td >{{recrep.visitingpersonname}}</td>
-                  <td {% if recrep.engineer != "Submitted" %} class="tablred my-2 mx-1" {% else %} class="tablgreen my-2 mx-1" {% endif %}  >
+                  <td >{{recrep.reportpersonname}}</td>
+                  <!-- <td {% if recrep.engineer != "Submitted" %} class="tablred my-2 mx-1" {% else %} class="tablgreen my-2 mx-1" {% endif %}  > -->
+                  <td >
                     {% if recrep.engineer == "Submitted" %} Completed
-                    {% elif recrep.engineer is none %} Pending
+                    {% elif recrep.engineer is none or recrep.engineer == "InProgress" %} Pending
+                    {% else %} {{recrep.engineer}}
+                    {% endif %}
+                    
+                  </td>
+                  <td>
+                    {% if recrep.reporter == "Submitted" %} Completed
+                    {% elif recrep.reporter is none or recrep.reporter == "InProgress" %} Pending
                     {% else %} {{recrep.engineer}}
                     {% endif %}
                     
@@ -59,14 +70,55 @@
               <tfoot>
                 <div style="display: flex; justify-content: space-between; align-items: center;">  
                   <h6 class="blink">Search Result</h6>  
-                  <div style="display: flex; align-items: center;"> 
+                  
+                  <div style="display: flex;justify-content: space-between; align-items: center;"> 
+                    <div class="itemglobdate me-2" style="margin-bottom: auto;">
+                      <label for="bankname">Bank</label>
+                      <select class="form-select" aria-label="Default select example" name="glbankid" id="glbankid">
+                        <option value="" >Select Bank</option>
+                        {% for bk in banks %}
+                           <option value="{{bk.id}}">{{bk.name}} {{bk.branch}} {{bk.city}}</option>
+                        {%  endfor %}
+                        
+                      </select>
+                  </div>
+                  <div class="itemglobdate" style="margin-bottom: auto;">
+                    <label for="vertical">Vertical</label> 
+                    <input type="text" id="vertical" placeholder="Vertical" /> 
+                  </div>
+                    <div class="itemglobdate me-2" style="margin-bottom: auto;">
+                      <label for="engstatus">Engineer status</label>
+                      <select class="form-select" aria-label="Default select example" name="engstatus" id="engstatus" >
+                        <option value="" >Select</option>
+                           <option value="Submitted">Completed</option>
+                           <option value="Pending">Pending</option>
+                           <option value="Hold">Hold</option>
+                        
+                      </select>
+                  </div>
+                    <div class="itemglobdate me-2" style="margin-bottom: auto;">
+                      <label for="repstatus">Reporter status</label>
+                      <select class="form-select" aria-label="Default select example" name="repstatus" id="repstatus" >
+                        <option value="" >Select</option>
+                           <option value="Submitted">Completed</option>
+                           <option value="Pending">Pending</option>
+                           <option value="Hold">Hold</option>
+                        
+                      </select>
+                  </div>
+                      <div class="itemglobdate" style="margin-bottom: auto;">
                       <label for="stdate">from</label> 
-                      <input type="date" id="stdate" placeholder="Start Date" />  
+                      <input type="date" id="stdate" placeholder="Start Date" /> <i class="fas fa-calendar-alt"></i> 
+                    </div>
+                    <div class="itemglobdate" >
                       <label for="endate">to</label>
-                      <input type="date" id="endate" placeholder="End Date" /> &nbsp;&nbsp;
+                      <input type="date" id="endate" placeholder="End Date" /><i class="fas fa-calendar-alt"></i> &nbsp;&nbsp;
+                    </div>
+                    <div class="">
                       <a type="button" class="homedatefilter" id="homedatefilter" ><i class="fa-solid fa-filter fa-2x"></i></a> &nbsp;&nbsp;
                       <a type="button" class="clearhomedatefilter" id="clearhomedatefilter" ><i class="fa-solid fa-brush fa-2x"></i></a> &nbsp;&nbsp;
                       <a type="button" onclick="clearsearch()"> <i class="fa-solid fa-xmark fa-2x"></i> </a>
+                      </div>
                   </div>  
               </div>
               </tfoot>

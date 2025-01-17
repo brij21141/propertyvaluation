@@ -363,6 +363,6 @@ a.sidebar-link:hover {
 
 .item {  
     padding: 5px;  
-    border-bottom: 1px solid #eee; /* Optional styling for items */  
+    /* border-bottom: 1px solid #eee; Optional styling for items */  
 }  
   

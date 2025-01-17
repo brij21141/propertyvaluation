@@ -81,6 +81,33 @@
   {% include 'globalsearchtemplate.html' %}
         <div class="row my-2">
           <div class="col-md-3">
+            <div class="card text-center">
+                <div class="card-body">
+                  <span id="tot"></span>
+                  <a href="#" id="engrecrep" type="button" class="float-end" data-bs-toggle="modal" data-bs-target="#myModal"> <i class="fa-regular fa-eye fa-2x float-end"></i></a>
+                  <br><br>Request Received by Engineer
+                </div>
+              </div>
+        </div>
+        <div class="col-md-3">
+          <div class="card text-center">
+              <div class="card-body">
+                <span id="hold"></span>
+                <a href="#" id="enghold" type="button" class="float-end"  data-bs-toggle="modal" data-bs-target="#myModal"> <i class="fa-regular fa-eye fa-2x float-end"></i></a>
+                <br><br> Hold by Engineer
+              </div>
+            </div>
+      </div>
+      <div class="col-md-3">
+        <div class="card text-center">
+            <div class="card-body">
+              <span id="pend"></span>
+              <a href="#" id="engpend" type="button" class="float-end" data-bs-toggle="modal" data-bs-target="#myModal"> <i class="fa-regular fa-eye fa-2x float-end"></i></a>
+              <br><br>Pending by Engineers
+            </div>
+          </div>
+    </div>
+          <div class="col-md-3">
               <div class="card text-center">
                   <div class="card-body">
                     <span id="comp" ></span>
@@ -89,16 +116,8 @@
                                    </div>
                 </div>
           </div>
-          <div class="col-md-3">
-              <div class="card text-center">
-                  <div class="card-body">
-                    <span id="pend"></span>
-                    <a href="#" id="engpend" type="button" class="float-end" data-bs-toggle="modal" data-bs-target="#myModal"> <i class="fa-regular fa-eye fa-2x float-end"></i></a>
-                    <br><br>Pending by Engineers
-                  </div>
-                </div>
-          </div>
-          <div class="col-md-3">
+          
+          <!-- <div class="col-md-3">
               <div class="card text-center">
                   <div class="card-body">
                     <span id="inprog"></span>
@@ -106,7 +125,7 @@
                     <br><br>Engineers inprogress
                   </div>
                 </div>
-          </div>
+          </div> -->
           </div>
       <div class="row my-3">
         <div class="col-md-3">
@@ -118,7 +137,7 @@
                 </div>
               </div>
         </div>
-        <div class="col-md-2">
+        <!-- <div class="col-md-2">
             <div class="card text-center">
                 <div class="card-body">
                   <span id="rinprog"></span>
@@ -126,9 +145,9 @@
                   <br><br>Reporters inprogress
                 </div>
               </div>
-        </div>
+        </div> -->
         
-        <div class="col-md-2">
+        <div class="col-md-3">
             <div class="card text-center">
                 <div class="card-body">
                   <span id="rhold"></span>
@@ -137,7 +156,7 @@
                 </div>
               </div>
         </div>
-        <div class="col-md-2">
+        <div class="col-md-3">
           <div class="card text-center">
               <div class="card-body">
                 <span id="rpend"></span>
@@ -222,14 +241,14 @@
                       <i class="fa fa-pencil" aria-hidden="true"></i></a>&nbsp;&nbsp;
                     <a class="priorit" data-url="{% url 'recepreportpriority' recrep.id %}" href="#"  {% if recrep.priority%}  style="color: red;" {%else%} style="color: green;"{% endif %} title="Set High Priority">
                       <i class="fa-solid fa-gauge-high" ></i></a>
-                      <label class="switch">  
+                      <!-- <label class="switch">  
                         {% if recrep.npa %}
                         <input type="checkbox" checked data-url="{% url 'recepreportnpa' recrep.id %}" id="toggle" class="toggle" onchange="toggleFunction(this.checked,{{recrep.id}})">
                         {% else %}  
                         <input type="checkbox" data-url="{% url 'recepreportnpa' recrep.id %}" id="toggle" class="toggle" onchange="toggleFunction(this.checked,{{recrep.id}})"> 
                         {% endif %} 
                         <span class="slider round"></span>  
-                      </label> 
+                      </label>  -->
                   </td> 
                   </tr>
                 {% endfor %}

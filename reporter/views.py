@@ -1,8 +1,8 @@
 from django.shortcuts import render,redirect
 import googlemaps.client
-from site_engineer.models import EngineerReport
+from site_engineer.models import EngineerReport,EngDynamicdValue
 from reception.models import ReceptionReport, Document
-from reporter.models import ReporterReport
+from reporter.models import ReporterReport,RepDynamicdValue
 from datetime import datetime
 from propval.models import UserDetails,Impdoc
 from django.db.models import Q
@@ -11,16 +11,24 @@ from django.views import View
 import googlemaps
 from django.conf import settings
 from django.core.files.storage import default_storage
-from propval.models import Banks
+from propval.models import Banks,EngDynamicField,EngFormOptionValues,EngFormsubOptionValues
 import os,requests,time
 from django.utils import timezone
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from rest_framework.authtoken.models import Token
+from django.utils.text import slugify
+from django.db.models import OuterRef, Subquery  
+
 # Create your views here.
 
 def add_report(request,repid):
     er=EngineerReport.objects.get(pk=repid)
+    subquery = EngDynamicdValue.objects.filter(
+            engreportid=repid,
+            input_field_id=OuterRef('input_field_id')
+            ).order_by('id').values('id')[:1]
+    engdynamicvalues = EngDynamicdValue.objects.filter(id__in=Subquery(subquery))
     if request.user.is_authenticated:
         useremail = request.user.email
         userid = User.objects.get(email=useremail)
@@ -28,9 +36,14 @@ def add_report(request,repid):
             username = UserDetails.objects.get(user_email=useremail).first_name+" "+UserDetails.objects.get(user_email=useremail).last_name
             userrole = UserDetails.objects.get(user_email=useremail).role
             uid = UserDetails.objects.get(user_email=useremail).user_id
+    try: 
+            engdynamicfields=EngDynamicField.objects.filter(active=True,form_type = "Reporter form")
+    except:
+            engdynamicfields=[]
+
 
     if request.method == "POST":
-        
+        # print (request.POST)
         rre=request.POST
         # print(rre['appno'])
         # print(rre['propertytype'])
@@ -42,113 +55,118 @@ def add_report(request,repid):
         rr.name=rre['custname']
         rr.docholdername=rre['dname']
         # print(rre['propertytype'])
-        try:
-            rr.propertytype=rre['propertytype']
-        except Exception as e:
-            rr.propertytype=None
+        # try:
+        #     rr.propertytype=rre['propertytype']
+        # except Exception as e:
+        #     rr.propertytype=None
         rr.add1=rre['add1']
         rr.add2=rre['add2']
         rr.city=rre['city']
         rr.region=rre['region']
+        print(request.POST.get('region'))
         rr.zip=rre['zip']
         rr.country=rre['country']
-        rr.landmark=rre['landmark']
-        rr.ladd1=rre['ladd1']
-        rr.ladd2=rre['ladd2']
-        rr.lcity=rre['lcity']
-        rr.lregion=rre['lregion']
-        rr.lzip=rre['lzip']
-        rr.lcountry=rre['lcountry']
-        rr.wardlandno=rre['ward']
-        rr.approachroadwidth=rre['aroadwidth']
-        rr.plotdem=rre['plotds']
-        rr.vicinity=rre['vicinity']
-        rr.propertylocation=rre['proplocation']
-        rr.propertyidentification=rre['propident']
-        rr.connectivityinfrastructure=rre['connectivity']
-        rr.railwaystation=rre['rly']
-        rr.busstop=rre['bus']
-        rr.hospital=rre['hosp']
-        rr.nearestlandmark=rre['nlandmark']
-        rr.typeusageproperty=rre['usagetype']
-        rr.additionalamenities=rre['addaminity']
-        rr.legalstatusproperty=rre['lsp']
-        rr.typepremises=rre['permissiontype']
-        rr.taxationmaintancecost=rre['taxation']
+        rr.propertytype=rre['property-type']
+        rr.propertysubtype=rre['subproperty-type']
+        rr.replat=rre['replat']
+        rr.replng=rre['replng']
+        # rr.landmark=rre['landmark']
+        # rr.ladd1=rre['ladd1']
+        # rr.ladd2=rre['ladd2']
+        # rr.lcity=rre['lcity']
+        # rr.lregion=rre['lregion']
+        # rr.lzip=rre['lzip']
+        # rr.lcountry=rre['lcountry']
+        # rr.wardlandno=rre['ward']
+        # rr.approachroadwidth=rre['aroadwidth']
+        # rr.plotdem=rre['plotds']
+        # rr.vicinity=rre['vicinity']
+        # rr.propertylocation=rre['proplocation']
+        # rr.propertyidentification=rre['propident']
+        # rr.connectivityinfrastructure=rre['connectivity']
+        # rr.railwaystation=rre['rly']
+        # rr.busstop=rre['bus']
+        # rr.hospital=rre['hosp']
+        # rr.nearestlandmark=rre['nlandmark']
+        # rr.typeusageproperty=rre['usagetype']
+        # rr.additionalamenities=rre['addaminity']
+        # rr.legalstatusproperty=rre['lsp']
+        # rr.typepremises=rre['permissiontype']
+        # rr.taxationmaintancecost=rre['taxation']
 
-        rr.rentingpotential=rre['rentedpotential']
-        rr.marketrentals=rre['mktrental']
-        rr.occupiedby=rre['occupiedby']
-        rr.ispropertyrented=rre['rentedproperty']
-        rr.listofoccupants=rre['roadwidth']
-        rr.perdcboundryeast=rre['eastboundary']
-        rr.perstboundrywest=rre['westboundary']
-        rr.perdcboundrynorth=rre['northboundary']
-        rr.perdcboundrysouth=rre['southboundar']
+        # rr.rentingpotential=rre['rentedpotential']
+        # rr.marketrentals=rre['mktrental']
+        # rr.occupiedby=rre['occupiedby']
+        # rr.ispropertyrented=rre['rentedproperty']
+        # rr.listofoccupants=rre['roadwidth']
+        # rr.perdcboundryeast=rre['eastboundary']
+        # rr.perstboundrywest=rre['westboundary']
+        # rr.perdcboundrynorth=rre['northboundary']
+        # rr.perdcboundrysouth=rre['southboundar']
 
-        rr.perstboundryeast=rre['seastboundary']
-        rr.perstboundrywest=rre['swestboundary']
-        rr.perstboundrynorth=rre['snorthboundary']
-        rr.perstboundrysouth=rre['ssouthboundary']
+        # rr.perstboundryeast=rre['seastboundary']
+        # rr.perstboundrywest=rre['swestboundary']
+        # rr.perstboundrynorth=rre['snorthboundary']
+        # rr.perstboundrysouth=rre['ssouthboundary']
 
-        rr.typestructure=rre['structtype']
-        rr.nofloors=rre['nofloor']
-        rr.nowings=rre['wingsno']
-        rr.nouniteachfloor=rre['flunitno']
-        rr.nolifteachwing=rre['wingliftno']
-        rr.ageproperty=rre['propertyage']
-        rr.futurelife=rre['estfutlife']
-        rr.exterior=rre['exteriors']
-        rr.internalcomposition=rre['propcomsition']
-        rr.constructionquality=rre['constqualty']
-        rr.beamcolumnstru=rre['clmstruct']
-        rr.commonarearemark=rre['commremarks']
-        rr.otherobservation=rre['otherobsr']
-        rr.floornfinish=rre['interrfinish']
-        rr.roofingnterracing=rre['roofterr']
-        rr.nooflifts=rre['nolifts']
-        rr.qualityfixing=rre['qltfix']
-        rr.constasperaprove=rre['consancplan']
-        rr.aprnodate=rre['apvnodate']
-        rr.constnodate=rre['consperdate']
-        rr.violationifany=rre['violrisk']
-        rr.confirmlocalbilaws=rre['lclbilaw']
-        rr.otherverifieddoc=rre['docverified']
-        rr.carpetareaflwise=rre['cafw']
-        rr.aprovbuaflwise=rre['apbuaflw']
-        rr.govtapprovalrate=rre['cgarate']
-        rr.recomendrate=rre['recmdrate']
-        rr.mktvalueinfig=rre['fmvrsinfig']
-        rr.mktvalueinwords=rre['fmvrsinwords']
-        rr.forcessalesless=rre['fslless']
-        rr.arearatepsft=rre['fsratepsqf']
-        rr.areavalueinfig=rre['amountinfig']
-        rr.areavalueinwords=rre['amountinwrods']
+        # rr.typestructure=rre['structtype']
+        # rr.nofloors=rre['nofloor']
+        # rr.nowings=rre['wingsno']
+        # rr.nouniteachfloor=rre['flunitno']
+        # rr.nolifteachwing=rre['wingliftno']
+        # rr.ageproperty=rre['propertyage']
+        # rr.futurelife=rre['estfutlife']
+        # rr.exterior=rre['exteriors']
+        # rr.internalcomposition=rre['propcomsition']
+        # rr.constructionquality=rre['constqualty']
+        # rr.beamcolumnstru=rre['clmstruct']
+        # rr.commonarearemark=rre['commremarks']
+        # rr.otherobservation=rre['otherobsr']
+        # rr.floornfinish=rre['interrfinish']
+        # rr.roofingnterracing=rre['roofterr']
+        # rr.nooflifts=rre['nolifts']
+        # rr.qualityfixing=rre['qltfix']
+        # rr.constasperaprove=rre['consancplan']
+        # rr.aprnodate=rre['apvnodate']
+        # rr.constnodate=rre['consperdate']
+        # rr.violationifany=rre['violrisk']
+        # rr.confirmlocalbilaws=rre['lclbilaw']
+        # rr.otherverifieddoc=rre['docverified']
+        # rr.carpetareaflwise=rre['cafw']
+        # rr.aprovbuaflwise=rre['apbuaflw']
+        # rr.govtapprovalrate=rre['cgarate']
+        # rr.recomendrate=rre['recmdrate']
+        # rr.mktvalueinfig=rre['fmvrsinfig']
+        # rr.mktvalueinwords=rre['fmvrsinwords']
+        # rr.forcessalesless=rre['fslless']
+        # rr.arearatepsft=rre['fsratepsqf']
+        # rr.areavalueinfig=rre['amountinfig']
+        # rr.areavalueinwords=rre['amountinwrods']
         rr.landarea=rre['landarea']
-        rr.govtaprovelandrate=rre['fgarate']
+        # rr.govtaprovelandrate=rre['fgarate']
         rr.recommendedlandrate=rre['recomndrate']
+        rr.govtaprovelandrate=''
         rr.landvalue=rre['landrate']
-        rr.actualbua=rre['actbua']
-        rr.asperpermissionbua=rre['buaasapprov']
-        rr.constcostperaminity=rre['costameniti']
-        rr.totalconstvalue=rre['aprovval']
-        rr.depreciatedconstvalue=rre['depval']
-        rr.landvaluedepndepconstvalueinfig=rre['drpsa']
-        rr.landvaluedepndepconstvalueinword=rre['drpsw']
-        rr.forcesalevaluepersqft=rre['fratepsqf']
-        rr.forcesvalueinfig=rre['frpsa']
-        rr.forcesvalueinword=rre['frpsw']
-        rr.marketibility=rre['mkt']
-        rr.valuationresult=rre['valueresult']
+        # rr.actualbua=rre['actbua']
+        # rr.asperpermissionbua=rre['buaasapprov']
+        # rr.constcostperaminity=rre['costameniti']
+        # rr.totalconstvalue=rre['aprovval']
+        # rr.depreciatedconstvalue=rre['depval']
+        # rr.landvaluedepndepconstvalueinfig=rre['drpsa']
+        # rr.landvaluedepndepconstvalueinword=rre['drpsw']
+        # rr.forcesalevaluepersqft=rre['fratepsqf']
+        # rr.forcesvalueinfig=rre['frpsa']
+        # rr.forcesvalueinword=rre['frpsw']
+        # rr.marketibility=rre['mkt']
+        # rr.valuationresult=rre['valueresult']
         rr.userdetailsid=userid
         rr.receptionid=ReceptionReport.objects.get(pk=er.receptionid_id,applicationnumber=rre['appno']) 
         rr.bankid=Banks.objects.get(pk = ReceptionReport.objects.get(pk=er.receptionid_id,applicationnumber=rre['appno']).bankid ) 
-        # print(ReceptionReport.objects.get(pk=er.receptionid_id,applicationnumber=rre['appno']).bankid)
-        # return False
         rr.remark = rre['remark']
         # Geo lat long and place id
         if(rre['add1'] and rre['city'] and rre['region'] and rre['country']  and rre['zip'] != None):
-                address_string = str(rre['add1'])+','+str(rre['add2'])+','+str(rre['region'])+','+str(rre['city'])+','+str(rre['country'])+','+str(rre['landmark'])+',',str(rre['zip'])
+                # address_string = str(rre['add1'])+','+str(rre['add2'])+','+str(rre['region'])+','+str(rre['city'])+','+str(rre['country'])+','+str(rre['landmark'])+',',str(rre['zip'])
+                address_string = str(rre['add1'])+','+str(rre['add2'])+','+str(rre['region'])+','+str(rre['city'])+','+str(rre['country'])+','+str(rre['zip'])
                 gmap =  googlemaps.Client(key=settings.GOOGLE_MAPS_API_KEY)
                 result = gmap.geocode(address_string)[0]
 
@@ -160,6 +178,41 @@ def add_report(request,repid):
         rr.save()
 
         newrecid=rr.id
+        floorsengid = ReporterReport.objects.get(pk = newrecid)
+
+        for field in engdynamicfields:  
+                if(field.input_type == 'checkbox'): 
+                    field_value = request.POST.getlist(field.label.replace(' ', '-').lower())
+                    for fld in field_value: 
+                        RepDynamicdValue.objects.create(input_field=field,value=fld,engreportid=floorsengid)
+                else:
+                     if(field.input_type == 'select'):
+                        optionvalue = request.POST.get(field.label.replace(' ', '-').lower()) 
+                        try: 
+                            field_value= EngFormOptionValues.objects.get(pk=int(optionvalue)).opt_value
+                        except:
+                            field_value=None
+                        field_valuea=None
+                        if field.suboption:
+                            sublabel = f'sub{field.label.replace(" ", "-").lower()}'
+                            optionsubvalue = request.POST.get(sublabel)
+                            try: 
+                                field_valuea= EngFormsubOptionValues.objects.get(pk=int(optionsubvalue)).name
+                            except:
+                                field_valuea=None
+                        # print(optionsubvalue, field_value)
+                        # form_data[field.label] = field_value  
+                        RepDynamicdValue.objects.create(input_field=field,value=field_value,subvalue=field_valuea,engreportid=floorsengid)  
+                     else:
+                            
+                        field_value = request.POST.get(field.label.replace(' ', '-').lower()) 
+                        # sublabel = f'sub{field.label.replace(" ", "-").lower()}'
+                        field_valuea=None
+                        # field_valuea = request.POST.get(sublabel) 
+                        # print(sublabel)
+                        # form_data[field.label] = field_value  
+                        RepDynamicdValue.objects.create(input_field=field,value=field_value,subvalue=field_valuea,engreportid=floorsengid)
+
         uploaded_files = request.FILES.getlist('reporterFiles') 
         for uploaded_file in uploaded_files:
             newfilename = rre['appno'] + "_"+str(newrecid)+"_" +str(time.time())+'_'+ uploaded_file.name
@@ -203,8 +256,11 @@ def add_report(request,repid):
             states=[{'state_name':'Madhya Pradesh','state_id':20}, {'state_name':'Uttar Pradesh'}, {'state_name':'Rajsthan'}, {'state_name':'Delhi'}]
     except requests.ConnectionError:
         states=[{'state_name':'Madhya Pradesh','state_id':20}, {'state_name':'Uttar Pradesh'}, {'state_name':'Rajsthan'}, {'state_name':'Delhi'}]
+    # print(states)
     invdate=er.datecreated.strftime("%Y-%m-%d")
-    return render(request,"reporter/reporterform.html",{'requestreceived':er,'states':states,'invdate':invdate})
+    optvalues = EngFormOptionValues.objects.select_related('eng_dynamic_field').all()
+    suboptions = EngFormsubOptionValues.objects.select_related('main_option').all()
+    return render(request,"reporter/reporterform.html",{'requestreceived':er,'dynamicrequestreceived':engdynamicvalues,'states':states,'invdate':invdate,'engdynamicfields':engdynamicfields,'optvalues':optvalues,'suboptions':suboptions})
 @login_required(login_url='login')
 def reporterhome(request):
     
@@ -236,32 +292,40 @@ def reporterhome(request):
             # print(results)
             if userrole == "Admin":
                   allreport=ReceptionReport.objects.all()
+                  banks= Banks.objects.all().values('id','name','branch','city')
                 #   allreport=EngineerReport.objects.all()
                 #   receivedrequest1=EngineerReport.objects.exclude(reporter ='Submitted').order_by('-priority','-updated_at')
-                  receivedrequest=ReceptionReport.objects.exclude(reporter ='Submitted').filter(reportperson__gt=0).order_by('-priority','-updated_at')
+                #   receivedrequest=ReceptionReport.objects.exclude(reporter ='Submitted').filter(reportperson__gt=0).order_by('-priority','-updated_at')
+                  receivedrequest=ReceptionReport.objects.exclude(reporter ='Submitted').order_by('-priority','-updated_at')
                 #   print(receivedrequest)
                   completedrequest=ReporterReport.objects.all().order_by('-updated_at')
                 #   print(EngineerReport.objects.get(pk=13).userdetailsid.first_name)
                 #   totalrequestnumber = EngineerReport.objects.count()
-                  totalrequestnumber = ReceptionReport.objects.filter(reportperson__gt=0).count()
+                #   totalrequestnumber = ReceptionReport.objects.filter(reportperson__gt=0).count()
+                  totalrequestnumber = ReceptionReport.objects.count()
                   totalcompleted = ReceptionReport.objects.filter(reporter='Submitted').count()
                   inprogress = ReceptionReport.objects.filter(reporter='InProgress').count()
                   hold = ReceptionReport.objects.filter(reporter='Hold').count()
-                  pendingrequest = totalrequestnumber-(totalcompleted+inprogress+hold)
+                #   pendingrequest = totalrequestnumber-(totalcompleted+inprogress+hold)
+                  pendingrequest = totalrequestnumber-(totalcompleted+hold)
                   
             else:
                   allreport= ReceptionReport.objects.all()
+                  banks= Banks.objects.all().values('id','name','branch','city')
                 #   allreport=EngineerReport.objects.filter(Q(receptionid__reportperson=userid) | Q(receptionid__reportperson=0))
                 #   receivedrequest1=EngineerReport.objects.exclude(reporter ='Submitted').filter(Q(receptionid__reportperson=userid) | Q(receptionid__reportperson=0)).order_by('-priority','-updated_at')
                 #   receivedrequest = ReceptionReport.objects.exclude(reporter ='Submitted').filter(Q(reportperson=userid) | Q(reportperson__gt=0)).order_by('-priority','-updated_at')
-                  receivedrequest = ReceptionReport.objects.exclude(reporter ='Submitted').filter(Q(reportperson=userid) ).order_by('-priority','-updated_at')
+                #   receivedrequest = ReceptionReport.objects.exclude(reporter ='Submitted').filter(reportperson=userid ).order_by('-priority','-updated_at')
+                  receivedrequest = ReceptionReport.objects.exclude(reporter ='Submitted').filter(Q(reportperson=userid) | Q(reportperson=0) ).order_by('-priority','-updated_at')
                   completedrequest=ReporterReport.objects.filter(receptionid__reportperson=userid).order_by('-updated_at')
                 #   totalrequestnumber = EngineerReport.objects.filter(receptionid__reportperson=userid).count()
-                  totalrequestnumber = ReceptionReport.objects.filter(reportperson=userid).count()
+                  totalrequestnumber = ReceptionReport.objects.filter(Q(reportperson=userid) | Q(reportperson=0)).count()
                   totalcompleted = ReceptionReport.objects.filter(reportperson=userid, reporter='Submitted').count()
                   inprogress = ReceptionReport.objects.filter(reportperson=userid, reporter='InProgress').count()
                   hold = ReceptionReport.objects.filter(reportperson=userid, reporter='Hold').count()
-                  pendingrequest = totalrequestnumber-(totalcompleted+inprogress+hold)
+                  print(hold)
+                #   pendingrequest = totalrequestnumber-(totalcompleted+inprogress+hold)
+                  pendingrequest = totalrequestnumber-(totalcompleted+hold)
                   
             totunassigned=ReceptionReport.objects.filter(reportperson=0).count()
 
@@ -284,6 +348,7 @@ def reporterhome(request):
     return render(request,"reporter/reporterhome.html",
                   {'requestreceived':receivedrequest,
                    'allreports':allreport,
+                   'banks':banks,
                    'totreq':totalrequestnumber,
                    'requestcompleted':completedrequest,
                    'compreq':totalcompleted,
@@ -323,105 +388,108 @@ def update_report(request,repid):
         rr.inspectiondate = rre['inspdate']
         rr.name=rre['custname']
         rr.docholdername=rre['dname']
-        rr.propertytype=rre['propertytype']
+        rr.propertytype=rre['property-type']
+        rr.propertysubtype=rre['subproperty-type']
+        rr.replat=rre['replat']
+        rr.replng=rre['replng']
         rr.add1=rre['add1']
         rr.add2=rre['add2']
         rr.city=rre['city']
         rr.region=rre['region']
         rr.zip=rre['zip']
         rr.country=rre['country']
-        rr.landmark=rre['landmark']
-        rr.ladd1=rre['ladd1']
-        rr.ladd2=rre['ladd2']
-        rr.lcity=rre['lcity']
-        rr.lregion=rre['lregion']
-        rr.lzip=rre['lzip']
-        rr.lcountry=rre['lcountry']
-        rr.wardlandno=rre['ward']
-        rr.approachroadwidth=rre['aroadwidth']
-        rr.plotdem=rre['plotds']
-        rr.vicinity=rre['vicinity']
-        rr.propertylocation=rre['proplocation']
-        rr.propertyidentification=rre['propident']
-        rr.connectivityinfrastructure=rre['connectivity']
-        rr.railwaystation=rre['rly']
-        rr.busstop=rre['bus']
-        rr.hospital=rre['hosp']
-        rr.nearestlandmark=rre['nlandmark']
-        rr.typeusageproperty=rre['usagetype']
-        rr.additionalamenities=rre['addaminity']
-        rr.legalstatusproperty=rre['lsp']
-        rr.typepremises=rre['permissiontype']
-        rr.taxationmaintancecost=rre['taxation']
+        # rr.landmark=rre['landmark']
+        # rr.ladd1=rre['ladd1']
+        # rr.ladd2=rre['ladd2']
+        # rr.lcity=rre['lcity']
+        # rr.lregion=rre['lregion']
+        # rr.lzip=rre['lzip']
+        # rr.lcountry=rre['lcountry']
+        # rr.wardlandno=rre['ward']
+        # rr.approachroadwidth=rre['aroadwidth']
+        # rr.plotdem=rre['plotds']
+        # rr.vicinity=rre['vicinity']
+        # rr.propertylocation=rre['proplocation']
+        # rr.propertyidentification=rre['propident']
+        # rr.connectivityinfrastructure=rre['connectivity']
+        # rr.railwaystation=rre['rly']
+        # rr.busstop=rre['bus']
+        # rr.hospital=rre['hosp']
+        # rr.nearestlandmark=rre['nlandmark']
+        # rr.typeusageproperty=rre['usagetype']
+        # rr.additionalamenities=rre['addaminity']
+        # rr.legalstatusproperty=rre['lsp']
+        # rr.typepremises=rre['permissiontype']
+        # rr.taxationmaintancecost=rre['taxation']
 
-        rr.rentingpotential=rre['rentedpotential']
-        rr.marketrentals=rre['mktrental']
-        rr.occupiedby=rre['occupiedby']
-        rr.ispropertyrented=rre['rentedproperty']
-        rr.listofoccupants=rre['roadwidth']
-        rr.perdcboundryeast=rre['eastboundary']
-        rr.perstboundrywest=rre['westboundary']
-        rr.perdcboundrynorth=rre['northboundary']
-        rr.perdcboundrysouth=rre['southboundar']
+        # rr.rentingpotential=rre['rentedpotential']
+        # rr.marketrentals=rre['mktrental']
+        # rr.occupiedby=rre['occupiedby']
+        # rr.ispropertyrented=rre['rentedproperty']
+        # rr.listofoccupants=rre['roadwidth']
+        # rr.perdcboundryeast=rre['eastboundary']
+        # rr.perstboundrywest=rre['westboundary']
+        # rr.perdcboundrynorth=rre['northboundary']
+        # rr.perdcboundrysouth=rre['southboundar']
 
-        rr.perstboundryeast=rre['seastboundary']
-        rr.perstboundrywest=rre['swestboundary']
-        rr.perstboundrynorth=rre['snorthboundary']
-        rr.perstboundrysouth=rre['ssouthboundary']
+        # rr.perstboundryeast=rre['seastboundary']
+        # rr.perstboundrywest=rre['swestboundary']
+        # rr.perstboundrynorth=rre['snorthboundary']
+        # rr.perstboundrysouth=rre['ssouthboundary']
 
-        rr.typestructure=rre['structtype']
-        rr.nofloors=rre['nofloor']
-        rr.nowings=rre['wingsno']
-        rr.nouniteachfloor=rre['flunitno']
-        rr.nolifteachwing=rre['wingliftno']
-        rr.ageproperty=rre['propertyage']
-        rr.futurelife=rre['estfutlife']
-        rr.exterior=rre['exteriors']
-        rr.internalcomposition=rre['propcomsition']
-        rr.constructionquality=rre['constqualty']
-        rr.beamcolumnstru=rre['clmstruct']
-        rr.commonarearemark=rre['commremarks']
-        rr.otherobservation=rre['otherobsr']
-        rr.floornfinish=rre['interrfinish']
-        rr.roofingnterracing=rre['roofterr']
-        rr.nooflifts=rre['nolifts']
-        rr.qualityfixing=rre['qltfix']
-        rr.constasperaprove=rre['consancplan']
-        rr.aprnodate=rre['apvnodate']
-        rr.constnodate=rre['consperdate']
-        rr.violationifany=rre['violrisk']
-        rr.confirmlocalbilaws=rre['lclbilaw']
-        rr.otherverifieddoc=rre['docverified']
-        rr.carpetareaflwise=rre['cafw']
-        rr.aprovbuaflwise=rre['apbuaflw']
-        rr.govtapprovalrate=rre['cgarate']
-        rr.recomendrate=rre['recmdrate']
-        rr.mktvalueinfig=rre['fmvrsinfig']
-        rr.mktvalueinwords=rre['fmvrsinwords']
-        rr.forcessalesless=rre['fslless']
-        rr.arearatepsft=rre['fsratepsqf']
-        rr.areavalueinfig=rre['amountinfig']
-        rr.areavalueinwords=rre['amountinwrods']
+        # rr.typestructure=rre['structtype']
+        # rr.nofloors=rre['nofloor']
+        # rr.nowings=rre['wingsno']
+        # rr.nouniteachfloor=rre['flunitno']
+        # rr.nolifteachwing=rre['wingliftno']
+        # rr.ageproperty=rre['propertyage']
+        # rr.futurelife=rre['estfutlife']
+        # rr.exterior=rre['exteriors']
+        # rr.internalcomposition=rre['propcomsition']
+        # rr.constructionquality=rre['constqualty']
+        # rr.beamcolumnstru=rre['clmstruct']
+        # rr.commonarearemark=rre['commremarks']
+        # rr.otherobservation=rre['otherobsr']
+        # rr.floornfinish=rre['interrfinish']
+        # rr.roofingnterracing=rre['roofterr']
+        # rr.nooflifts=rre['nolifts']
+        # rr.qualityfixing=rre['qltfix']
+        # rr.constasperaprove=rre['consancplan']
+        # rr.aprnodate=rre['apvnodate']
+        # rr.constnodate=rre['consperdate']
+        # rr.violationifany=rre['violrisk']
+        # rr.confirmlocalbilaws=rre['lclbilaw']
+        # rr.otherverifieddoc=rre['docverified']
+        # rr.carpetareaflwise=rre['cafw']
+        # rr.aprovbuaflwise=rre['apbuaflw']
+        # rr.govtapprovalrate=rre['cgarate']
+        # rr.recomendrate=rre['recmdrate']
+        # rr.mktvalueinfig=rre['fmvrsinfig']
+        # rr.mktvalueinwords=rre['fmvrsinwords']
+        # rr.forcessalesless=rre['fslless']
+        # rr.arearatepsft=rre['fsratepsqf']
+        # rr.areavalueinfig=rre['amountinfig']
+        # rr.areavalueinwords=rre['amountinwrods']
         rr.landarea=rre['landarea']
-        rr.govtaprovelandrate=rre['fgarate']
+        # rr.govtaprovelandrate=rre['fgarate']
         rr.recommendedlandrate=rre['recomndrate']
         rr.landvalue=rre['landrate']
-        rr.actualbua=rre['actbua']
-        rr.asperpermissionbua=rre['buaasapprov']
-        rr.constcostperaminity=rre['costameniti']
-        rr.totalconstvalue=rre['aprovval']
-        rr.depreciatedconstvalue=rre['depval']
-        rr.landvaluedepndepconstvalueinfig=rre['drpsa']
-        rr.landvaluedepndepconstvalueinword=rre['drpsw']
-        rr.forcesalevaluepersqft=rre['fratepsqf']
-        rr.forcesvalueinfig=rre['frpsa']
-        rr.forcesvalueinword=rre['frpsw']
-        rr.marketibility=rre['mkt']
-        rr.valuationresult=rre['valueresult']
+        # rr.actualbua=rre['actbua']
+        # rr.asperpermissionbua=rre['buaasapprov']
+        # rr.constcostperaminity=rre['costameniti']
+        # rr.totalconstvalue=rre['aprovval']
+        # rr.depreciatedconstvalue=rre['depval']
+        # rr.landvaluedepndepconstvalueinfig=rre['drpsa']
+        # rr.landvaluedepndepconstvalueinword=rre['drpsw']
+        # rr.forcesalevaluepersqft=rre['fratepsqf']
+        # rr.forcesvalueinfig=rre['frpsa']
+        # rr.forcesvalueinword=rre['frpsw']
+        # rr.marketibility=rre['mkt']
+        # rr.valuationresult=rre['valueresult']
         rr.remark = rre['remark']
         # Geo data lat, long, placeid
         if(rre['add1'] and rre['city'] and rre['region'] and rre['country']  and rre['zip'] != None):
-                address_string = str(rre['add1'])+','+str(rre['add2'])+','+str(rre['region'])+','+str(rre['city'])+','+str(rre['country'])+','+str(rre['landmark'])+',',str(rre['zip'])
+                address_string = str(rre['add1'])+','+str(rre['add2'])+','+str(rre['region'])+','+str(rre['city'])+','+str(rre['country'])+','+str(rre['zip'])
                 gmap =  googlemaps.Client(key=settings.GOOGLE_MAPS_API_KEY)
                 result = gmap.geocode(address_string)[0]
 
@@ -431,6 +499,43 @@ def update_report(request,repid):
 
 
         rr.save()
+
+        RepDynamicdValue.objects.filter(engreportid=repid).delete()
+        floorsengid = ReporterReport.objects.get(pk = repid)
+        # saving dynamic fields details
+        try: 
+            engdynamicfields=EngDynamicField.objects.filter(active=True,form_type="Reporter form")
+        except:
+            engdynamicfields=[]
+        for field in engdynamicfields:  
+        # Get the submitted value from request.POST 
+            if(field.input_type == 'checkbox'): 
+                field_value = request.POST.getlist(field.label.replace(' ', '-').lower())
+                for fld in field_value: 
+                    RepDynamicdValue.objects.create(input_field=field,value=fld,engreportid=floorsengid)
+            else: 
+                if(field.input_type == 'select'):
+                    optionvalue = request.POST.get(field.label.replace(' ', '-').lower()) 
+                    try: 
+                        field_value= EngFormOptionValues.objects.get(pk=int(optionvalue)).opt_value
+                    except:
+                        field_value=None
+                    field_valuea=None
+                    if field.suboption:
+                        sublabel = f'sub{field.label.replace(" ", "-").lower()}'
+                        optionsubvalue = request.POST.get(sublabel)
+                        print(sublabel)
+                        try: 
+                            field_valuea= EngFormsubOptionValues.objects.get(pk=int(optionsubvalue)).name
+                        except:
+                            field_valuea=None
+                    RepDynamicdValue.objects.create(input_field=field,value=field_value,subvalue=field_valuea,engreportid=floorsengid)  
+                else:
+                        
+                    field_value = request.POST.get(field.label.replace(' ', '-').lower()) 
+                    field_valuea=None
+                    if field_value:
+                        RepDynamicdValue.objects.create(input_field=field,value=field_value,subvalue=field_valuea,engreportid=floorsengid)
 
         uploaded_files = request.FILES.getlist('reporterFiles')
         for uploaded_file in uploaded_files:
@@ -476,7 +581,15 @@ def update_report(request,repid):
             states=[{'state_name':'Madhya Pradesh','state_id':20}, {'state_name':'Uttar Pradesh'}, {'state_name':'Rajsthan'}, {'state_name':'Delhi'}]
     except requests.ConnectionError:
         states=[{'state_name':'Madhya Pradesh','state_id':20}, {'state_name':'Uttar Pradesh'}, {'state_name':'Rajsthan'}, {'state_name':'Delhi'}]
-    return render(request,'reporter/reporterform.html',{'recptreport':rr,'appdd':appdate,'documents':documents,'states':states})
+    subquery = RepDynamicdValue.objects.filter(
+            engreportid=repid,
+            input_field_id=OuterRef('input_field_id')
+            ).order_by('id').values('id')[:1]
+    engdynamicvalues = RepDynamicdValue.objects.filter(id__in=Subquery(subquery))
+    engdynamiccheckvalues = list(RepDynamicdValue.objects.values_list('value', flat=True).filter(engreportid=repid))    
+    optvalues = EngFormOptionValues.objects.select_related('eng_dynamic_field').all()
+    suboptions = EngFormsubOptionValues.objects.select_related('main_option').all()
+    return render(request,'reporter/reporterform.html',{'recptreport':rr,'appdd':appdate,'documents':documents,'states':states,'engdynamicvalues':engdynamicvalues,'optvalues':optvalues,'engdynamiccheckvalues':engdynamiccheckvalues,'suboptions':suboptions})
 
 class Geomapview(View):
     template_name = 'reporter/geomap.html'
@@ -490,21 +603,36 @@ class Geomapview(View):
             username = UserDetails.objects.get(user_email=useremail).first_name+" "+UserDetails.objects.get(user_email=useremail).last_name
             userrole = UserDetails.objects.get(user_email=useremail).role
             if userrole == "Admin":
-                  eligable_locations = ReporterReport.objects.filter(placeid__isnull=False)  
+                #   eligable_locations = ReporterReport.objects.filter(placeid__isnull=False)  
+                  eligable_locations = ReporterReport.objects.filter(replat__isnull=False, replng__isnull=False)  
                    
             else:
-                  eligable_locations = ReporterReport.objects.filter(placeid__isnull=False,receptionid__reportperson=userid)
-                #   completedrequest=ReporterReport.objects.filter(receptionid__reportperson=userid)
+                #   eligable_locations = ReporterReport.objects.filter(placeid__isnull=False,receptionid__reportperson=userid)
+                  eligable_locations = ReporterReport.objects.filter(replat__isnull=False, replng__isnull=False,receptionid__reportperson=userid)
                   
 
         # eligable_locations = ReporterReport.objects.filter(placeid__isnull=False)
         maplocations = []
 
         for a in eligable_locations: 
+            if (not a.lat is None and not a.lng is None):
+                lat=a.lat
+                lng=a.lng
+            else:
+                lat=0
+                lng=0
+            if (((not a.replat is None) and a.replat !="") and ((not a.replng is None) and a.replng !="")):
+                replat=a.replat
+                replng=a.replng
+            else:
+                replat=0
+                replng=0
             data = {
                 'id':a.id,
-                'lat': float(a.lat), 
-                'lng': float(a.lng), 
+                'lat': float(lat), 
+                'lng': float(lng), 
+                'replat': float(replat), 
+                'replng': float(replng), 
                 'inpdate': a.inspectiondate.strftime('%d-%m-%Y'), 
                 'name': a.name,
                 'add1': a.add1,
@@ -512,7 +640,7 @@ class Geomapview(View):
                 'city': a.city,
                 'landarea': a.landarea,
                 'bank': a.bankid.name,
-                'govrate':a.govtaprovelandrate,
+                'landvalue':a.landvalue,
                 'recomrate':a.recommendedlandrate,
                 
             }
@@ -520,7 +648,7 @@ class Geomapview(View):
             maplocations.append(data)
     # below lines are only to update in data base the lat and lng and place id 
         label="no record"
-        locations = ReporterReport.objects.values('id','add1', 'add2','city','region','country','landmark','zip','lat','lng','placeid')
+        locations = ReporterReport.objects.values('id','add1', 'add2','city','region','country','landmark','zip','lat','lng','placeid','replat','replng')
         for location in locations:
             # print(location['add1'])
             
@@ -530,7 +658,7 @@ class Geomapview(View):
                 placeid=location['placeid']
                 label = "from database"
             elif(location['add1'] and location['city'] and location['region'] and location['country']  and location['zip'] != None):
-                address_string = str(location['add1'])+','+str(location['add2'])+','+str(location['region'])+','+str(location['city'])+','+str(location['country'])+','+str(location['landmark'])+',',str(location['zip'])
+                address_string = str(location['add1'])+','+str(location['add2'])+','+str(location['region'])+','+str(location['city'])+','+str(location['country'])+',',str(location['zip'])
                 gmap =  googlemaps.Client(key=settings.GOOGLE_MAPS_API_KEY)
                 result = gmap.geocode(address_string)[0]
 
@@ -556,7 +684,7 @@ class Geomapview(View):
                 lng = ""
                 placeid = ""
                 label = "neither api nor database "
-        locations = ReporterReport.objects.values('id','name','add1', 'add2','city','region','country','landmark','zip','lat','lng','placeid')
+        locations = ReporterReport.objects.values('id','name','add1', 'add2','city','region','country','landmark','zip','lat','lng','placeid','replat','replng')
         
         context = {
                     'locations':locations,

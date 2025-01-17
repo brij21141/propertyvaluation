@@ -193,10 +193,24 @@ class HistoryFloordetails(models.Model):
     historyengreportid = models.ForeignKey(HistoryEngineerReport, related_name='historyfloors', on_delete=models.CASCADE)  
     def __str__(self):
         return str(self.id)
-    
+
+class Occupants(models.Model):
+    occupantname = models.CharField(max_length=50,null=True)
+    engreportid = models.ForeignKey(EngineerReport, on_delete=models.DO_NOTHING,null=True, blank=True, related_name='occupants')
+    def __str__(self):
+        return str(self.id)
+
+class HistoryOccupants(models.Model):
+    occupantname = models.CharField(max_length=50,null=True)
+    engreportid = models.ForeignKey(EngineerReport, on_delete=models.DO_NOTHING,null=True, blank=True, related_name='hsoccupants')
+    historyengreportid = models.ForeignKey(HistoryEngineerReport, related_name='historyoccupants', on_delete=models.CASCADE)  
+    def __str__(self):
+        return str(self.id)
+
 class EngDynamicdValue(models.Model):  
     input_field = models.ForeignKey(EngDynamicField, on_delete=models.DO_NOTHING)  
-    value = models.TextField()  # Use TextField to accommodate various input lengths.  
+    value = models.CharField(max_length=100,null=True)  
+    subvalue = models.CharField(max_length=100,null=True)  
     engreportid = models.ForeignKey(EngineerReport, on_delete=models.DO_NOTHING,null=True, blank=True, related_name='engdynamic')
     submitted_at = models.DateTimeField(auto_now_add=True)  
 
@@ -205,7 +219,8 @@ class EngDynamicdValue(models.Model):
     
 class HistoryEngDynamicdValue(models.Model):  
     input_field = models.ForeignKey(EngDynamicField, on_delete=models.DO_NOTHING)  
-    value = models.TextField()  # Use TextField to accommodate various input lengths.  
+    value = models.CharField(max_length=100,null=True)  
+    subvalue = models.CharField(max_length=100,null=True)  
     engreportid = models.ForeignKey(EngineerReport, on_delete=models.DO_NOTHING,null=True, blank=True, related_name='hsengdynamic')
     hsengreportid = models.ForeignKey(HistoryEngineerReport, related_name='hsengdynamic', on_delete=models.CASCADE)
     submitted_at = models.DateTimeField(auto_now_add=True)  

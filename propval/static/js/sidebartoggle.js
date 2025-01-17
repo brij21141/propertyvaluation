@@ -172,13 +172,13 @@ document.getElementById('profileimage').onchange = function(event) {
     // Redirect to the last accessed URL  
     window.location.href = lastUrl;  
 }  
-  function addmorerows() {  
-    document.getElementById("tf").style.display = "inline-block";
-    document.getElementById("frf").style.display = "inline-block";
-    document.getElementById("fvf").style.display = "inline-block";
-    document.getElementById("sxf").style.display = "inline-block";
-    document.getElementById('addmorerows').disabled = true;  
-}  
+//   function addmorerows() {  
+//     document.getElementById("tf").style.display = "inline-block";
+//     document.getElementById("frf").style.display = "inline-block";
+//     document.getElementById("fvf").style.display = "inline-block";
+//     document.getElementById("sxf").style.display = "inline-block";
+//     document.getElementById('addmorerows').disabled = true;  
+// }  
 
 
  

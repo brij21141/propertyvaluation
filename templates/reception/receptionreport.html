@@ -18,7 +18,7 @@
                             <h1>Reception Report Form</h1>
                             {% endif %}
                         </div>
-                        
+                        <div class="row d-flex ">
                         <div class="item col-sm-6">
                             <label for="appdate">Enter Application Date</label>
                             <input id="appdate" name = "appdate" type="date" class="form-control" placeholder="Enter date" 
@@ -29,6 +29,18 @@
                             />
                             <i class="fas fa-calendar-alt"></i>
                         </div>
+                        <div class="item col-sm-6 text-center">
+                          <p>Npa:</p>
+                          <label class="switch">  
+                            {% if recptreport.npa %}
+                            <input type="checkbox" name="npa" checked data-url="" id="toggle" class="toggle" onchange="toggleFunction(this.checked,{{recrep.id}})">
+                            {% else %}  
+                            <input type="checkbox" name="npa" data-url="" id="toggle" class="toggle" onchange="toggleFunction(this.checked,{{recrep.id}})"> 
+                            {% endif %} 
+                            <span class="slider round"></span>  
+                          </label>
+                        </div>
+                      </div>
                         <div class="item">
                             <label for="appno">Enter Application Number</label>
                             <input id="appno" name="appno" type="text" class="form-control" placeholder="Enter Application Number"
@@ -93,9 +105,9 @@
                               <option value="">{% if recptreport %} {{recptreport.region}} {% else %} Select State {% endif %}</option>
                               {% for state in states %}
                                 {% if state.state_id == 20 %}
-                                  <option value={{state.state_name}}  selected   >{{state.state_name}}</option>
+                                  <option value="{{state.state_name}}"  selected   >{{state.state_name}}</option>
                                 {% else %}
-                                  <option value={{state.state_name}}   >{{state.state_name}}</option>
+                                  <option value="{{state.state_name}}"   >{{state.state_name}}</option>
                                 {%endif%}
                               {% endfor %}
                             </select>
@@ -147,6 +159,103 @@
                         </div>
                         
                     </div>
+    
+    {% if engdynamicvalues %}
+    {% for field in engdynamicvalues %}
+      {% if field.input_field.input_type == 'select' %}
+      <div class="item">
+        <label>{{ field.input_field.label }}</label>
+        <div class="city-item">
+          <select id="{{ field.input_field.label|slugify }}" class="form-select" aria-label="Default select example" name="{{ field.input_field.label|slugify }}" onchange="updateSubOptions('{{field.input_field.label|slugify}}')" >
+            <option value="0" >Select {{ field.input_field.label }}</option>
+            {% for optvalue in optvalues %}
+              {% if optvalue.eng_dynamic_field.label == field.input_field.label %}
+              {% if optvalue.opt_value == field.value %}
+                <option value="{{ optvalue.id }}" selected  >{{ optvalue.opt_value }} </option>
+              {% else %}
+                <option value="{{ optvalue.id }}"  >{{ optvalue.opt_value }} </option>
+              {% endif %}
+              {% endif %}
+            {% endfor %}
+          </select>
+          <select id="sub{{ field.input_field.label|slugify }}" class="form-select" aria-label="Default select example" name="sub{{ field.input_field.label|slugify }}"  {% if not field.input_field.suboption %} hidden {% endif %} >
+            <option value="0" >Select sub option</option>
+            {% for subopt in suboptions %}
+            {% if subopt.main_option.opt_value == field.value %}
+            {% if subopt.name == field.subvalue %}
+            <option value="{{ subopt.id }}" selected  >{{ subopt.name }} </option>
+            {% else%}
+            <option value="{{ subopt.id }}">{{ subopt.name }} </option>
+            {% endif %}
+            {%endif%}
+            {% endfor %}
+          </select>
+        </div>
+      </div>
+      {% elif field.input_field.input_type == 'checkbox' %}
+        <label for="{{ field.input_field.label }}"> {{ field.input_field.label }}:</label>
+        {% for optvalue in optvalues %}
+          {% if optvalue.eng_dynamic_field.label == field.input_field.label %}
+            <div class="form-check">
+            <input type="checkbox" class="form-check-input" id="{{ optvalue.opt_value }}" name="{{ field.input_field.label|slugify }}" value="{{ optvalue.opt_value }}" {% if optvalue.opt_value in engdynamiccheckvalues %} checked {% endif %}>
+            <label class="form-check-label" for="{{ optvalue.opt_value }}">{{ optvalue.opt_value }}</label>
+            </div>
+            <!-- engdynamiccheckvalues -->
+          {% endif %}
+        {% endfor %}
+      {% else %}
+      <div class="item col-sm-6">
+          <label>{{ field.input_field.label }}</label>
+          <input type="{{ field.input_field.input_type }}" name="{{ field.input_field.label|slugify }}" value="{{field.value}}">
+          {% if field.input_field.input_type == 'date' %}<i class="fas fa-calendar-alt"></i> {% endif %}
+        </div>
+        
+        {%endif%}
+        <!-- <br> -->
+    {% endfor %}
+  {% else %}
+  {% for field in engdynamicfields %}  
+      {% if field.input_type == 'select' %}
+    <div class="item">
+      <label>{{ field.label }}</label>
+      <div class="city-item">
+      <select id="{{ field.label|slugify }}" class="form-select" aria-label="Default select example" name="{{ field.label|slugify }}" onchange="updateSubOptions('{{ field.label|slugify }}')">
+        <option value="0" >Select {{ field.label }}</option>
+        {% for optvalue in optvalues %}
+          {% if optvalue.eng_dynamic_field.label == field.label %}
+            <option value="{{ optvalue.id }}">{{ optvalue.opt_value }}</option>
+          {% endif %}
+        {% endfor %}
+      </select>
+          <select id="sub{{ field.label|slugify }}" class="form-select" aria-label="Default select example" name="sub{{ field.label|slugify }}"  {% if not field.suboption %} hidden {% endif %} >
+            <option value="0" >Select sub option</option>
+            
+          </select>
+        
+    </div>
+    </div>
+      {% elif field.input_type == 'checkbox' %}
+            <label for="{{ field.label }}"> {{ field.label }}:</label>
+            {% for optvalue in optvalues %}
+              {% if optvalue.eng_dynamic_field.label == field.label %}
+                <div class="form-check">
+                <input type="checkbox" class="form-check-input" id="{{ optvalue.opt_value }}" name="{{ field.label|slugify }}" value="{{ optvalue.opt_value }}" >
+                <label class="form-check-label" for="{{ optvalue.opt_value }}">{{ optvalue.opt_value }}</label>
+                </div>
+              {% endif %}
+            {% endfor %}
+      {% else %}
+      <div class="item col-sm-6">
+      <label>{{ field.label }}</label>  
+      <input type="{{ field.input_type }}" name="{{ field.label|slugify }}"> 
+      {% if field.input_type == 'date' %}<i class="fas fa-calendar-alt"></i> {% endif %}
+      </div> 
+      {% endif %}
+      <!-- <br>   -->
+  {% endfor %}
+  {% endif %}
+
+
                         <div class="item">
                             <label for="necessarydocument" class="form-label">Upload necessary document</label>
                             <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -194,4 +303,42 @@
                 
 </div>
 </div>
+
+<script>
+  function updateSubOptions( nme) {  
+    
+    const suboptionvalues = [
+        {% for optn in suboptions %}
+        {
+            id: '{{ optn.id }}',
+            name: '{{ optn.name }}',
+            main_option_id: '{{ optn.main_option_id }}',
+            main_option_value: '{{ optn.main_option.opt_value }}'
+        },
+        {% endfor %}
+    ];
+    // field_value = field.label.replace(' ', '-').lower()
+            // const elementname=document.getElementsByName()
+    console.log(nme); 
+            // const mainDropdown = document.getElementById('mainoption');  
+            const mainDropdown = document.getElementById(nme); 
+            const selectedMainOptionId = mainDropdown.value;
+            // const selectElement = document.getElementById('suboption');  
+            const selectElement = document.getElementById('sub'+nme);  
+            // const subOptionContainer = document.getElementById('sub-options-container');  
+            // console.log(selectedMainOptionId);
+            // Clear previous inputs  
+            selectElement.innerHTML = ''; 
+            suboptionvalues.forEach(opt => {
+              // console.log(opt.name);
+                if (opt.main_option_id === selectedMainOptionId || opt.main_option_value === selectedMainOptionId) {
+                    const option = document.createElement('option');
+                    option.value = opt.id;
+                    option.textContent = opt.name;
+                    selectElement.appendChild(option);
+                }
+            }); 
+  
+        }  
+</script>
 {% endblock %}

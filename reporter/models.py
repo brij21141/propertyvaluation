@@ -1,7 +1,7 @@
 from django.db import models
 from django.contrib.auth.models import User
 from reception.models import ReceptionReport,ArchieveReceptionReport
-from propval.models import Banks
+from propval.models import Banks,EngDynamicField
 
 class ReporterReport(models.Model):
     inspectiondate = models.DateTimeField(null=True)
@@ -9,6 +9,7 @@ class ReporterReport(models.Model):
     name = models.CharField(max_length=30,null=True)
     docholdername = models.CharField(max_length=30,null=True)
     propertytype = models.CharField(max_length=30,null=True)
+    propertysubtype = models.CharField(max_length=30,null=True)
     add1 = models.CharField(max_length=100, null=True, default="Gwalior")
     add2 = models.CharField(max_length=100, null=True)
     city = models.CharField(max_length=30, null=True)
@@ -105,6 +106,8 @@ class ReporterReport(models.Model):
     lat = models.CharField(max_length=200,null=True,blank=True)
     lng = models.CharField(max_length=200,null=True,blank=True)
     placeid = models.CharField(max_length=200,null=True,blank=True)
+    replat = models.CharField(max_length=200,null=True,blank=True)
+    replng = models.CharField(max_length=200,null=True,blank=True)
     receptionid = models.ForeignKey(ReceptionReport, on_delete=models.DO_NOTHING, null=True, blank=True)
     bankid = models.ForeignKey(Banks,on_delete=models.SET_NULL, null=True, blank=True)
     userdetailsid = models.ForeignKey(User, on_delete=models.DO_NOTHING)
@@ -120,6 +123,7 @@ class ArchieveReporterReport(models.Model):
     name = models.CharField(max_length=30,null=True)
     docholdername = models.CharField(max_length=30,null=True)
     propertytype = models.CharField(max_length=30,null=True)
+    propertysubtype = models.CharField(max_length=30,null=True)
     add1 = models.CharField(max_length=100, null=True, default="Gwalior")
     add2 = models.CharField(max_length=100, null=True)
     city = models.CharField(max_length=30, null=True)
@@ -216,6 +220,8 @@ class ArchieveReporterReport(models.Model):
     lat = models.CharField(max_length=200,null=True,blank=True)
     lng = models.CharField(max_length=200,null=True,blank=True)
     placeid = models.CharField(max_length=200,null=True,blank=True)
+    replat = models.CharField(max_length=200,null=True,blank=True)
+    replng = models.CharField(max_length=200,null=True,blank=True)
     # receptionid = models.ForeignKey(ReceptionReport, on_delete=models.DO_NOTHING, null=True, blank=True)
     receptionid = models.ForeignKey(ArchieveReceptionReport, on_delete=models.DO_NOTHING,null=True, blank=True)
     # receptiontempid = models.IntegerField(null=True, blank=True)
@@ -228,3 +234,24 @@ class ArchieveReporterReport(models.Model):
     
 def __str__(self):
      return str(self.id)
+
+class RepDynamicdValue(models.Model):  
+    input_field = models.ForeignKey(EngDynamicField, on_delete=models.DO_NOTHING)  
+    value = models.CharField(max_length=100,null=True)  
+    subvalue = models.CharField(max_length=100,null=True)  
+    engreportid = models.ForeignKey(ReporterReport, on_delete=models.DO_NOTHING,null=True, blank=True, related_name='repdynamic')
+    submitted_at = models.DateTimeField(auto_now_add=True)  
+
+    def __str__(self):  
+        return f"{self.input_field.label}: {self.value}"
+    
+# class HistoryRepDynamicdValue(models.Model):  
+#     input_field = models.ForeignKey(EngDynamicField, on_delete=models.DO_NOTHING)  
+#     value = models.CharField(max_length=100,null=True)  
+#     subvalue = models.CharField(max_length=100,null=True)  
+#     engreportid = models.ForeignKey(ReporterReport, on_delete=models.DO_NOTHING,null=True, blank=True, related_name='hsrepdynamic')
+#     hsengreportid = models.ForeignKey(HistoryReporterReport, related_name='hsrepdynamic', on_delete=models.CASCADE)
+#     submitted_at = models.DateTimeField(auto_now_add=True)  
+
+#     def __str__(self):  
+#         return f"{self.input_field.label}: {self.value}"

@@ -1,6 +1,6 @@
 from django.db import models
 from django.contrib.auth.models import User
-from propval.models import UserDetails
+from propval.models import UserDetails,EngDynamicField
 
 # Create your models here.
 class ReceptionReport(models.Model):
@@ -79,4 +79,26 @@ class Document(models.Model):
     updated_at = models.DateTimeField(auto_now=True)
     
     def __str__(self):
-        return self.file_name    
+        return self.file_name   
+
+class RecDynamicdValue(models.Model):  
+    input_field = models.ForeignKey(EngDynamicField, on_delete=models.DO_NOTHING)  
+    value = models.CharField(max_length=100,null=True)  
+    subvalue = models.CharField(max_length=100,null=True)  
+    engreportid = models.ForeignKey(ReceptionReport, on_delete=models.DO_NOTHING,null=True, blank=True, related_name='recdynamic')
+    submitted_at = models.DateTimeField(auto_now_add=True)  
+
+    def __str__(self):  
+        return f"{self.input_field.label}: {self.value}"
+    
+# class HistoryRecDynamicdValue(models.Model):  
+#     input_field = models.ForeignKey(EngDynamicField, on_delete=models.DO_NOTHING)  
+#     value = models.CharField(max_length=100,null=True)  
+#     subvalue = models.CharField(max_length=100,null=True)  
+#     engreportid = models.ForeignKey(ReceptionReport, on_delete=models.DO_NOTHING,null=True, blank=True, related_name='hsrecdynamic')
+#     hsengreportid = models.ForeignKey(HistoryReceptionReport, related_name='hsrecdynamic', on_delete=models.CASCADE)
+#     submitted_at = models.DateTimeField(auto_now_add=True)  
+
+#     def __str__(self):  
+#         return f"{self.input_field.label}: {self.value}"
+ 

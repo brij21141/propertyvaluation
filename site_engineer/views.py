@@ -1,8 +1,8 @@
 from django.shortcuts import render, redirect,get_object_or_404
-from site_engineer.models import EngineerReport,HistoryEngineerReport,Floordetails,HistoryFloordetails,EngDynamicdValue,HistoryEngDynamicdValue
+from site_engineer.models import EngineerReport,HistoryEngineerReport,Floordetails,HistoryFloordetails,EngDynamicdValue,HistoryEngDynamicdValue,Occupants,HistoryOccupants
 from reception.models import ReceptionReport,Document
 from datetime import datetime
-from propval.models import UserDetails,Banks,Impdoc,EngDynamicField
+from propval.models import UserDetails,Banks,Impdoc,EngDynamicField,EngFormOptionValues,EngFormsubOptionValues
 from django.contrib import messages
 from django.core.files.storage import default_storage
 from django.http import HttpResponseRedirect,JsonResponse
@@ -14,6 +14,7 @@ from django.contrib.auth.decorators import login_required
 from rest_framework.authtoken.models import Token
 from django.db import transaction
 from django.utils.text import slugify
+from django.db.models import OuterRef, Subquery  
 
 # Create your views here.
 
@@ -28,7 +29,7 @@ def add_report(request,repid):
                 uid = UserDetails.objects.get(user_email=useremail).user_id
         
         try: 
-            engdynamicfields=EngDynamicField.objects.exclude(active=False)
+            engdynamicfields=EngDynamicField.objects.filter(active=True,form_type = "Engineer form")
         except:
             engdynamicfields=[]
         
@@ -61,8 +62,9 @@ def add_report(request,repid):
             # sxarea = request.POST.get("sixthfloor")
             propertyage = request.POST.get("age")
             landrate = request.POST.get("rate")
-            occupant = request.POST.get("occupant")
-            lanrented = request.POST.get("ranted")
+            occupancy = request.POST.get("occupancy")
+            # lanrented = request.POST.get("ranted")
+            lanrented = ""
             landmark = request.POST.get("landmark")
             roadwidth = request.POST.get("roadwidth")
             hightension = request.POST.get("hightension")
@@ -104,7 +106,10 @@ def add_report(request,repid):
             # er.sxarea = sxarea
             er.propertyage = propertyage
             er.landrate = landrate
-            er.Occupant = occupant
+            if occupancy == 1:
+                er.Occupant = "Single Occupancy"
+            else:
+                er.Occupant = "Multiple Occupancy"
             er.landmark = landmark
             er.roadwidth = roadwidth
             if hightension is None:
@@ -159,15 +164,45 @@ def add_report(request,repid):
                 area_value = floor_areas[i] 
 
                 Floordetails.objects.create(floorname=floor_value, floordetail=detail_value, floorarea=area_value,engreportid = floorsengid)  
+            
+            occupants = request.POST.getlist('occupant')  
+            for i in range(len(occupants)):  
+                occupantname = occupants[i]  
+                
+                Occupants.objects.create(occupantname=occupantname,engreportid = floorsengid)  
 
-            form_data = {}
+            # form_data = {}
+            # print(request.POST)
             for field in engdynamicfields:  
-            # Get the submitted value from request.POST  
-                field_value = request.POST.get(field.label.replace(' ', '-').lower())  
-                form_data[field.label] = field_value  
-                EngDynamicdValue.objects.create(input_field=field,value=field_value,engreportid=floorsengid)
+                if(field.input_type == 'checkbox'): 
+                    field_value = request.POST.getlist(field.label.replace(' ', '-').lower())
+                    for fld in field_value: 
+                        EngDynamicdValue.objects.create(input_field=field,value=fld,engreportid=floorsengid)
+                else:
+                     if(field.input_type == 'select'):
+                        optionvalue = request.POST.get(field.label.replace(' ', '-').lower()) 
+                        try: 
+                            field_value= EngFormOptionValues.objects.get(pk=int(optionvalue)).opt_value
+                        except:
+                            field_value=None
+                        field_valuea=None
+                        if field.suboption:
+                            sublabel = f'sub{field.label.replace(" ", "-").lower()}'
+                            optionsubvalue = request.POST.get(sublabel) 
+                            field_valuea= EngFormsubOptionValues.objects.get(pk=int(optionsubvalue)).name
+                        # print(optionsubvalue, field_value)
+                        # form_data[field.label] = field_value  
+                        EngDynamicdValue.objects.create(input_field=field,value=field_value,subvalue=field_valuea,engreportid=floorsengid)  
+                     else:
+                            
+                        field_value = request.POST.get(field.label.replace(' ', '-').lower()) 
+                        # sublabel = f'sub{field.label.replace(" ", "-").lower()}'
+                        field_valuea=None
+                        # field_valuea = request.POST.get(sublabel) 
+                        # print(sublabel)
+                        # form_data[field.label] = field_value  
+                        EngDynamicdValue.objects.create(input_field=field,value=field_value,subvalue=field_valuea,engreportid=floorsengid)
             # print (form_data)
-
             uploaded_files = request.FILES.getlist('engineerFiles') 
             for uploaded_file in uploaded_files:
                 # print(time.time())
@@ -211,8 +246,11 @@ def add_report(request,repid):
                 states=[{'state_name':'Madhya Pradesh','state_id':20}, {'state_name':'Uttar Pradesh'}, {'state_name':'Rajsthan'}, {'state_name':'Delhi'}]
         except requests.ConnectionError:
             states=[{'state_name':'Madhya Pradesh','state_id':20}, {'state_name':'Uttar Pradesh'}, {'state_name':'Rajsthan'}, {'state_name':'Delhi'}]
-        
-        return render(request,"engineer/engineersiteform.html",{'requestreceived':rr,'engdynamicfields':engdynamicfields, 'banks':banks,'states':states})
+        optvalues = EngFormOptionValues.objects.select_related('eng_dynamic_field').all()
+        suboptions = EngFormsubOptionValues.objects.select_related('main_option').all()
+        # for option in optvalues:
+        #     print(option.eng_dynamic_field.label)
+        return render(request,"engineer/engineersiteform.html",{'requestreceived':rr,'engdynamicfields':engdynamicfields, 'banks':banks,'states':states,'optvalues':optvalues,'suboptions':suboptions})
 @login_required(login_url='login')
 def engineerhome(request):
     if request.user.is_authenticated:
@@ -235,6 +273,7 @@ def engineerhome(request):
                     userrole = UserDetails.objects.get(user_email=useremail).role   
                     if userrole == "Admin":
                             allreport=ReceptionReport.objects.all()
+                            banks= Banks.objects.all().values('id','name','branch','city')
                             receivedrequest=ReceptionReport.objects.exclude(engineer ='Submitted').order_by('-priority','-updated_at')
                             totalrequestnumber = ReceptionReport.objects.count()
                             totalcompleted = ReceptionReport.objects.filter(engineer='Submitted').count()
@@ -242,10 +281,12 @@ def engineerhome(request):
                             completedrequest=EngineerReport.objects.all().order_by('-priority','-updated_at')
                             inprogress = ReceptionReport.objects.filter(engineer='InProgress').count()
                             hold = ReceptionReport.objects.filter(engineer='Hold').count()
-                            pendingrequest = totalrequestnumber-(totalcompleted+inprogress+hold)
+                            # pendingrequest = totalrequestnumber-(totalcompleted+inprogress+hold)
+                            pendingrequest = totalrequestnumber-(totalcompleted+hold)
                             
                     else:
                             allreport=ReceptionReport.objects.all()
+                            banks= Banks.objects.all().values('id','name','branch','city')
                             # allreport=ReceptionReport.objects.filter(visitingpersonname=username)
                             receivedrequest=ReceptionReport.objects.exclude(engineer ='Submitted').filter(visitingpersonname=username).order_by('-priority','-updated_at')
                             # totalrequestnumber = ReceptionReport.objects.filter(visitingpersonname=username).count()
@@ -255,11 +296,13 @@ def engineerhome(request):
                             completedrequest=EngineerReport.objects.filter(receptionid__visitingpersonname=username).order_by('-priority','-updated_at')
                             inprogress = ReceptionReport.objects.filter(visitingpersonname=username, engineer='InProgress').count()
                             hold = ReceptionReport.objects.filter(visitingpersonname=username, engineer='Hold').count()
-                            pendingrequest = totalrequestnumber-(totalcompleted+inprogress+hold)
+                            # pendingrequest = totalrequestnumber-(totalcompleted+inprogress+hold)
+                            pendingrequest = totalrequestnumber-(totalcompleted+hold)
         impdocs= Impdoc.objects.all()                    
         return render(request,"engineer/engineerhome.html",
                 {'requestreceived':receivedrequest,
                  'allreports':allreport,
+                 'banks':banks,
                 'totreq':totalrequestnumber,
                 'requestcompleted':completedrequest,
                 'compreq':totalcompleted,
@@ -287,7 +330,7 @@ def update_report(request,repid):
                 username = UserDetails.objects.get(user_email=useremail).first_name+" "+UserDetails.objects.get(user_email=useremail).last_name
                 userrole = UserDetails.objects.get(user_email=useremail).role
                 uid = UserDetails.objects.get(user_email=useremail).id
-            engdynamicvalues=EngDynamicdValue.objects.filter(engreportid=repid)
+            
             with transaction.atomic():  # Start the transaction  if transactions fails it will rollback data
                 if request.method == "POST":
                     app_number = request.POST.get("appno")
@@ -317,8 +360,9 @@ def update_report(request,repid):
                     sxarea = request.POST.get("sixthfloor")
                     propertyage = request.POST.get("age")
                     landrate = request.POST.get("rate")
-                    occupant = request.POST.get("occupant")
-                    lanrented = request.POST.get("ranted")
+                    occupancy = request.POST.get("occupancy")
+                    # lanrented = request.POST.get("ranted")
+                    lanrented = ""
                     landmark = request.POST.get("landmark")
                     roadwidth = request.POST.get("roadwidth")
                     hightension = request.POST.get("hightension")
@@ -395,6 +439,7 @@ def update_report(request,repid):
                         old_floor.save()
                     # deleting existing floor details and inserting updated 
                     Floordetails.objects.filter(engreportid=repid).delete()
+
                     floorsengid = EngineerReport.objects.get(pk = repid)
                     # saving floor details
                     floors = request.POST.getlist('floor[]')  
@@ -406,6 +451,26 @@ def update_report(request,repid):
                         area_value = floor_areas[i] 
 
                         Floordetails.objects.create(floorname=floor_value, floordetail=detail_value, floorarea=area_value,engreportid = floorsengid)      
+                    # copying occupant records to history occupant records
+                    # historyengreportid = HistoryEngineerReport.objects.get(pk=oldrecid)
+                    occupants = Occupants.objects.filter(engreportid=repid)
+                    for occupant in occupants:
+                        old_occupant = HistoryOccupants(  
+                        occupantname = occupant.occupantname,
+                        engreportid = occupant.engreportid,
+                        historyengreportid = historyengreportid
+                        # historyengreportid = HistoryEngineerReport.objects.get(pk=oldrecid)
+                        )
+                        old_occupant.save()
+                    # deleting existing occupant details and inserting updated 
+                    Occupants.objects.filter(engreportid=repid).delete()
+
+                    # floorsengid = EngineerReport.objects.get(pk = repid)
+                    # saving occupant details
+                    occupants = request.POST.getlist('occupant')  
+                    for i in range(len(occupants)):  
+                        occupant_value = occupants[i]  
+                        Occupants.objects.create(occupantname=occupant_value,engreportid = floorsengid)      
                     # copying dynamic fields records to history dynamic field records
                     dynamicfields = EngDynamicdValue.objects.filter(engreportid=repid)
                     for dynamic in dynamicfields:
@@ -421,16 +486,38 @@ def update_report(request,repid):
                     # floorsengid = EngineerReport.objects.get(pk = repid)
                     # saving dynamic fields details
                     try: 
-                        engdynamicfields=EngDynamicField.objects.all()
+                        engdynamicfields=EngDynamicField.objects.filter(active=True,form_type = "Engineer form")
                     except:
                         engdynamicfields=[]
                     form_data = {}
                     for field in engdynamicfields:  
-                    # Get the submitted value from request.POST  
-                        field_value = request.POST.get(field.label.replace(' ', '-').lower())  
-                        if field_value: 
-                            form_data[field.label] = field_value  
-                            EngDynamicdValue.objects.create(input_field=field,value=field_value,engreportid=floorsengid)
+                    # Get the submitted value from request.POST 
+                        if(field.input_type == 'checkbox'): 
+                            field_value = request.POST.getlist(field.label.replace(' ', '-').lower())
+                            for fld in field_value: 
+                                EngDynamicdValue.objects.create(input_field=field,value=fld,engreportid=floorsengid)
+                        else: 
+                            if(field.input_type == 'select'):
+                                optionvalue = request.POST.get(field.label.replace(' ', '-').lower()) 
+                                try: 
+                                    field_value= EngFormOptionValues.objects.get(pk=int(optionvalue)).opt_value
+                                except:
+                                    field_value=None
+                                field_valuea=None
+                                if field.suboption:
+                                    sublabel = f'sub{field.label.replace(" ", "-").lower()}'
+                                    optionsubvalue = request.POST.get(sublabel) 
+                                    try:
+                                        field_valuea= EngFormsubOptionValues.objects.get(pk=int(optionsubvalue)).name
+                                    except:
+                                        field_valuea=None
+                                EngDynamicdValue.objects.create(input_field=field,value=field_value,subvalue=field_valuea,engreportid=floorsengid)  
+                            else:
+                                    
+                                field_value = request.POST.get(field.label.replace(' ', '-').lower()) 
+                                field_valuea=None
+                                if field_value:
+                                    EngDynamicdValue.objects.create(input_field=field,value=field_value,subvalue=field_valuea,engreportid=floorsengid)
                                 
                     recid=er.receptionid_id
                     er.applicationnumber = app_number
@@ -459,7 +546,10 @@ def update_report(request,repid):
                     er.sxarea = sxarea
                     er.propertyage = propertyage
                     er.landrate = landrate
-                    er.Occupant = occupant
+                    if occupancy == 1:
+                        er.Occupant = "Single Occupancy"
+                    else:
+                        er.Occupant = "Multiple Occupancy"
                     er.landmark = landmark
                     er.roadwidth = roadwidth
                     if hightension is None:
@@ -543,7 +633,20 @@ def update_report(request,repid):
                 states=[{'state_name':'Madhya Pradesh','state_id':20}, {'state_name':'Uttar Pradesh'}, {'state_name':'Rajsthan'}, {'state_name':'Delhi'}]
         except requests.ConnectionError:
             states=[{'state_name':'Madhya Pradesh','state_id':20}, {'state_name':'Uttar Pradesh'}, {'state_name':'Rajsthan'}, {'state_name':'Delhi'}]
-        return render(request,'engineer/engineersiteform.html',{'recptreport':rr,'engdynamicvalues':engdynamicvalues, 'documents':documents,'banks':banks,'states':states,'floors':floors})
+        # EngDynamicdValue table contain duplicate label id for check boxes so unique records fetching
+        subquery = EngDynamicdValue.objects.filter(
+            engreportid=repid,
+            input_field_id=OuterRef('input_field_id')
+            ).order_by('id').values('id')[:1]
+        engdynamicvalues = EngDynamicdValue.objects.filter(id__in=Subquery(subquery))
+        engdynamiccheckvalues = list(EngDynamicdValue.objects.values_list('value', flat=True).filter(engreportid=repid))    
+        # engdynamicvalues=EngDynamicdValue.objects.filter(engreportid=repid).distinct('input_field_id') 
+        for engid in engdynamicvalues:
+            print(engid.input_field_id)
+        optvalues = EngFormOptionValues.objects.select_related('eng_dynamic_field').all()
+        suboptions = EngFormsubOptionValues.objects.select_related('main_option').all()
+        occupants = Occupants.objects.filter(engreportid_id=repid)
+        return render(request,'engineer/engineersiteform.html',{'recptreport':rr,'engdynamicvalues':engdynamicvalues, 'documents':documents,'banks':banks,'states':states,'floors':floors,'optvalues':optvalues,'engdynamiccheckvalues':engdynamiccheckvalues,'suboptions':suboptions,'occupants':occupants})
 
 def delete_file(request, doc_id):
     try:

@@ -7,7 +7,7 @@ import datetime, os,requests,json
 from django.http import JsonResponse
 from reception.models import ReceptionReport,ArchieveReceptionReport
 from reporter.models import ReporterReport
-from site_engineer.models import EngAttendance
+from site_engineer.models import EngAttendance,EngDynamicdValue
 from .models import UserDetails, CompanyProfile,Banks
 from django.db.models import Count
 from django.views.decorators.http import require_POST
@@ -22,7 +22,7 @@ from xhtml2pdf import pisa
 from django.views import View
 from django.db.models import OuterRef, Subquery
 from rest_framework import viewsets  
-from .models import UserActivity, Impdoc,EngDynamicField
+from .models import UserActivity, Impdoc,EngDynamicField,EngFormOptionValues,EngFormsubOptionValues
 from .serializers import UserActivitySerializer
 from geopy.geocoders import Nominatim
 
@@ -126,8 +126,9 @@ def Home(request):
         #         print(engId.id,engId.name)
         #     print(engId)
         allreports = ReceptionReport.objects.all()
+        banks= Banks.objects.all().values('id','name','branch','city')
         impdocs= Impdoc.objects.all()
-        return render (request,'home.html',{'userdata':userdetails,'usno':dictusersno,'recpreports':recpreport,'totrep':totrep,'context':context,'repwise':queryset,'allreports':allreports,'impdocs':impdocs})
+        return render (request,'home.html',{'userdata':userdetails,'usno':dictusersno,'recpreports':recpreport,'totrep':totrep,'context':context,'repwise':queryset,'allreports':allreports,'impdocs':impdocs,'banks':banks})
     elif user_details.role == 'Engineer':
         return redirect('/engineer/engineerhome/')
     elif user_details.role == 'Reception':
@@ -518,11 +519,37 @@ def engdynamicfield(request):
         'api_base_url': settings.API_BASE_URL,
     }
     if request.method == 'POST':
-        # print(request.POST)
-        engdynamicfields = EngDynamicField()
-        engdynamicfields.label =request.POST.get('label')
-        engdynamicfields.input_type = request.POST.get('input_type')
-        engdynamicfields.save()
+        if 'optbtn' in request.POST:
+            # print(request.POST.get('dummyid'))
+            optvals=EngFormOptionValues()
+            dynfieldid = EngDynamicField.objects.get(pk=int(request.POST.get('dummyid')))
+            options = request.POST.getlist('optionval[]')
+            for i in range(len(options)):  
+                option_value = options[i]  
+                EngFormOptionValues.objects.create(eng_dynamic_field=dynfieldid, opt_value=option_value)  
+        elif 'suboptbtn' in request.POST:
+            # print(request.POST.get('dummyid'))
+            # optvals=EngFormOptionValues()
+            mainopt=request.POST.get('subopt')
+            suboptions = request.POST.getlist('suboptionval[]')
+            mainoption = EngFormOptionValues.objects.get(pk=int(mainopt))
+            # dynfieldid = EngDynamicField.objects.get(pk=int(request.POST.get('dummysubid')))
+            # options = request.POST.getlist('optionval[]')
+            for i in range(len(suboptions)):  
+                option_value = suboptions[i]
+                if option_value.strip():  
+                    EngFormsubOptionValues.objects.create(name=option_value.strip(),main_option=mainoption)  
+            dynfieldid = EngDynamicField.objects.get(pk=mainoption.eng_dynamic_field_id)
+            if not dynfieldid.suboption:
+                dynfieldid.suboption=True
+                dynfieldid.save()
+            
+        else:
+            engdynamicfields = EngDynamicField()
+            engdynamicfields.label =request.POST.get('label')
+            engdynamicfields.input_type = request.POST.get('input_type')
+            engdynamicfields.form_type = request.POST.get('form_type')
+            engdynamicfields.save()
         return redirect('engdynamicfield')
 
     try:  
@@ -532,8 +559,9 @@ def engdynamicfield(request):
     except Exception as e:  
         engdynamicfields=[]
         print(f"An error occurred: {e}")  
-    print(engdynamicfields)
-    return render(request, 'engdynamicfield.html', {'engdynamicfields': engdynamicfields,'context': context})
+    # print(engdynamicfields)
+    options = EngFormOptionValues.objects.all()
+    return render(request, 'engdynamicfield.html', {'engdynamicfields': engdynamicfields,'context': context, 'options': options})
 
 def impdocdelete(request,uid,):
     # print (uid,udid)
@@ -564,6 +592,7 @@ def engdynamicfieldupdate(request,uid):
         data = json.loads(request.body)
         engdynamicfield.label = data.get('label')
         engdynamicfield.input_type = data.get('input_type')
+        engdynamicfield.form_type = data.get('form_type')
         engdynamicfield.save()
         return JsonResponse({'success':True, 'message':"Record updated successfully."})  
     return JsonResponse({'success':False,'message':"Record could not update"})  

@@ -1,7 +1,6 @@
 from django.shortcuts import render, redirect,get_object_or_404
-from .models import ReceptionReport,Document
-from propval.models import UserDetails, Banks,Impdoc
-# from datetime import datetime
+from .models import ReceptionReport,Document,RecDynamicdValue
+from propval.models import UserDetails, Banks,Impdoc,EngDynamicField,EngFormOptionValues,EngFormsubOptionValues
 import datetime
 from django.contrib import messages
 from django.core.files.storage import default_storage
@@ -20,6 +19,9 @@ from reportlab.lib.enums import TA_LEFT
 from django.contrib.auth.decorators import login_required
 from reporter.models import ReporterReport
 from django.urls import reverse 
+from django.utils.text import slugify
+from django.db.models import OuterRef, Subquery  
+
 
 # Create your views here.
 
@@ -30,7 +32,19 @@ def add_report(request):
             username = UserDetails.objects.get(user_email=useremail).first_name+" "+UserDetails.objects.get(user_email=useremail).last_name
             userrole = UserDetails.objects.get(user_email=useremail).role
             uid = UserDetails.objects.get(user_email=useremail).id
+    
+    try: 
+            engdynamicfields=EngDynamicField.objects.filter(active=True,form_type = "Reception form")
+    except:
+            engdynamicfields=[]
+
     if request.method == "POST":
+        # print(request.POST.get('npa'))
+        # print(request.POST)
+        if request.POST.get('npa'):
+            recnpa =True
+        else:
+            recnpa = False
         app_date = request.POST.get('appdate')
         app_number = request.POST.get("appno")
         app_name = request.POST.get("name")
@@ -56,28 +70,7 @@ def add_report(request):
         else:
             visitr =  UserDetails.objects.get(user=app_visitor).first_name+' '+UserDetails.objects.get(user=app_visitor).last_name 
 
-        # # Check if application number already exists
-        # if ReceptionReport.objects.filter(applicationnumber=app_number).exists():
-        #     messages.error(request, "Application number already exists.")
-        #     return render(request, "reception/receptionreport.html", {
-        #         'recptreport': {
-        #             'applicationnumber': app_number,
-        #             'applicationdate': app_date,
-        #             'name': app_name,
-        #             'bankname': app_bankname,
-        #             'bankvertical': app_bankvertical,
-        #             'add1': app_add1,
-        #             'add2': app_add2,
-        #             'city': app_city,
-        #             'region': app_region,
-        #             'zip': app_zip,
-        #             'country': app_country,
-        #             'phonenumber': app_phonenumber,
-        #             'visitingperson': app_visitor,
-        #             'reportperson': app_reporter,
-        #         }
-        #     })
-
+        
         rr=ReceptionReport()
         rr.applicationdate=app_date
         rr.applicationnumber=app_number
@@ -97,8 +90,44 @@ def add_report(request):
         # print(app_reporter)
         rr.visitingpersonname= visitr
         rr.reportpersonname=reprtr
+        rr.npa=recnpa
         rr.save()
         newrecid=rr.id
+        floorsengid = ReceptionReport.objects.get(pk = newrecid)
+
+        for field in engdynamicfields:  
+                if(field.input_type == 'checkbox'): 
+                    field_value = request.POST.getlist(field.label.replace(' ', '-').lower())
+                    for fld in field_value: 
+                        RecDynamicdValue.objects.create(input_field=field,value=fld,engreportid=floorsengid)
+                else:
+                     if(field.input_type == 'select'):
+                        optionvalue = request.POST.get(field.label.replace(' ', '-').lower()) 
+                        try: 
+                            field_value= EngFormOptionValues.objects.get(pk=int(optionvalue)).opt_value
+                        except:
+                            field_value=None
+                        field_valuea=None
+                        if field.suboption:
+                            sublabel = f'sub{field.label.replace(" ", "-").lower()}'
+                            optionsubvalue = request.POST.get(sublabel) 
+                            try:
+                                field_valuea= EngFormsubOptionValues.objects.get(pk=int(optionsubvalue)).name
+                            except:
+                                field_valuea=None
+                        # print(optionsubvalue, field_value)
+                        # form_data[field.label] = field_value  
+                        RecDynamicdValue.objects.create(input_field=field,value=field_value,subvalue=field_valuea,engreportid=floorsengid)  
+                     else:
+                            
+                        field_value = request.POST.get(field.label.replace(' ', '-').lower()) 
+                        # sublabel = f'sub{field.label.replace(" ", "-").lower()}'
+                        field_valuea=None
+                        # field_valuea = request.POST.get(sublabel) 
+                        # print(sublabel)
+                        # form_data[field.label] = field_value  
+                        RecDynamicdValue.objects.create(input_field=field,value=field_value,subvalue=field_valuea,engreportid=floorsengid)
+
         uploaded_files = request.FILES.getlist('receptionFiles') 
         for uploaded_file in uploaded_files:
             newfilename = app_number + "_"+str(newrecid)+"_"+str(time.time())+'_' + uploaded_file.name
@@ -138,10 +167,14 @@ def add_report(request):
         # print(states[0]['state_name']) 
     #  print("Error:", response.status_code, response.json())  
     currdate=datetime.date.today().strftime("%Y-%m-%d")
-    return render(request,"reception/receptionreport.html",{'engineers':ers,'reporters':rrs,'banks':banks,'states':states,'currdate':currdate})
+    
+    optvalues = EngFormOptionValues.objects.select_related('eng_dynamic_field').all()
+    suboptions = EngFormsubOptionValues.objects.select_related('main_option').all()
+    return render(request,"reception/receptionreport.html",{'engineers':ers,'reporters':rrs,'banks':banks,'states':states,'currdate':currdate,'engdynamicfields':engdynamicfields,'optvalues':optvalues,'suboptions':suboptions})
 @login_required(login_url='login')
 def receptionhome(request):
     allreports = ReceptionReport.objects.all()
+    banks= Banks.objects.all().values('id','name','branch','city')
     context = {
         'api_base_url': settings.API_BASE_URL,
     }
@@ -155,7 +188,7 @@ def receptionhome(request):
     if user_details.role == 'Admin' or user_details.role == 'Reception':
         # return redirect('home')
         impdocs= Impdoc.objects.all()
-        return render(request,"reception/receptionhome.html",{'recpreports':recpreport,'totrep':totrep,'context':context,'allreports':allreports,'impdocs':impdocs})
+        return render(request,"reception/receptionhome.html",{'recpreports':recpreport,'totrep':totrep,'context':context,'allreports':allreports,'impdocs':impdocs,'banks':banks})
     elif user_details.role == 'Engineer':
         return redirect('/engineer/engineerhome/')
     # elif user_details.role == 'Reception':
@@ -192,6 +225,10 @@ def update_report(request,repid):
             userrole = UserDetails.objects.get(user_email=useremail).role
             uid = UserDetails.objects.get(user_email=useremail).id
     if request.method == "POST":
+        if request.POST.get('npa'):
+            recnpa =True
+        else:
+            recnpa = False
         app_date = request.POST.get('appdate')
         app_number = request.POST.get("appno")
         app_name = request.POST.get("name")
@@ -208,6 +245,10 @@ def update_report(request,repid):
         app_phonenumber = request.POST.get("phonenumber")
         app_visitor = request.POST.get("visitor")
         app_reporter = request.POST.get("reporter")
+        if app_visitor =='' or app_visitor =='0':
+            engr = 'Engineer Not Assigned'
+        else:
+            engr =  UserDetails.objects.get(user=app_visitor).first_name+' '+UserDetails.objects.get(user=app_visitor).last_name      
         if app_reporter =='' or app_reporter =='0':
             reprtr = 'Reporter Not Assigned'
         else:
@@ -229,10 +270,49 @@ def update_report(request,repid):
         rr.phonenumber=app_phonenumber
         rr.visitingperson=app_visitor
         rr.reportperson=app_reporter
-        rr.visitingpersonname= UserDetails.objects.get(user=app_visitor).first_name+' '+UserDetails.objects.get(user=app_visitor).last_name 
+        # rr.visitingpersonname= UserDetails.objects.get(user=app_visitor).first_name+' '+UserDetails.objects.get(user=app_visitor).last_name 
+        rr.visitingpersonname= engr
         rr.reportpersonname=reprtr
+        rr.npa = recnpa
         # print(app_visitor,app_reporter,'B')
         rr.save()
+
+        RecDynamicdValue.objects.filter(engreportid=repid).delete()
+        floorsengid = ReceptionReport.objects.get(pk = repid)
+        # saving dynamic fields details
+        try: 
+            engdynamicfields=EngDynamicField.objects.filter(active=True,form_type="Reception form")
+        except:
+            engdynamicfields=[]
+        for field in engdynamicfields:  
+        # Get the submitted value from request.POST 
+            if(field.input_type == 'checkbox'): 
+                field_value = request.POST.getlist(field.label.replace(' ', '-').lower())
+                for fld in field_value: 
+                    RecDynamicdValue.objects.create(input_field=field,value=fld,engreportid=floorsengid)
+            else: 
+                if(field.input_type == 'select'):
+                    optionvalue = request.POST.get(field.label.replace(' ', '-').lower()) 
+                    try: 
+                        field_value= EngFormOptionValues.objects.get(pk=int(optionvalue)).opt_value
+                    except:
+                        field_value=None
+                    field_valuea=None
+                    if field.suboption:
+                        sublabel = f'sub{field.label.replace(" ", "-").lower()}'
+                        optionsubvalue = request.POST.get(sublabel)
+                        print(sublabel)
+                        try: 
+                            field_valuea= EngFormsubOptionValues.objects.get(pk=int(optionsubvalue)).name
+                        except:
+                            field_valuea=None
+                    RecDynamicdValue.objects.create(input_field=field,value=field_value,subvalue=field_valuea,engreportid=floorsengid)  
+                else:
+                        
+                    field_value = request.POST.get(field.label.replace(' ', '-').lower()) 
+                    field_valuea=None
+                    if field_value:
+                        RecDynamicdValue.objects.create(input_field=field,value=field_value,subvalue=field_valuea,engreportid=floorsengid)
 
         uploaded_files = request.FILES.getlist('receptionFiles')
         for uploaded_file in uploaded_files:
@@ -278,7 +358,17 @@ def update_report(request,repid):
             states=[{'state_name':'Madhya Pradesh','state_id':20}, {'state_name':'Uttar Pradesh'}, {'state_name':'Rajsthan'}, {'state_name':'Delhi'}]
     except requests.ConnectionError:
         states=[{'state_name':'Madhya Pradesh','state_id':20}, {'state_name':'Uttar Pradesh'}, {'state_name':'Rajsthan'}, {'state_name':'Delhi'}]
-    return render(request,'reception/receptionreport.html',{'recptreport':rr,'appdd':appdate,'engineers':ers,'reporters':rrs,'documents':documents,'banks':banks,'states':states})
+    
+    subquery = RecDynamicdValue.objects.filter(
+            engreportid=repid,
+            input_field_id=OuterRef('input_field_id')
+            ).order_by('id').values('id')[:1]
+    engdynamicvalues = RecDynamicdValue.objects.filter(id__in=Subquery(subquery))
+    engdynamiccheckvalues = list(RecDynamicdValue.objects.values_list('value', flat=True).filter(engreportid=repid))    
+    optvalues = EngFormOptionValues.objects.select_related('eng_dynamic_field').all()
+    suboptions = EngFormsubOptionValues.objects.select_related('main_option').all()
+    
+    return render(request,'reception/receptionreport.html',{'recptreport':rr,'appdd':appdate,'engineers':ers,'reporters':rrs,'documents':documents,'banks':banks,'states':states,'engdynamicvalues':engdynamicvalues,'optvalues':optvalues,'engdynamiccheckvalues':engdynamiccheckvalues,'suboptions':suboptions})
 
 def delete_file(request, doc_id):
     try:

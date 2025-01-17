@@ -60,7 +60,7 @@
                   </div>
               
                 </div>
-                <div class="radioinput" >
+                <!-- <div class="radioinput" >
                   <p>Type of property:</p>
                   <input type="radio" id="res" name="propertytype" value="Residential" {% if recptreport.propertytype == 'Residential' %}checked{% endif %}>
                   <label for="res">Residential</label>&nbsp;&nbsp;
@@ -73,7 +73,7 @@
                   <input type="radio" id="vacant" name="propertytype" value="Vacant plot" {% if recptreport.propertytype == 'Vacant plot' %}checked{% endif %}>
                   <label for="vacant">Vacant plot</label>
                   
-                </div>
+                </div> -->
                 <div class="item">
                   <p>Property Address</p>
                   <input type="text" name="add1" placeholder="Street address"
@@ -95,19 +95,14 @@
                   {% else %}
                   value="{{recptreport.city}}"
                   {% endif %}/>
-                  <!-- <input type="text" name="region" placeholder="State" 
-                  {% if requestreceived %}
-                value="{{requestreceived.region}}"
-                {% else %}
-                value="{{recptreport.region}}"
-                {% endif %}/> -->
-                <select name="region" required>
+                  
+                <select name="region" >
                   <option value="">{% if requestreceived %} {{requestreceived.region}} {% else %} {{recptreport.region}} {% endif %}</option>
                   {% for state in states %}
                     {% if state.state_id == 20 %}
-                      <option value={{state.state_name}}  selected   >{{state.state_name}}</option>
+                      <option value="{{state.state_name}}"  selected   >{{state.state_name}}</option>
                     {% else %}
-                      <option value={{state.state_name}}   >{{state.state_name}}</option>
+                      <option value="{{state.state_name}}"   >{{state.state_name}}</option>
                     {%endif%}
                   {% endfor %}
                 </select>
@@ -125,7 +120,183 @@
                     </select>
                 </div>
               </div>
+              {% if recptreport %}
               <div class="item">
+                <label>Property type</label>
+                <div class="city-item">
+                  <input type="text" name="property-type" value="{{recptreport.propertytype}}">
+                  <input type="text" name="subproperty-type" value="{{recptreport.propertysubtype}}">
+                </div>
+              </div>
+              {%endif%}
+              <!-- <div class="item col-md-6">
+                <p>Property Address:</p>
+        <div class="city-item">
+          
+          <textarea id="propaddress" name="propaddress" rows="4" cols="30">{{requestreceived.add1}} {{requestreceived.add2}} {{requestreceived.city}} {{requestreceived.region}} {{requestreceived.zip}} {{requestreceived.country}}</textarea>
+        </div>
+        </div> -->
+              <!--add all dynamic field  -->
+        {% if dynamicrequestreceived %}
+        {% for field in dynamicrequestreceived %}
+         {% if field.input_field.id == 4 %}
+          <div class="item">
+            <label>{{ field.input_field.label }}</label>
+            <div class="city-item">
+              <input type="text" name="{{ field.input_field.label|slugify }}" value="{{field.value}}">
+              <input type="text" name="sub{{ field.input_field.label|slugify }}" value="{{field.subvalue}}">
+            </div>
+          </div>
+            {%endif%}
+            {% endfor %}
+            {% endif %}
+
+      <div class="row">
+        <div class="item col-sm-6">
+          <label for="landarea">Latitude</label>
+          <input id="replat" name="replat" type="number" step="any" min="-90" max="90" class="form-control" placeholder="Enter latitude"
+          {% if recptreport %}
+          value="{{recptreport.replat}}"
+          {% endif %}/>
+          </div>
+          <div class="item col-sm-6">
+            <label for="recomndrate">Longitude</label>
+            <input id="replng" name="replng" type="number" step="any" min="-180" max="180" class="form-control" placeholder="Enter longitude"
+            {% if recptreport %}
+            value="{{recptreport.replng}}"
+            {% endif %}/>
+            </div>
+      </div>    
+      <div class="row">
+        <div class="item col-sm-4">
+          <label for="landarea">Land Area</label>
+          <input id="landarea" name="landarea" type="text" class="form-control" placeholder="Enter land area"
+          {% if recptreport %}
+          value="{{recptreport.landarea}}"
+          {% endif %}/>
+          </div>
+          <div class="item col-sm-4">
+            <label for="recomndrate">Land rate</label>
+            <input id="recomndrate" name="recomndrate" type="text" class="form-control" placeholder="Enter land rate"
+            {% if recptreport %}
+            value="{{recptreport.recommendedlandrate}}"
+            {% endif %}/>
+            </div>
+            <div class="item col-sm-4">
+              <label for="landrate">Land value</label>
+              <input id="landrate" name="landrate" type="landrate" class="form-control" placeholder="Enter land value"
+              {% if recptreport %}
+              value="{{recptreport.landvalue}}"
+              {% endif %}/>
+              </div>
+          <!-- <div class="item col-sm-8">
+            <label for="fgarate">Rs. In figures Current Government Approved Rates for land.</label>
+            <input id="fgarate" name="fgarate" type="text" class="form-control" placeholder="Enter Government approved rate"
+            {% if recptreport %}
+            value="{{recptreport.govtaprovelandrate}}"
+            {% endif %}/>
+            </div> -->
+            
+      </div>
+      
+     {% if engdynamicvalues %}
+      {% for field in engdynamicvalues %}
+        {% if field.input_field.input_type == 'select' %}
+        <div class="item">
+          <label>{{ field.input_field.label }}</label>
+          <div class="city-item">
+            <select id="{{ field.input_field.label|slugify }}" class="form-select" aria-label="Default select example" name="{{ field.input_field.label|slugify }}" onchange="updateSubOptions('{{field.input_field.label|slugify}}')" >
+              <option value="0" >Select {{ field.input_field.label }}</option>
+              {% for optvalue in optvalues %}
+                {% if optvalue.eng_dynamic_field.label == field.input_field.label %}
+                {% if optvalue.opt_value == field.value %}
+                  <option value="{{ optvalue.id }}" selected  >{{ optvalue.opt_value }} </option>
+                {% else %}
+                  <option value="{{ optvalue.id }}"  >{{ optvalue.opt_value }} </option>
+                {% endif %}
+                {% endif %}
+              {% endfor %}
+            </select>
+            <select id="sub{{ field.input_field.label|slugify }}" class="form-select" aria-label="Default select example" name="sub{{ field.input_field.label|slugify }}"  {% if not field.input_field.suboption %} hidden {% endif %} >
+              <option value="0" >Select sub option</option>
+              {% for subopt in suboptions %}
+              {% if subopt.main_option.opt_value == field.value %}
+              {% if subopt.name == field.subvalue %}
+              <option value="{{ subopt.id }}" selected  >{{ subopt.name }} </option>
+              {% else%}
+              <option value="{{ subopt.id }}">{{ subopt.name }} </option>
+              {% endif %}
+              {%endif%}
+              {% endfor %}
+            </select>
+          </div>
+        </div>
+        {% elif field.input_field.input_type == 'checkbox' %}
+          <label for="{{ field.input_field.label }}"> {{ field.input_field.label }}:</label>
+          {% for optvalue in optvalues %}
+            {% if optvalue.eng_dynamic_field.label == field.input_field.label %}
+              <div class="form-check">
+              <input type="checkbox" class="form-check-input" id="{{ optvalue.opt_value }}" name="{{ field.input_field.label|slugify }}" value="{{ optvalue.opt_value }}" {% if optvalue.opt_value in engdynamiccheckvalues %} checked {% endif %}>
+              <label class="form-check-label" for="{{ optvalue.opt_value }}">{{ optvalue.opt_value }}</label>
+              </div>
+              <!-- engdynamiccheckvalues -->
+            {% endif %}
+          {% endfor %}
+        {% else %}
+        <div class="item col-sm-6">
+            <label>{{ field.input_field.label }}</label>
+            <input type="{{ field.input_field.input_type }}" name="{{ field.input_field.label|slugify }}" value="{{field.value}}">
+            {% if field.input_field.input_type == 'date' %}<i class="fas fa-calendar-alt"></i> {% endif %}
+          </div>
+          
+          {%endif%}
+          <!-- <br> -->
+      {% endfor %}
+    {% else %}
+    {% for field in engdynamicfields %}  
+        {% if field.input_type == 'select' %}
+      <div class="item">
+        <label>{{ field.label }}</label>
+        <div class="city-item">
+        <select id="{{ field.label|slugify }}" class="form-select" aria-label="Default select example" name="{{ field.label|slugify }}" onchange="updateSubOptions('{{ field.label|slugify }}')">
+          <option value="0" >Select {{ field.label }}</option>
+          {% for optvalue in optvalues %}
+            {% if optvalue.eng_dynamic_field.label == field.label %}
+              <option value="{{ optvalue.id }}">{{ optvalue.opt_value }}</option>
+            {% endif %}
+          {% endfor %}
+        </select>
+            <select id="sub{{ field.label|slugify }}" class="form-select" aria-label="Default select example" name="sub{{ field.label|slugify }}"  {% if not field.suboption %} hidden {% endif %} >
+              <option value="0" >Select sub option</option>
+              
+            </select>
+          
+      </div>
+      </div>
+        {% elif field.input_type == 'checkbox' %}
+              <label for="{{ field.label }}"> {{ field.label }}:</label>
+              {% for optvalue in optvalues %}
+                {% if optvalue.eng_dynamic_field.label == field.label %}
+                  <div class="form-check">
+                  <input type="checkbox" class="form-check-input" id="{{ optvalue.opt_value }}" name="{{ field.label|slugify }}" value="{{ optvalue.opt_value }}" >
+                  <label class="form-check-label" for="{{ optvalue.opt_value }}">{{ optvalue.opt_value }}</label>
+                  </div>
+                {% endif %}
+              {% endfor %}
+        {% else %}
+        <div class="item col-sm-6">
+        <label>{{ field.label }}</label>  
+        <input type="{{ field.input_type }}" name="{{ field.label|slugify }}"> 
+        {% if field.input_type == 'date' %}<i class="fas fa-calendar-alt"></i> {% endif %}
+        </div> 
+        {% endif %}
+        <!-- <br>   -->
+    {% endfor %}
+    {% endif %}
+          
+
+
+              <!-- <div class="item">
                 <label for="landmark">Landmark</label>
                 <input id="landmark" name="landmark" type="text" class="form-control" placeholder="Enter Landmark"
                 {% if requestreceived %}
@@ -134,8 +305,8 @@
                   value="{{recptreport.landmark}}"
                   {% endif %}
                 />
-              </div>
-              <div class="item">
+              </div> -->
+              <!-- <div class="item">
                 <p>Legal Address of Property ( House No./ Survey no./ khasra No.)</p>
                 <input type="text" name="ladd1" placeholder="Street address"
                 {% if recptreport %}
@@ -288,10 +459,10 @@
           </div> 
         </div>
       <div>
-        <!-- <button class="btn-btn-sm float-end" type="button" onclick="nextStep(2)">Next</button> -->
-      </div>
+       
+      </div> -->
     
-          <p>PROPERTY DETAILS </p>
+          <!-- <p>PROPERTY DETAILS </p>
               <div class="row">
                 <div class="item col-sm-4">
                     <label for="usagetype">Type of Usage of entire property</label>
@@ -593,10 +764,8 @@
     value="{{recptreport.otherobservation}}"
     {% endif %}/>
     </div>
-    </div>
-    <!-- <button class="btn-btn-sm float-end" type="button" onclick="nextStep(3)">Next</button>
-    <button class="btn-btn-sm float-end" type="button" onclick="nextStep(1)">Back</button> -->
-    
+    </div> -->
+<!--     
           <div class="row">
             <p>Interiors</p>
             <div class="item col-sm-3">
@@ -774,40 +943,7 @@
                       {% endif %}/>
                       </div>
               </div>
-              <div class="row">
-                <div class="item col-sm-4">
-                  <label for="landarea">Land Area</label>
-                  <input id="landarea" name="landarea" type="text" class="form-control" placeholder="Enter land area"
-                  {% if recptreport %}
-                  value="{{recptreport.landarea}}"
-                  {% endif %}/>
-                  </div>
-                  <div class="item col-sm-8">
-                    <label for="fgarate">Rs. In figures Current Government Approved Rates for land.</label>
-                    <input id="fgarate" name="fgarate" type="text" class="form-control" placeholder="Enter Government approved rate"
-                    {% if recptreport %}
-                    value="{{recptreport.govtaprovelandrate}}"
-                    {% endif %}/>
-                    </div>
-                    
-              </div>
-              <div class="row">
-                <div class="item col-sm-6">
-                  <label for="recomndrate">Recommended Rate and Basis for recommendation</label>
-                  <input id="recomndrate" name="recomndrate" type="text" class="form-control" placeholder="Enter Recommended rate"
-                  {% if recptreport %}
-                  value="{{recptreport.recommendedlandrate}}"
-                  {% endif %}/>
-                  </div>
-                  <div class="item col-sm-6">
-                    <label for="landrate">Land value--Land area x Rate per Sqft.</label>
-                    <input id="landrate" name="landrate" type="landrate" class="form-control" placeholder="Enter land rate per square feet"
-                    {% if recptreport %}
-                    value="{{recptreport.landvalue}}"
-                    {% endif %}/>
-                    </div>
-                    
-              </div>
+              
               <div class="row">
                 <div class="item col-sm-6">
                   <label for="actbua">Actual Bua of the premises(Sqft)</label>
@@ -914,7 +1050,7 @@
                         
                       </select>
                 </div>
-                </div>
+                </div> -->
 
             <div class="item">
               <label for="remark">Remarks if any</label>
@@ -957,10 +1093,8 @@
               <button class="btn-btn-sm" type="button" onclick="window.location.href='../reporterhome'">Cancel</button>
             </div>
             <div class="col-sm-4">
-          <!-- <button class="" type="button" onclick="window.location.href='../reporterhome'">Cancel</button> -->
           
           </div>
-            <!-- <button class="btn-btn-sm float-end" type="button" onclick="nextStep(2)">Back</button> -->
           <div class="col-sm-4">
           {% if recptreport %}
             <button class="float-end btn-btn-sm" type="submit" href="/">Update</button>
@@ -974,7 +1108,43 @@
       </form>
     </div>
   </div>
-  
+  <script>
+    function updateSubOptions( nme) {  
+      
+      const suboptionvalues = [
+          {% for optn in suboptions %}
+          {
+              id: '{{ optn.id }}',
+              name: '{{ optn.name }}',
+              main_option_id: '{{ optn.main_option_id }}',
+              main_option_value: '{{ optn.main_option.opt_value }}'
+          },
+          {% endfor %}
+      ];
+      // field_value = field.label.replace(' ', '-').lower()
+              // const elementname=document.getElementsByName()
+      console.log(nme); 
+              // const mainDropdown = document.getElementById('mainoption');  
+              const mainDropdown = document.getElementById(nme); 
+              const selectedMainOptionId = mainDropdown.value;
+              // const selectElement = document.getElementById('suboption');  
+              const selectElement = document.getElementById('sub'+nme);  
+              // const subOptionContainer = document.getElementById('sub-options-container');  
+              // console.log(selectedMainOptionId);
+              // Clear previous inputs  
+              selectElement.innerHTML = ''; 
+              suboptionvalues.forEach(opt => {
+                // console.log(opt.name);
+                  if (opt.main_option_id === selectedMainOptionId || opt.main_option_value === selectedMainOptionId) {
+                      const option = document.createElement('option');
+                      option.value = opt.id;
+                      option.textContent = opt.name;
+                      selectElement.appendChild(option);
+                  }
+              }); 
+    
+          }  
+  </script> 
 {% endblock %}
 {% block scripts%}
 
