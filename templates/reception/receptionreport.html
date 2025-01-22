@@ -29,13 +29,24 @@
                             />
                             <i class="fas fa-calendar-alt"></i>
                         </div>
-                        <div class="item col-sm-6 text-center">
+                        <div class="item col-sm-3 text-center">
                           <p>Npa:</p>
                           <label class="switch">  
                             {% if recptreport.npa %}
                             <input type="checkbox" name="npa" checked data-url="" id="toggle" class="toggle" onchange="toggleFunction(this.checked,{{recrep.id}})">
                             {% else %}  
                             <input type="checkbox" name="npa" data-url="" id="toggle" class="toggle" onchange="toggleFunction(this.checked,{{recrep.id}})"> 
+                            {% endif %} 
+                            <span class="slider round"></span>  
+                          </label>
+                        </div>
+                        <div class="item col-sm-3 text-center">
+                          <p>Part case:</p>
+                          <label class="switch">  
+                            {% if recptreport.partcase %}
+                            <input type="checkbox" name="partcase" checked data-url="" id="toggle" class="toggle" onchange="toggleFunction(this.checked,{{recrep.id}})">
+                            {% else %}  
+                            <input type="checkbox" name="partcase" data-url="" id="toggle" class="toggle" onchange="toggleFunction(this.checked,{{recrep.id}})"> 
                             {% endif %} 
                             <span class="slider round"></span>  
                           </label>

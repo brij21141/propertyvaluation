@@ -1,6 +1,7 @@
 from django.shortcuts import render,redirect
 import googlemaps.client
 from site_engineer.models import EngineerReport,EngDynamicdValue
+from site_engineer.views import load_json_data
 from reception.models import ReceptionReport, Document
 from reporter.models import ReporterReport,RepDynamicdValue
 from datetime import datetime
@@ -59,13 +60,13 @@ def add_report(request,repid):
         #     rr.propertytype=rre['propertytype']
         # except Exception as e:
         #     rr.propertytype=None
-        rr.add1=rre['add1']
-        rr.add2=rre['add2']
+        # rr.add1=rre['add1']
+        # rr.add2=rre['add2']
         rr.city=rre['city']
-        rr.region=rre['region']
-        print(request.POST.get('region'))
-        rr.zip=rre['zip']
-        rr.country=rre['country']
+        rr.add1=rre['propaddress']
+        # rr.region=rre['region']
+        # rr.zip=rre['zip']
+        # rr.country=rre['country']
         rr.propertytype=rre['property-type']
         rr.propertysubtype=rre['subproperty-type']
         rr.replat=rre['replat']
@@ -164,9 +165,10 @@ def add_report(request,repid):
         rr.bankid=Banks.objects.get(pk = ReceptionReport.objects.get(pk=er.receptionid_id,applicationnumber=rre['appno']).bankid ) 
         rr.remark = rre['remark']
         # Geo lat long and place id
-        if(rre['add1'] and rre['city'] and rre['region'] and rre['country']  and rre['zip'] != None):
-                # address_string = str(rre['add1'])+','+str(rre['add2'])+','+str(rre['region'])+','+str(rre['city'])+','+str(rre['country'])+','+str(rre['landmark'])+',',str(rre['zip'])
-                address_string = str(rre['add1'])+','+str(rre['add2'])+','+str(rre['region'])+','+str(rre['city'])+','+str(rre['country'])+','+str(rre['zip'])
+        # if(rre['add1'] and rre['city'] and rre['region'] and rre['country']  and rre['zip'] != None):
+        #         address_string = str(rre['add1'])+','+str(rre['add2'])+','+str(rre['region'])+','+str(rre['city'])+','+str(rre['country'])+','+str(rre['zip'])
+        if(rre['propaddress'] and rre['city']  != None):
+                address_string = str(rre['propaddress'])+str(rre['city'])
                 gmap =  googlemaps.Client(key=settings.GOOGLE_MAPS_API_KEY)
                 result = gmap.geocode(address_string)[0]
 
@@ -260,7 +262,10 @@ def add_report(request,repid):
     invdate=er.datecreated.strftime("%Y-%m-%d")
     optvalues = EngFormOptionValues.objects.select_related('eng_dynamic_field').all()
     suboptions = EngFormsubOptionValues.objects.select_related('main_option').all()
-    return render(request,"reporter/reporterform.html",{'requestreceived':er,'dynamicrequestreceived':engdynamicvalues,'states':states,'invdate':invdate,'engdynamicfields':engdynamicfields,'optvalues':optvalues,'suboptions':suboptions})
+    cities = load_json_data()
+    allcities = cities.get('cities')
+    return render(request,"reporter/reporterform.html",{'requestreceived':er,'dynamicrequestreceived':engdynamicvalues,'states':states,'cities':allcities,'invdate':invdate,'engdynamicfields':engdynamicfields,'optvalues':optvalues,'suboptions':suboptions})
+
 @login_required(login_url='login')
 def reporterhome(request):
     
@@ -295,14 +300,14 @@ def reporterhome(request):
                   banks= Banks.objects.all().values('id','name','branch','city')
                 #   allreport=EngineerReport.objects.all()
                 #   receivedrequest1=EngineerReport.objects.exclude(reporter ='Submitted').order_by('-priority','-updated_at')
-                #   receivedrequest=ReceptionReport.objects.exclude(reporter ='Submitted').filter(reportperson__gt=0).order_by('-priority','-updated_at')
-                  receivedrequest=ReceptionReport.objects.exclude(reporter ='Submitted').order_by('-priority','-updated_at')
+                  receivedrequest=ReceptionReport.objects.exclude(reporter ='Submitted').filter(Q(reportperson__gt=0)|Q(visitingperson__gt=0)).order_by('-priority','-updated_at')
+                #   receivedrequest=ReceptionReport.objects.exclude(reporter ='Submitted').order_by('-priority','-updated_at')
                 #   print(receivedrequest)
                   completedrequest=ReporterReport.objects.all().order_by('-updated_at')
                 #   print(EngineerReport.objects.get(pk=13).userdetailsid.first_name)
                 #   totalrequestnumber = EngineerReport.objects.count()
-                #   totalrequestnumber = ReceptionReport.objects.filter(reportperson__gt=0).count()
-                  totalrequestnumber = ReceptionReport.objects.count()
+                  totalrequestnumber = ReceptionReport.objects.filter(Q(reportperson__gt=0)|Q(visitingperson__gt=0)).count()
+                #   totalrequestnumber = ReceptionReport.objects.count()
                   totalcompleted = ReceptionReport.objects.filter(reporter='Submitted').count()
                   inprogress = ReceptionReport.objects.filter(reporter='InProgress').count()
                   hold = ReceptionReport.objects.filter(reporter='Hold').count()
@@ -315,11 +320,11 @@ def reporterhome(request):
                 #   allreport=EngineerReport.objects.filter(Q(receptionid__reportperson=userid) | Q(receptionid__reportperson=0))
                 #   receivedrequest1=EngineerReport.objects.exclude(reporter ='Submitted').filter(Q(receptionid__reportperson=userid) | Q(receptionid__reportperson=0)).order_by('-priority','-updated_at')
                 #   receivedrequest = ReceptionReport.objects.exclude(reporter ='Submitted').filter(Q(reportperson=userid) | Q(reportperson__gt=0)).order_by('-priority','-updated_at')
-                #   receivedrequest = ReceptionReport.objects.exclude(reporter ='Submitted').filter(reportperson=userid ).order_by('-priority','-updated_at')
-                  receivedrequest = ReceptionReport.objects.exclude(reporter ='Submitted').filter(Q(reportperson=userid) | Q(reportperson=0) ).order_by('-priority','-updated_at')
+                  receivedrequest = ReceptionReport.objects.exclude(reporter ='Submitted').filter(reportperson=userid ).order_by('-priority','-updated_at')
+                #   receivedrequest = ReceptionReport.objects.exclude(reporter ='Submitted').filter(Q(reportperson=userid) | Q(reportperson=0) ).order_by('-priority','-updated_at')
                   completedrequest=ReporterReport.objects.filter(receptionid__reportperson=userid).order_by('-updated_at')
                 #   totalrequestnumber = EngineerReport.objects.filter(receptionid__reportperson=userid).count()
-                  totalrequestnumber = ReceptionReport.objects.filter(Q(reportperson=userid) | Q(reportperson=0)).count()
+                  totalrequestnumber = ReceptionReport.objects.filter(reportperson=userid).count()
                   totalcompleted = ReceptionReport.objects.filter(reportperson=userid, reporter='Submitted').count()
                   inprogress = ReceptionReport.objects.filter(reportperson=userid, reporter='InProgress').count()
                   hold = ReceptionReport.objects.filter(reportperson=userid, reporter='Hold').count()
@@ -392,12 +397,13 @@ def update_report(request,repid):
         rr.propertysubtype=rre['subproperty-type']
         rr.replat=rre['replat']
         rr.replng=rre['replng']
-        rr.add1=rre['add1']
-        rr.add2=rre['add2']
+        # rr.add1=rre['add1']
+        # rr.add2=rre['add2']
         rr.city=rre['city']
-        rr.region=rre['region']
-        rr.zip=rre['zip']
-        rr.country=rre['country']
+        rr.add1=rre['propaddress']
+        # rr.region=rre['region']
+        # rr.zip=rre['zip']
+        # rr.country=rre['country']
         # rr.landmark=rre['landmark']
         # rr.ladd1=rre['ladd1']
         # rr.ladd2=rre['ladd2']
@@ -488,8 +494,10 @@ def update_report(request,repid):
         # rr.valuationresult=rre['valueresult']
         rr.remark = rre['remark']
         # Geo data lat, long, placeid
-        if(rre['add1'] and rre['city'] and rre['region'] and rre['country']  and rre['zip'] != None):
-                address_string = str(rre['add1'])+','+str(rre['add2'])+','+str(rre['region'])+','+str(rre['city'])+','+str(rre['country'])+','+str(rre['zip'])
+        # if(rre['add1'] and rre['city'] and rre['region'] and rre['country']  and rre['zip'] != None):
+        #         address_string = str(rre['add1'])+','+str(rre['add2'])+','+str(rre['region'])+','+str(rre['city'])+','+str(rre['country'])+','+str(rre['zip'])
+        if(rre['propaddress'] and rre['city'] != None):
+                address_string = str(rre['propaddress'])+str(rre['city'])
                 gmap =  googlemaps.Client(key=settings.GOOGLE_MAPS_API_KEY)
                 result = gmap.geocode(address_string)[0]
 
@@ -589,7 +597,9 @@ def update_report(request,repid):
     engdynamiccheckvalues = list(RepDynamicdValue.objects.values_list('value', flat=True).filter(engreportid=repid))    
     optvalues = EngFormOptionValues.objects.select_related('eng_dynamic_field').all()
     suboptions = EngFormsubOptionValues.objects.select_related('main_option').all()
-    return render(request,'reporter/reporterform.html',{'recptreport':rr,'appdd':appdate,'documents':documents,'states':states,'engdynamicvalues':engdynamicvalues,'optvalues':optvalues,'engdynamiccheckvalues':engdynamiccheckvalues,'suboptions':suboptions})
+    cities = load_json_data()
+    allcities = cities.get('cities')
+    return render(request,'reporter/reporterform.html',{'recptreport':rr,'appdd':appdate,'documents':documents,'states':states,'cities':allcities,'engdynamicvalues':engdynamicvalues,'optvalues':optvalues,'engdynamiccheckvalues':engdynamiccheckvalues,'suboptions':suboptions})
 
 class Geomapview(View):
     template_name = 'reporter/geomap.html'

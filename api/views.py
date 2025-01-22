@@ -385,7 +385,7 @@ def engreportstatus(request,status,uid):
                         
                         if (userrole == "Admin" or userrole == "Reception"):
                               # receivedrequest=ReceptionReport.objects.exclude(engineer ='Submitted')
-                              totalrequestnumber = ReceptionReport.objects.count()
+                              totalrequestnumber = ReceptionReport.objects.filter(Q(reportperson__gt=0)|Q(visitingperson__gt=0)).count()
                               totalcompleted = ReceptionReport.objects.filter(engineer='Submitted').count()
                               inprogress = ReceptionReport.objects.filter(engineer='InProgress').count()
                               hold = ReceptionReport.objects.filter(engineer='Hold').count()
@@ -453,8 +453,8 @@ def reporterreportstatus(request,uid):
             # print(results)
                         if (userrole == "Admin" or userrole == "Reception"):
                               # receivedrequest=ReceptionReport.objects.exclude(engineer ='Submitted')
-                              # totalrequestnumber = ReceptionReport.objects.filter(reportperson__gt=0).count()
-                              totalrequestnumber = ReceptionReport.objects.count()
+                              totalrequestnumber = ReceptionReport.objects.filter(Q(reportperson__gt=0)|Q(visitingperson__gt=0)).count()
+                              # totalrequestnumber = ReceptionReport.objects.count()
                               totalcompleted = ReceptionReport.objects.filter(reporter='Submitted').count()
                               inprogress = ReceptionReport.objects.filter(reporter='InProgress').count()
                               hold = ReceptionReport.objects.filter(reporter='Hold').count()
@@ -463,7 +463,7 @@ def reporterreportstatus(request,uid):
                         else:
                               # receivedrequest=ReceptionReport.objects.exclude(engineer ='Submitted')
                               # totalrequestnumber = ReceptionReport.objects.filter(visitingpersonname=username).count()
-                              totalrequestnumber = ReceptionReport.objects.filter(Q(reportpersonname=username) | Q(reportperson=0)).count()
+                              totalrequestnumber = ReceptionReport.objects.filter(reportpersonname=username).count()
                               totalcompleted = ReceptionReport.objects.filter(reportpersonname=username, reporter='Submitted').count()
                               inprogress = ReceptionReport.objects.filter(reportpersonname=username, reporter='InProgress').count()
                               hold = ReceptionReport.objects.filter(reportpersonname=username, reporter='Hold').count()

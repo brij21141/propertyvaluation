@@ -78,7 +78,7 @@
                       </div>
 
                   
-                      <div class="item">
+                      <!-- <div class="item">
                             <p>Address</p>
                             <input type="text" name="add1" placeholder="Street address"
                             {% if requestreceived %}
@@ -98,14 +98,14 @@
                             value="{{requestreceived.city}}"
                             {% else %}
                             value="{{recptreport.city}}"
-                            {% endif %}/>
+                            {% endif %}/> -->
                             <!-- <input type="text" name="region" placeholder="State" 
                             {% if requestreceived %}
                           value="{{requestreceived.region}}"
                           {% else %}
                           value="{{recptreport.region}}"
                           {% endif %}/> -->
-                          <select name="region" required>
+                          <!-- <select name="region" required>
                             <option value="">{% if requestreceived %} {{requestreceived.region}} {% else %} {{recptreport.region}} {% endif %}</option>
                             {% for state in states %}
                               {% if state.state_id == 20 %}
@@ -128,14 +128,26 @@
                                 
                               </select>
                           </div>
-                        </div>
-          <!-- <div class="item col-md-6">
-            <p>Property Address:</p>
-          <div class="city-item">
+                        </div> -->
+           <div class="row">    
             
-            <textarea id="propaddress" name="propaddress" rows="4" cols="30">{{requestreceived.add1}} {{requestreceived.add2}} {{requestreceived.city}} {{requestreceived.region}} {{requestreceived.zip}} {{requestreceived.country}}</textarea>
+          <div class="col-md-6">
+            <label for="propaddress">Property Address:</label>
+            <textarea id="propaddress" name="propaddress" rows="3" cols="30">{% if requestreceived %}{{requestreceived.add1}} {{requestreceived.add2}} {{requestreceived.city}} {{requestreceived.region}} {{requestreceived.zip}} {{requestreceived.country}}{% else %}{{recptreport.add1}}
+              {% endif %}
+            </textarea>
           </div>
-          </div> -->
+            <div class="col-md-6">
+            <label for="city">City:</label>
+            <select name="city" style="height: fit-content;" required>
+              <option value="{% if requestreceived %} {{requestreceived.city}} {% else %} {{recptreport.city}} {% endif %}" selected>{% if requestreceived %} {{requestreceived.city}} {% else %} {{recptreport.city}} {% endif %}</option>
+              {% for city in cities %}
+                  <option value="{{city.District}}"   >{{city.District}}</option>
+                {% endfor %}
+            </select>
+          </div>
+          
+        </div>
                         <p>BOUNDARIES AS PER SITE</p>
                         <div class="item">
                           <label for="east">East</label>

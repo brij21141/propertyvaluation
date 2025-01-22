@@ -6,11 +6,13 @@
 
 {% block content %}
 <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.1/moment.min.js"></script>
-<!-- <div class="container-fluid"> -->
+<div class="container-fluid">
   <div class="container my-2" style="display: block; background: #f6f6f6; padding: 20px 20px 20px;">
 
-  <!-- <div class="container my-2"> -->
+  <div class="container my-2">
+    <div class="card">
       <div class="row" style="height: 100px;">
+        
           <div class="col-md-2" onclick="filtpending('all')" style="cursor: pointer;height:100px;overflow:hidden;">
               <div class="card text-center widget-card border-light shadow-sm" style="background-image: url('{% static "img/cardprog.jpg" %}'); ">
                   <div class="card-body">
@@ -77,8 +79,9 @@
             </div></a>
           </div> -->
           
-        </div>
       </div>
+      </div>
+    </div>
   <!-- </div>  -->
   <!-- <div class="ms-2 mt-3" style="display: flex;align-items: center;"><h4>Important document links</h4><span class="ms-2"><a href="" data-bs-toggle="modal" data-bs-target="#impdocpopup">View all</a></span></div>
   <div class="container my-1">
@@ -186,7 +189,7 @@
               </thead>
               <tbody>
                 {% for recrep in requestreceived %}
-                <tr {% if recrep.receptionid.priority%}  class="table-danger" {% elif recrep.npa%} class="table-warning" {%else%} class=""{% endif %}>
+                <tr {% if recrep.receptionid.priority%}  class="table-danger" {% elif recrep.npa%} class="table-warning" {% elif recrep.partcase%} class="table-success" {%else%} class=""{% endif %}>
                   <td scope="row">{{forloop.counter}}</td>
                   <!-- <td >{{recrep.id}}</td> -->
                   <!-- <td >{{recrep.applicationdate}}</td> -->
@@ -194,7 +197,13 @@
                   <td >{{recrep.name}}</td>
                   
                   <td >{{recrep.bankname}}</td>
-                  <td >{{recrep.bankvertical}}</td>
+                  {% if recrep.npa %}
+                  <td >NPA case</td>
+                  {% elif recrep.partcase %}
+                  <td >Part case</td>
+                  {% else %}
+                  <td>Normal case</td>
+                  {% endif %}
                   <!-- <td >{{recrep.add1}}</td>
                   <td >{{recrep.city}}</td> -->
                   <td >{{recrep.visitingpersonname}}</td>
@@ -238,6 +247,7 @@
       </div>
     </div>
   </div>
+
   <div class="modal fade" id="holdcausepopup" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
     <div class="modal-dialog">
       <div class="modal-content">
@@ -294,7 +304,7 @@
                 </thead>
                 <tbody>
                   {% for reqcom in requestcompleted %}
-                  <tr {% if reqcom.receptionid.priority%}  class="table-danger" {%else%} class=""{% endif %}>
+                  <tr {% if reqcom.receptionid.priority%}  class="table-danger" {% elif reqcom.receptionid.npa%} class="table-warning" {% elif reqcom.receptionid.partcase%} class="table-success" {%else%} class=""{% endif %}>
                     <td scope="row">{{forloop.counter}}</td>
                     <!-- <td >{{recrep.id}}</td> -->
                     <!-- <td >{{recrep.applicationdate}}</td> -->

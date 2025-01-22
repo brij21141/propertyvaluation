@@ -58,7 +58,7 @@ fetch('/api/currentuser')
      navbarname.textContent=data.data[1];
      topnavbarname.textContent=data.data[1]+" ("+ data.data[3]+" )";
      topnavbaremail.textContent=data.data[2];
-     console.log(data.data[3]);
+    //  console.log(data.data[3]);
     //  navprofileimg.src='/propval/static/img/OIP.jpg';
     //  navmenuprofileimg.src='/propval/static/img/OIP.jpg';
     if(data.data[4]) {
@@ -76,6 +76,7 @@ fetch('/api/currentuser')
       document.getElementById("compprofile").style.display = "none";
       document.getElementById("genbill").style.display = "none";
       document.getElementById("administration").style.display = "none";
+      document.getElementById("repinitiate").style.display = "none";
       document.querySelectorAll('.engedit').forEach(function(element) {  
         element.style.display = 'none';  
     }); 
@@ -102,6 +103,7 @@ fetch('/api/currentuser')
       document.getElementById("compprofile").style.display = "none";
       // document.getElementById("genbpythonill").style.display = "none";
       document.getElementById("administration").style.display = "none";
+      document.getElementById("repinitiate").style.display = "none";
       document.querySelectorAll('.recedit').forEach(function(element) {  
         element.style.display = 'none';  
     }); 

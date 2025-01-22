@@ -74,7 +74,7 @@
                   <label for="vacant">Vacant plot</label>
                   
                 </div> -->
-                <div class="item">
+                <!-- <div class="item">
                   <p>Property Address</p>
                   <input type="text" name="add1" placeholder="Street address"
                   {% if requestreceived %}
@@ -119,23 +119,35 @@
                       
                     </select>
                 </div>
+              </div> -->
+              <div class="row">    
+            
+                <div class="col-md-6">
+                  <label for="propaddress">Property Address:</label>
+                  <textarea id="propaddress" name="propaddress" rows="3" cols="30">{% if requestreceived %}{{requestreceived.add1}}{% else %}{{recptreport.add1}}
+                    {% endif %}
+                  </textarea>
+                </div>
+                  <div class="col-md-6">
+                  <label for="city">City:</label>
+                  <select name="city" style="height: fit-content;" required>
+                    <option value="{% if requestreceived %} {{requestreceived.city}} {% else %} {{recptreport.city}} {% endif %}" selected>{% if requestreceived %} {{requestreceived.city}} {% else %} {{recptreport.city}} {% endif %}</option>
+                    {% for city in cities %}
+                        <option value="{{city.District}}"   >{{city.District}}</option>
+                      {% endfor %}
+                  </select>
+                </div>
+                
               </div>
-              {% if recptreport %}
+
               <div class="item">
                 <label>Property type</label>
                 <div class="city-item">
-                  <input type="text" name="property-type" value="{{recptreport.propertytype}}">
-                  <input type="text" name="subproperty-type" value="{{recptreport.propertysubtype}}">
+                  <input type="text" name="property-type" value="{% if requestreceived %} {{requestreceived.propertytype}} {% else %} {{recptreport.propertytype}} {% endif %}">
+                  <input type="text" name="subproperty-type" value="{% if requestreceived %} {{requestreceived.propertysubtype}} {% else %} {{recptreport.propertysubtype}} {% endif %}">
                 </div>
               </div>
-              {%endif%}
-              <!-- <div class="item col-md-6">
-                <p>Property Address:</p>
-        <div class="city-item">
-          
-          <textarea id="propaddress" name="propaddress" rows="4" cols="30">{{requestreceived.add1}} {{requestreceived.add2}} {{requestreceived.city}} {{requestreceived.region}} {{requestreceived.zip}} {{requestreceived.country}}</textarea>
-        </div>
-        </div> -->
+              
               <!--add all dynamic field  -->
         {% if dynamicrequestreceived %}
         {% for field in dynamicrequestreceived %}

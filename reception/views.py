@@ -45,6 +45,10 @@ def add_report(request):
             recnpa =True
         else:
             recnpa = False
+        if request.POST.get('partcase'):
+            recpartcase =True
+        else:
+            recpartcase = False
         app_date = request.POST.get('appdate')
         app_number = request.POST.get("appno")
         app_name = request.POST.get("name")
@@ -91,6 +95,7 @@ def add_report(request):
         rr.visitingpersonname= visitr
         rr.reportpersonname=reprtr
         rr.npa=recnpa
+        rr.partcase=recpartcase
         rr.save()
         newrecid=rr.id
         floorsengid = ReceptionReport.objects.get(pk = newrecid)
@@ -229,6 +234,10 @@ def update_report(request,repid):
             recnpa =True
         else:
             recnpa = False
+        if request.POST.get('partcase'):
+            recpartcase =True
+        else:
+            recpartcase = False
         app_date = request.POST.get('appdate')
         app_number = request.POST.get("appno")
         app_name = request.POST.get("name")
@@ -274,6 +283,7 @@ def update_report(request,repid):
         rr.visitingpersonname= engr
         rr.reportpersonname=reprtr
         rr.npa = recnpa
+        rr.partcase = recpartcase
         # print(app_visitor,app_reporter,'B')
         rr.save()
 

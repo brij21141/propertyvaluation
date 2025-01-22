@@ -195,6 +195,9 @@ html, body {
   .city-item select {
   width: calc(50% - 8px);
   }
+  .city-item textarea {
+  width: calc(50% - 8px);
+  }
   }
 
   /* profile css */

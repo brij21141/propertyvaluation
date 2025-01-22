@@ -7,17 +7,22 @@ from django.contrib import messages
 from django.core.files.storage import default_storage
 from django.http import HttpResponseRedirect,JsonResponse
 from django.conf import settings
-import os , requests, time
+import os , requests, time, json
 from django.contrib.auth.models import User
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from rest_framework.authtoken.models import Token
 from django.db import transaction
 from django.utils.text import slugify
-from django.db.models import OuterRef, Subquery  
+from django.db.models import OuterRef, Subquery 
+from django.db.models import Q 
 
 # Create your views here.
-
+def load_json_data():  
+    json_file_path = f'{settings.BASE_DIR}/propval/static/cities.json'  
+    with open(json_file_path, 'r') as file:  
+        data = json.load(file)  
+    return data  
 def add_report(request,repid):
     with transaction.atomic():  # Start the transaction  if transactions fails it will rollback data
         if request.user.is_authenticated:
@@ -42,12 +47,14 @@ def add_report(request,repid):
             app_bankname = Banks.objects.get(pk=request.POST.get("bankid")).name
             app_bankid = request.POST.get("bankid")
             casetype = request.POST.get("case")
-            app_add1 = request.POST.get("add1")
-            app_add2 = request.POST.get("add2")
+            # app_add1 = request.POST.get("add1")
+            # app_add2 = request.POST.get("add2")
             app_city = request.POST.get("city")
-            app_region = request.POST.get("region")
-            app_zip = request.POST.get("zip")
-            app_country = request.POST.get("country")
+            print(app_city)
+            # app_region = request.POST.get("region")
+            # app_zip = request.POST.get("zip")
+            # app_country = request.POST.get("country")
+            propaddress = request.POST.get("propaddress")
             eastboundary = request.POST.get("east")
             westboundary = request.POST.get("west")
             northboundary = request.POST.get("north")
@@ -86,12 +93,13 @@ def add_report(request,repid):
             er.bankname = app_bankname
             er.bankid = app_bankid
             er.casetype = casetype
-            er.add1 = app_add1
-            er.add2 = app_add2
+            # er.add1 = app_add1
+            # er.add2 = app_add2
             er.city = app_city
-            er.region = app_region
-            er.zip = app_zip
-            er.country = app_country
+            # er.region = app_region
+            # er.zip = app_zip
+            # er.country = app_country
+            er.add1 = propaddress
             er.east = eastboundary
             er.west = westboundary
             er.north = northboundary
@@ -188,8 +196,11 @@ def add_report(request,repid):
                         field_valuea=None
                         if field.suboption:
                             sublabel = f'sub{field.label.replace(" ", "-").lower()}'
-                            optionsubvalue = request.POST.get(sublabel) 
-                            field_valuea= EngFormsubOptionValues.objects.get(pk=int(optionsubvalue)).name
+                            optionsubvalue = request.POST.get(sublabel)
+                            try: 
+                                field_valuea= EngFormsubOptionValues.objects.get(pk=int(optionsubvalue)).name
+                            except:
+                                field_valuea=None
                         # print(optionsubvalue, field_value)
                         # form_data[field.label] = field_value  
                         EngDynamicdValue.objects.create(input_field=field,value=field_value,subvalue=field_valuea,engreportid=floorsengid)  
@@ -246,13 +257,18 @@ def add_report(request,repid):
                 states=[{'state_name':'Madhya Pradesh','state_id':20}, {'state_name':'Uttar Pradesh'}, {'state_name':'Rajsthan'}, {'state_name':'Delhi'}]
         except requests.ConnectionError:
             states=[{'state_name':'Madhya Pradesh','state_id':20}, {'state_name':'Uttar Pradesh'}, {'state_name':'Rajsthan'}, {'state_name':'Delhi'}]
+        cities = load_json_data()
+        allcities = cities.get('cities')
         optvalues = EngFormOptionValues.objects.select_related('eng_dynamic_field').all()
         suboptions = EngFormsubOptionValues.objects.select_related('main_option').all()
         # for option in optvalues:
         #     print(option.eng_dynamic_field.label)
-        return render(request,"engineer/engineersiteform.html",{'requestreceived':rr,'engdynamicfields':engdynamicfields, 'banks':banks,'states':states,'optvalues':optvalues,'suboptions':suboptions})
+        return render(request,"engineer/engineersiteform.html",{'requestreceived':rr,'engdynamicfields':engdynamicfields, 'banks':banks,'states':states,'cities':allcities, 'optvalues':optvalues,'suboptions':suboptions})
 @login_required(login_url='login')
 def engineerhome(request):
+    cities = load_json_data()
+    # print(cities.get('cities'))
+    # print(load_json_data()['cities'][0]['District'])
     if request.user.is_authenticated:
         useremail = request.user.email
         userid = User.objects.get(email=useremail).id
@@ -274,8 +290,8 @@ def engineerhome(request):
                     if userrole == "Admin":
                             allreport=ReceptionReport.objects.all()
                             banks= Banks.objects.all().values('id','name','branch','city')
-                            receivedrequest=ReceptionReport.objects.exclude(engineer ='Submitted').order_by('-priority','-updated_at')
-                            totalrequestnumber = ReceptionReport.objects.count()
+                            receivedrequest=ReceptionReport.objects.exclude(engineer ='Submitted').filter(Q(reportperson__gt=0)|Q(visitingperson__gt=0)).order_by('-priority','-updated_at')
+                            totalrequestnumber = ReceptionReport.objects.filter(Q(reportperson__gt=0)|Q(visitingperson__gt=0)).count()
                             totalcompleted = ReceptionReport.objects.filter(engineer='Submitted').count()
                             # print(totalrequestnumber-totalcompleted)
                             completedrequest=EngineerReport.objects.all().order_by('-priority','-updated_at')
@@ -340,12 +356,13 @@ def update_report(request,repid):
                     app_bankname = Banks.objects.get(pk=request.POST.get("bankid")).name
                     app_bankid = request.POST.get("bankid")
                     casetype = request.POST.get("case")
-                    app_add1 = request.POST.get("add1")
-                    app_add2 = request.POST.get("add2")
+                    # app_add1 = request.POST.get("add1")
+                    # app_add2 = request.POST.get("add2")
                     app_city = request.POST.get("city")
-                    app_region = request.POST.get("region")
-                    app_zip = request.POST.get("zip")
-                    app_country = request.POST.get("country")
+                    # app_region = request.POST.get("region")
+                    # app_zip = request.POST.get("zip")
+                    # app_country = request.POST.get("country")
+                    propaddress = request.POST.get("propaddress")
                     eastboundary = request.POST.get("east")
                     westboundary = request.POST.get("west")
                     northboundary = request.POST.get("north")
@@ -388,12 +405,13 @@ def update_report(request,repid):
                     bankname = er.bankname,
                     bankid = er.bankid,
                     casetype = er.casetype,
-                    add1 = er.add1,
-                    add2 = er.add2,
+                    # add1 = er.add1,
+                    # add2 = er.add2,
                     city = er.city,
-                    region = er.region,
-                    zip = er.zip,
-                    country = er.country,
+                    # region = er.region,
+                    # zip = er.zip,
+                    # country = er.country,
+                    add1 = er.add1,
                     east = er.east,
                     west = er.west,
                     north = er.north,
@@ -526,12 +544,13 @@ def update_report(request,repid):
                     er.bankname = app_bankname
                     er.bankid = app_bankid
                     er.casetype = casetype
-                    er.add1 = app_add1
-                    er.add2 = app_add2
+                    # er.add1 = app_add1
+                    # er.add2 = app_add2
                     er.city = app_city
-                    er.region = app_region
-                    er.zip = app_zip
-                    er.country = app_country
+                    # er.region = app_region
+                    # er.zip = app_zip
+                    # er.country = app_country
+                    er.add1 = propaddress
                     er.east = eastboundary
                     er.west = westboundary
                     er.north = northboundary
@@ -646,7 +665,9 @@ def update_report(request,repid):
         optvalues = EngFormOptionValues.objects.select_related('eng_dynamic_field').all()
         suboptions = EngFormsubOptionValues.objects.select_related('main_option').all()
         occupants = Occupants.objects.filter(engreportid_id=repid)
-        return render(request,'engineer/engineersiteform.html',{'recptreport':rr,'engdynamicvalues':engdynamicvalues, 'documents':documents,'banks':banks,'states':states,'floors':floors,'optvalues':optvalues,'engdynamiccheckvalues':engdynamiccheckvalues,'suboptions':suboptions,'occupants':occupants})
+        cities = load_json_data()
+        allcities = cities.get('cities')
+        return render(request,'engineer/engineersiteform.html',{'recptreport':rr,'engdynamicvalues':engdynamicvalues, 'documents':documents,'banks':banks,'states':states,'cities':allcities,'floors':floors,'optvalues':optvalues,'engdynamiccheckvalues':engdynamiccheckvalues,'suboptions':suboptions,'occupants':occupants})
 
 def delete_file(request, doc_id):
     try:

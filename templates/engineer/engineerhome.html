@@ -171,6 +171,7 @@
                   <!-- <th scope="col">ADDRESS</th>
                   <th scope="col">CITY</th> -->
                   <th scope="col">PHONE</th>
+                  <th scope="col">Case Type</th>
                   <th scope="col">ASSIGNED VISITOR</th>
                   <th scope="col">ASSIGNED REPORTER</th>
                   <th scope="col">Engineer Status</th>
@@ -180,7 +181,7 @@
               </thead>
               <tbody>
                 {% for recrep in requestreceived %}
-                <tr {% if recrep.priority%}  class="table-danger" {% elif recrep.npa%} class="table-warning" {%else%} class=""{% endif %}>
+                <tr {% if recrep.priority%}  class="table-danger" {% elif recrep.npa%} class="table-warning" {% elif recrep.partcase%} class="table-success" {%else%} class=""{% endif %}>
                   <td scope="row">{{forloop.counter}}</th>
                   <!-- <td >{{recrep.id}}</td> -->
                   <td >{{recrep.applicationdate|date:"d-m-Y"}}</td>
@@ -191,6 +192,13 @@
                   <!-- <td >{{recrep.add1}}</td>
                   <td >{{recrep.city}}</td> -->
                   <td >{{recrep.phonenumber}}</td>
+                  {% if recrep.npa %}
+                  <td >NPA case</td>
+                  {% elif recrep.partcase %}
+                  <td >Part case</td>
+                  {% else %}
+                  <td>Normal case</td>
+                  {% endif %}
                   <td >{{recrep.visitingpersonname}}</td>
                   <td >{{recrep.reportpersonname}}</td>
                   {% if recrep.engineer == "Submitted" or recrep.engineer == "Hold"   %}
@@ -265,7 +273,7 @@
             <hr>
             <table id="engineertablecomp" class="table table-hover table-striped tavle-bordered" style="font-size: 90%;">
               <thead>
-                <tr {% if recrep.priority%}  class="table-danger" {% elif recrep.npa%} class="table-warning" {%else%} class=""{% endif %}>
+                <tr >
                   <th scope="col">#</th>
                   <!-- <th scope="col">APP.DATE</th> -->
                   <th scope="col">APP.NO.</th>
@@ -281,7 +289,7 @@
               <tbody>
                 <!-- {{requestcompleted}} -->
                 {% for reqcom in requestcompleted %}
-                <tr>
+                <tr {% if reqcom.receptionid.priority%}  class="table-danger" {% elif reqcom.receptionid.npa%} class="table-warning" {% elif reqcom.receptionid.partcase%} class="table-success" {%else%} class=""{% endif %}>
                   <td scope="row">{{forloop.counter}}</th>
                   <!-- <td >{{recrep.id}}</td> -->
                   <!-- <td >{{reqcom.applicationdate}}</td> -->
