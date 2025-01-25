@@ -4,7 +4,7 @@ from django.contrib.auth.models import User
 import csv,json,time
 from django.utils import timezone
 from datetime import datetime,timedelta
-from propval.models import UserDetails,Banks,Impdoc
+from propval.models import UserDetails,Banks,Impdoc,EngDynamicField,EngFormOptionValues,EngFormsubOptionValues
 from django.db.models import Count
 from reception.models import ReceptionReport,ArchieveReceptionReport
 from site_engineer.models import EngineerReport,ArchieveEngineerReport,HistoryEngineerReport,Floordetails,HistoryFloordetails,EngAttendance,EngDynamicdValue,HistoryEngDynamicdValue
@@ -13,7 +13,7 @@ from django.contrib.auth import login, authenticate, logout
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from .serializers import LoginSerializer,UserSerializer,EngineerSerializer,ReceptionSerializer,UserdetailSerializer,EngineerCreateSerializer,ReporterSerializer,UserProfileSerializer
-from .serializers import ResetPasswordEmailRequestSerializer,ResetPasswordSerializer,BankSerializer,FileUploadSerializer,EngineerAttendanceSerializer
+from .serializers import ResetPasswordEmailRequestSerializer,ResetPasswordSerializer,BankSerializer,FileUploadSerializer,EngineerAttendanceSerializer,DynamicfieldSerializer,OptionvaluesSerializer,SuboptionvaluesSerializer
 from rest_framework.authtoken.models import Token
 from rest_framework.permissions import IsAuthenticated
 from rest_framework import viewsets
@@ -528,6 +528,18 @@ def reportassign(request,uid):
         return JsonResponse({'success': False, 'error':'Report could not be assigned'})
     
 #Apis
+class DynamicFieldsVs(viewsets.ModelViewSet):
+     queryset = EngDynamicField.objects.exclude(active=False).filter(Q(form_type = "Engineer form") | Q(form_type = "Reception form") )
+     serializer_class = DynamicfieldSerializer
+
+class OptionValuesVs(viewsets.ModelViewSet):
+     queryset = EngFormOptionValues.objects.all()
+     serializer_class = OptionvaluesSerializer
+
+class SubOptionValuesVs(viewsets.ModelViewSet):
+     queryset = EngFormsubOptionValues.objects.all()
+     serializer_class = SuboptionvaluesSerializer
+
 class EngAttendanceViewSet(viewsets.ModelViewSet):
      queryset = EngAttendance.objects.all()
      serializer_class=EngineerAttendanceSerializer

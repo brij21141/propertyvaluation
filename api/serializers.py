@@ -2,13 +2,28 @@ from rest_framework import serializers
 from site_engineer.models import EngineerReport,EngAttendance
 from django.contrib.auth.models import User
 from reception.models import ReceptionReport,Document
-from propval.models import UserDetails,Banks
+from propval.models import UserDetails,Banks,EngDynamicField,EngFormOptionValues,EngFormsubOptionValues
 from reporter.models import ReporterReport
 
 class LoginSerializer(serializers.Serializer):
     username = serializers.CharField(max_length=50)
     password = serializers.CharField(max_length=50)
 
+class DynamicfieldSerializer(serializers.HyperlinkedModelSerializer):
+    id = serializers.ReadOnlyField()
+    class Meta:
+        model = EngDynamicField
+        fields = "__all__"
+class OptionvaluesSerializer(serializers.HyperlinkedModelSerializer):
+    id = serializers.ReadOnlyField()
+    class Meta:
+        model = EngFormOptionValues
+        fields = "__all__"
+class SuboptionvaluesSerializer(serializers.HyperlinkedModelSerializer):
+    id = serializers.ReadOnlyField()
+    class Meta:
+        model = EngFormsubOptionValues
+        fields = "__all__"
 class ReceptionSerializer(serializers.HyperlinkedModelSerializer):
     id = serializers.ReadOnlyField()
     class Meta:

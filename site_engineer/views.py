@@ -261,8 +261,9 @@ def add_report(request,repid):
         allcities = cities.get('cities')
         optvalues = EngFormOptionValues.objects.select_related('eng_dynamic_field').all()
         suboptions = EngFormsubOptionValues.objects.select_related('main_option').all()
-        # for option in optvalues:
-        #     print(option.eng_dynamic_field.label)
+        # queryset = EngDynamicField.objects.prefetch_related('sub_options', 'sub_options').all()  
+        # for option in queryset:
+        #     print(option)
         return render(request,"engineer/engineersiteform.html",{'requestreceived':rr,'engdynamicfields':engdynamicfields, 'banks':banks,'states':states,'cities':allcities, 'optvalues':optvalues,'suboptions':suboptions})
 @login_required(login_url='login')
 def engineerhome(request):
