@@ -1,44 +1,44 @@
-document.addEventListener('DOMContentLoaded', () => {  
-  const container = document.getElementById('scrollContainer');  
-  const items = Array.from(container.children);  
+// document.addEventListener('DOMContentLoaded', () => {  
+//   const container = document.getElementById('scrollContainer');  
+//   const items = Array.from(container.children);  
   
-  // Clone the items to create an infinite scrolling effect  
-  items.forEach(item => {  
-      const clone = item.cloneNode(true);  
-      container.appendChild(clone);  
-  });  
+//   // Clone the items to create an infinite scrolling effect  
+//   items.forEach(item => {  
+//       const clone = item.cloneNode(true);  
+//       container.appendChild(clone);  
+//   });  
   
-  let scrollPosition = 0; // Initial scroll position  
-  const scrollSpeed = 1; // Pixels to scroll per interval  
-  const scrollInterval = 20; // Milliseconds between scrolls  
+//   let scrollPosition = 0; // Initial scroll position  
+//   const scrollSpeed = 1; // Pixels to scroll per interval  
+//   const scrollInterval = 20; // Milliseconds between scrolls  
 
-  function autoScroll() {  
-      // Scroll by `scrollSpeed` pixels  
-      scrollPosition += scrollSpeed;   
-      container.scrollTop = scrollPosition;  
+//   function autoScroll() {  
+//       // Scroll by `scrollSpeed` pixels  
+//       scrollPosition += scrollSpeed;   
+//       container.scrollTop = scrollPosition;  
 
-      // If we've scrolled past the original content height, reset to the top  
-      if (scrollPosition >= container.scrollHeight / 2) {  
-          scrollPosition = 0; // Reset scroll position  
-      }  
-  }  
-  function startScrolling() {  
-    // Start auto-scrolling at defined intervals  
-    intervalId = setInterval(autoScroll, scrollInterval);  
-}  
+//       // If we've scrolled past the original content height, reset to the top  
+//       if (scrollPosition >= container.scrollHeight / 2) {  
+//           scrollPosition = 0; // Reset scroll position  
+//       }  
+//   }  
+//   function startScrolling() {  
+//     // Start auto-scrolling at defined intervals  
+//     intervalId = setInterval(autoScroll, scrollInterval);  
+// }  
 
-function stopScrolling() {  
-    // Clear the interval to stop scrolling  
-    clearInterval(intervalId);  
-}
+// function stopScrolling() {  
+//     // Clear the interval to stop scrolling  
+//     clearInterval(intervalId);  
+// }
 
-  // Start auto-scrolling at defined intervals  
-  // setInterval(autoScroll, scrollInterval); 
-  startScrolling(); 
+//   // Start auto-scrolling at defined intervals  
+//   // setInterval(autoScroll, scrollInterval); 
+//   startScrolling(); 
 
-  container.addEventListener('mouseover', stopScrolling);  
-    container.addEventListener('mouseout', startScrolling);  
-});
+//   container.addEventListener('mouseover', stopScrolling);  
+//     container.addEventListener('mouseout', startScrolling);  
+// });
 
 const hamburger = document.querySelector("#toggle-btn");
 console.log("sidebar connected");

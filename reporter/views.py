@@ -646,7 +646,7 @@ class Geomapview(View):
                 'inpdate': a.inspectiondate.strftime('%d-%m-%Y'), 
                 'name': a.name,
                 'add1': a.add1,
-                'add2': a.add2,
+                # 'add2': a.add2,
                 'city': a.city,
                 'landarea': a.landarea,
                 'bank': a.bankid.name,
