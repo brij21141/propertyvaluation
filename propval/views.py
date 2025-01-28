@@ -502,7 +502,7 @@ def impdoc(request):
             impdocadd.pdf_file = request.FILES['imppdfFile']
             impdocadd.linkurl = request.FILES['imppdfFile'].name
         impdocadd.userdetails = UserDetails.objects.filter(user_email=request.user.email).first()
-        # impdocadd.save()
+        impdocadd.save()
         return redirect('impdoc')
 
     try:  

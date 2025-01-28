@@ -535,10 +535,36 @@ class DynamicFieldsVs(viewsets.ModelViewSet):
 class OptionValuesVs(viewsets.ModelViewSet):
      queryset = EngFormOptionValues.objects.all()
      serializer_class = OptionvaluesSerializer
+     @action(detail=True,methods=['get'])
+     def dynoptionvalues(self, request,pk=None):
+          try:
+            optionvalues = EngFormOptionValues.objects.filter(eng_dynamic_field_id=pk) 
+            optionvalues_serializer=OptionvaluesSerializer(optionvalues,many=True,context={'request':request})
+             
+          except EngFormOptionValues.DoesNotExist:
+            return JsonResponse({'success': False, 'error':'Record not found'})
+          return Response({
+            'success': True,
+            'data': optionvalues_serializer.data
+             }, status=status.HTTP_200_OK)
+
+     
 
 class SubOptionValuesVs(viewsets.ModelViewSet):
      queryset = EngFormsubOptionValues.objects.all()
      serializer_class = SuboptionvaluesSerializer
+     @action(detail=True,methods=['get'])
+     def dynsuboptionvalues(self, request,pk=None):
+          try:
+            optionvalues = EngFormsubOptionValues.objects.filter(main_option_id=pk) 
+            optionvalues_serializer=SuboptionvaluesSerializer(optionvalues,many=True,context={'request':request})
+             
+          except EngFormsubOptionValues.DoesNotExist:
+            return JsonResponse({'success': False, 'error':'Record not found'})
+          return Response({
+            'success': True,
+            'data': optionvalues_serializer.data
+             }, status=status.HTTP_200_OK)
 
 class EngAttendanceViewSet(viewsets.ModelViewSet):
      queryset = EngAttendance.objects.all()
