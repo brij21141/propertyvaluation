@@ -2,7 +2,7 @@ from django.urls import path,include
 from . import views
 from .views import LoginAPI, LogoutAPI,EngineerViewSet,UserViewSet,ReceptionViewSet,ReporterViewSet,UserProfileUpdateView,UserdetailViewSet
 from .views import ResetPasswordRequestView, ResetPasswordConfirmView,BankViewSet,DocumentUploadView,DocumentgetView,EngAttendanceViewSet
-from .views import DynamicFieldsVs,OptionValuesVs,SubOptionValuesVs
+from .views import DynamicFieldsVs,OptionValuesVs,SubOptionValuesVs,OccupantVs,FloorVs
 from rest_framework import routers
 
 router = routers.DefaultRouter()
@@ -13,9 +13,12 @@ router.register(r'reception',ReceptionViewSet)
 router.register(r'reporter',ReporterViewSet)
 router.register(r'userdetail',UserdetailViewSet)
 router.register(r'bank',BankViewSet)
+# router.register(r'dynamicvalues',DynamicValuesVs)
 router.register(r'dynamicfields',DynamicFieldsVs)
 router.register(r'optionvalues',OptionValuesVs)
 router.register(r'suboptions',SubOptionValuesVs)
+router.register(r'occupant',OccupantVs)
+router.register(r'floor',FloorVs)
 
 urlpatterns = [
     # to get all users api

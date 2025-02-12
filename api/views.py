@@ -7,13 +7,13 @@ from datetime import datetime,timedelta
 from propval.models import UserDetails,Banks,Impdoc,EngDynamicField,EngFormOptionValues,EngFormsubOptionValues
 from django.db.models import Count
 from reception.models import ReceptionReport,ArchieveReceptionReport
-from site_engineer.models import EngineerReport,ArchieveEngineerReport,HistoryEngineerReport,Floordetails,HistoryFloordetails,EngAttendance,EngDynamicdValue,HistoryEngDynamicdValue
+from site_engineer.models import EngineerReport,ArchieveEngineerReport,HistoryEngineerReport,Floordetails,HistoryFloordetails,EngAttendance,EngDynamicdValue,HistoryEngDynamicdValue,Occupants,HistoryOccupants
 from reporter.models import ReporterReport
 from django.contrib.auth import login, authenticate, logout
 from rest_framework.views import APIView
 from rest_framework.response import Response
-from .serializers import LoginSerializer,UserSerializer,EngineerSerializer,ReceptionSerializer,UserdetailSerializer,EngineerCreateSerializer,ReporterSerializer,UserProfileSerializer
-from .serializers import ResetPasswordEmailRequestSerializer,ResetPasswordSerializer,BankSerializer,FileUploadSerializer,EngineerAttendanceSerializer,DynamicfieldSerializer,OptionvaluesSerializer,SuboptionvaluesSerializer
+from .serializers import LoginSerializer,UserSerializer,EngineerSerializer,ReceptionSerializer,UserdetailSerializer,EngineerCreateSerializer,ReporterSerializer,UserProfileSerializer,OccupantSerializer,FloorSerializer,HistoryEngineerCreateSerializer,HistoryFloordetailsSerializer,HistoryOccupantsSerializer,HistoryEngDynamicdValueSerializer
+from .serializers import ResetPasswordEmailRequestSerializer,ResetPasswordSerializer,BankSerializer,FileUploadSerializer,EngineerAttendanceSerializer,DynamicfieldSerializer,OptionvaluesSerializer,SuboptionvaluesSerializer,DynValueSerializer
 from rest_framework.authtoken.models import Token
 from rest_framework.permissions import IsAuthenticated
 from rest_framework import viewsets
@@ -22,7 +22,7 @@ from rest_framework.response import Response
 from rest_framework import status
 from rest_framework import generics
 import openpyxl
-from django.db.models import Q  
+from django.db.models import Q ,OuterRef, Subquery
 from django.dispatch import receiver
 from django_rest_passwordreset.signals import reset_password_token_created
 from django.core.mail import send_mail
@@ -32,7 +32,7 @@ import os
 from django.conf import settings
 from reception.models import Document
 from django.db.models import Prefetch
-
+from django.db import transaction
 
 # users=User.objects.all().filter(id__gt=1)
 users=User.objects.all()
@@ -528,9 +528,82 @@ def reportassign(request,uid):
         return JsonResponse({'success': False, 'error':'Report could not be assigned'})
     
 #Apis
+class OccupantVs(viewsets.ModelViewSet):
+     queryset = Occupants.objects.all()
+     serializer_class = OccupantSerializer
+     @action(detail=True,methods=['get'])
+     def getoccupant(self, request,pk=None):
+          try:
+            occupants = Occupants.objects.filter(engreportid_id=pk)  
+            occupant_serializer=OccupantSerializer(occupants,many=True,context={'request':request})
+          except Occupants.DoesNotExist:
+            return JsonResponse({'success': False, 'error':'Record not found'})
+          return Response({
+            'success': True,
+            'data': occupant_serializer.data
+             }, status=status.HTTP_200_OK)
+class FloorVs(viewsets.ModelViewSet):
+     queryset = Floordetails.objects.all()
+     serializer_class = FloorSerializer
+     @action(detail=True,methods=['get'])
+     def getfloor(self, request,pk=None):
+          try:
+            floors = Floordetails.objects.filter(engreportid_id=pk)  
+            floor_serializer=FloorSerializer(floors,many=True,context={'request':request})
+          except Floordetails.DoesNotExist:
+            return JsonResponse({'success': False, 'error':'Record not found'})
+          return Response({
+            'success': True,
+            'data': floor_serializer.data
+             }, status=status.HTTP_200_OK)
+
+# class DynamicValuesVs(viewsets.ModelViewSet):
+#      queryset = EngDynamicdValue.objects.all()
+#      serializer_class = DynamicValueSerializer
+#      @action(detail=True,methods=['get'])
+#      def getdynamicvalues(self, request,pk=None):
+#       #     try:
+#       #       subquery = EngDynamicdValue.objects.filter(
+#       #       engreportid=pk,
+#       #       input_field_id=OuterRef('input_field_id')
+#       #       ).order_by('id').values('id')[:1]
+#       #       # engdynamicvalues = EngDynamicdValue.objects.prefetch_related('input_field').filter(id__in=Subquery(subquery))
+#       #       engdynamicvalues = EngDynamicdValue.objects.filter(engreportid_id=pk)
+#       #       dynamic_serializer=DynamicValueSerializer(engdynamicvalues,many=True,context={'request':request})
+#       #     except EngDynamicdValue.DoesNotExist:
+#       #       return JsonResponse({'success': False, 'error':'Record not found'})
+#       #     return Response({
+#       #       'success': True,
+#       #       'data': dynamic_serializer.data
+#       #        }, status=status.HTTP_200_OK)
+#         instance = self.get_object()  
+#         # Retrieve the related EngDynamicdValue if it exists  
+#         dynamic_value = EngDynamicdValue.objects.filter(engreportid_id=pk)  
+#         response_data = self.get_serializer(instance).data  
+#         response_data['dynamic_value'] = EngDynamicdValueSerializer(dynamic_value).data if dynamic_value else None  
+#         return Response(response_data)
+     
+     
+
 class DynamicFieldsVs(viewsets.ModelViewSet):
      queryset = EngDynamicField.objects.exclude(active=False).filter(Q(form_type = "Engineer form") | Q(form_type = "Reception form") )
      serializer_class = DynamicfieldSerializer
+
+     @action(detail=True,methods=['get'])
+     def getdynamicvalues(self, request,pk=None):
+        # Call the superclass to get the queryset  
+        newqueryset = self.get_queryset()  
+        # Serialize the EngDynamicField instances  
+        fields_data = self.get_serializer(newqueryset, many=True).data  
+        
+        # For each field, include the corresponding EngDynamicdValue records  
+        for field in fields_data:  
+            # Get the related EngDynamicdValues for the current field and engreportid  
+            related_values = EngDynamicdValue.objects.filter(input_field_id=field['id'], engreportid_id=pk)  
+            # Serialize the related EngDynamicdValue records  
+            field['dynamic_values'] = DynValueSerializer(related_values, many=True).data  
+            
+        return Response(fields_data)  
 
 class OptionValuesVs(viewsets.ModelViewSet):
      queryset = EngFormOptionValues.objects.all()
@@ -538,9 +611,16 @@ class OptionValuesVs(viewsets.ModelViewSet):
      @action(detail=True,methods=['get'])
      def dynoptionvalues(self, request,pk=None):
           try:
-            optionvalues = EngFormOptionValues.objects.filter(eng_dynamic_field_id=pk) 
+            # optionvalues = EngFormOptionValues.objects.filter(eng_dynamic_field_id=pk) 
+            # optionvalues = EngFormOptionValues.objects.prefetch_related('sub_options').values( 
+            # 'eng_dynamic_field', 
+            # 'id',   
+            # 'opt_value',   
+            # 'sub_options__name'  
+            # ).filter(eng_dynamic_field_id=pk)  
+            optionvalues = EngFormOptionValues.objects.prefetch_related('sub_options').filter(eng_dynamic_field_id=pk)  
             optionvalues_serializer=OptionvaluesSerializer(optionvalues,many=True,context={'request':request})
-             
+            print(optionvalues_serializer.data[0]['sub_options'])
           except EngFormOptionValues.DoesNotExist:
             return JsonResponse({'success': False, 'error':'Record not found'})
           return Response({
@@ -594,28 +674,129 @@ class EngineerViewSet(viewsets.ModelViewSet):
      @action(detail=False, methods=['post'])
      def createengreport(self, request, pk=None):
       #     queryset = EngineerReport.objects.all()
+      with transaction.atomic():
           serializer_class=EngineerCreateSerializer(data=request.data,context={'request':request})
           if serializer_class.is_valid():  
-            serializer_class.save()  
-            print(request.data.get('receptionid').split('/')[-2] ) 
+            newid=serializer_class.save() 
+            floorsengid = EngineerReport.objects.get(pk = newid.id) 
+
+            # floors = request.data.get('floors') 
+            floors =json.loads(request.data.get('floors'))
+            floor_details = json.loads(request.data.get('floor_details')) 
+            floor_areas = json.loads(request.data.get('floor_areas')) 
+            print(floors,floor_details,floor_areas)
+            print("occ",request.data.get('occupant'))
+            for i in range(len(floors)):  
+                floor_value = floors[i]  
+                detail_value = floor_details[i]  
+                area_value = floor_areas[i] 
+                Floordetails.objects.create(floorname=floor_value, floordetail=detail_value, floorarea=area_value,engreportid = floorsengid)  
+            
+            occupants = json.loads(request.data.get('occupants'))
+            for i in range(len(occupants)):  
+                occupantname = occupants[i]  
+                Occupants.objects.create(occupantname=occupantname,engreportid = floorsengid)  
+            # print(request.data.get('receptionid').split('/')[-2] ) 
             queryset=ReceptionReport.objects.get(id=request.data.get('receptionid').split('/')[-2])
-            print(queryset)
+            # print(queryset)
             queryset.engineer='Submitted'
             queryset.save()
-            # rr=ReceptionReport.objects.get(applicationnumber=app_number,pk=repid)
-        
+            # rr=ReceptionReport.objects.get(applicationnumber=app_number,pk=repid)  
+            dynamicValues =json.loads(request.data.get('dynamicValues'))
+            for i in range(len(dynamicValues)):
+                 print(dynamicValues[i])
+                 field = EngDynamicField.objects.get(pk=dynamicValues[i]['id']) 
+                 field_value = dynamicValues[i]['value']
+                 field_valuea = dynamicValues[i]['subvalue']
+                 print(dynamicValues[i]['id'],field_value,field_valuea)
+                 
+                 EngDynamicdValue.objects.create(input_field=field,value=field_value,subvalue=field_valuea,engreportid=floorsengid)  
+                 
             return Response({'success': True, 'data': serializer_class.data}, status=status.HTTP_201_CREATED)  
           return Response(serializer_class.errors, status=status.HTTP_400_BAD_REQUEST)  
  
 #http://127.0.0.1:8000/api/engineer/updateengreport/     updating record of eng report api
      @action(detail=True, methods=['put'])
      def updateengreport(self, request, pk=None):
-          queryset = EngineerReport.objects.get(pk=pk)
-          serializer_class=EngineerCreateSerializer(queryset,data=request.data,context={'request':request})
-          if serializer_class.is_valid():  
-            serializer_class.save()  
-            return Response({'success': True, 'message':f'Record id: {pk} Application#: {queryset.applicationnumber} updated successfully','data': serializer_class.data}, status=status.HTTP_202_ACCEPTED)  
-          return Response(serializer_class.errors, status=status.HTTP_400_BAD_REQUEST)  
+        with transaction.atomic():  
+            queryset = EngineerReport.objects.get(pk=pk)
+            history_record = HistoryEngineerReport() 
+            # print(pk,queryset)
+            historyserializer_class  = HistoryEngineerCreateSerializer(history_record, data=queryset.__dict__)
+            if historyserializer_class.is_valid():  
+                  oldrecid=historyserializer_class.save()
+                  historyengreportid = HistoryEngineerReport.objects.get(pk=oldrecid.id)  
+            else:  
+                  # Handle serializer errors, e.g., log them  
+                  print(historyserializer_class.errors)  
+                  return Response(historyserializer_class.errors, status=status.HTTP_400_BAD_REQUEST)  
+            
+            floorqueryset = Floordetails.objects.filter(engreportid=pk)
+            for floor in floorqueryset:
+                              old_floor = HistoryFloordetails(  
+                              floorname = floor.floorname,
+                              floordetail = floor.floordetail,
+                              floorarea = floor.floorarea,
+                              engreportid = floor.engreportid,
+                              historyengreportid = historyengreportid
+                              # historyengreportid = HistoryEngineerReport.objects.get(pk=oldrecid)
+                              )
+                              old_floor.save()
+                        # deleting existing floor details and inserting updated 
+            Floordetails.objects.filter(engreportid=pk).delete()
+            floorsengid = EngineerReport.objects.get(pk = pk) 
+
+            # floors = request.data.get('floors') 
+            floors =json.loads(request.data.get('floors'))
+            floor_details = json.loads(request.data.get('floor_details')) 
+            floor_areas = json.loads(request.data.get('floor_areas')) 
+            for i in range(len(floors)):  
+                  floor_value = floors[i]  
+                  detail_value = floor_details[i]  
+                  area_value = floor_areas[i] 
+                  Floordetails.objects.create(floorname=floor_value, floordetail=detail_value, floorarea=area_value,engreportid = floorsengid)  
+            
+            occupants = Occupants.objects.filter(engreportid=pk)
+            for occupant in occupants:
+                  old_occupant = HistoryOccupants(  
+                  occupantname = occupant.occupantname,
+                  engreportid = occupant.engreportid,
+                  historyengreportid = historyengreportid
+                  # historyengreportid = HistoryEngineerReport.objects.get(pk=oldrecid)
+                  )
+                  old_occupant.save()
+                    # deleting existing occupant details and inserting updated 
+            Occupants.objects.filter(engreportid=pk).delete()
+            occupants = json.loads(request.data.get('occupants'))
+            for i in range(len(occupants)):  
+                occupantname = occupants[i]  
+                Occupants.objects.create(occupantname=occupantname,engreportid = floorsengid)  
+            
+            dynamicfields = EngDynamicdValue.objects.filter(engreportid=pk)
+            for dynamic in dynamicfields:
+                  old_dynamic = HistoryEngDynamicdValue(  
+                  input_field = dynamic.input_field,
+                  value = dynamic.value,
+                  engreportid = dynamic.engreportid,
+                  hsengreportid = historyengreportid
+                  )
+                  old_dynamic.save()
+                    # deleting existing dynamic values details and inserting updated 
+            EngDynamicdValue.objects.filter(engreportid=pk).delete()
+            dynamicValues =json.loads(request.data.get('dynamicValues'))
+            for i in range(len(dynamicValues)):
+                 field = EngDynamicField.objects.get(pk=dynamicValues[i]['id']) 
+                 field_value = dynamicValues[i]['value']
+                 field_valuea = dynamicValues[i]['subvalue']
+                 EngDynamicdValue.objects.create(input_field=field,value=field_value,subvalue=field_valuea,engreportid=floorsengid)  
+            
+           
+            serializer_class=EngineerCreateSerializer(queryset,data=request.data,context={'request':request})
+            if serializer_class.is_valid():  
+                  newid = serializer_class.save()  
+                  
+                  return Response({'success': True, 'message':f'Record id: {pk} Application#: {queryset.applicationnumber} updated successfully','data': serializer_class.data}, status=status.HTTP_202_ACCEPTED)  
+            return Response(serializer_class.errors, status=status.HTTP_400_BAD_REQUEST)  
           
 #http://127.0.0.1:8000/api/engineer/engineercomjob/
      @action(detail=False,methods=['get'])

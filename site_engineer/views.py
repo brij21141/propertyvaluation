@@ -50,7 +50,7 @@ def add_report(request,repid):
             # app_add1 = request.POST.get("add1")
             # app_add2 = request.POST.get("add2")
             app_city = request.POST.get("city")
-            print(app_city)
+            # print(app_city)
             # app_region = request.POST.get("region")
             # app_zip = request.POST.get("zip")
             # app_country = request.POST.get("country")
@@ -115,9 +115,9 @@ def add_report(request,repid):
             er.propertyage = propertyage
             er.landrate = landrate
             if occupancy == 1:
-                er.Occupant = "Single Occupancy"
+                er.occupant = "Single Occupancy"
             else:
-                er.Occupant = "Multiple Occupancy"
+                er.occupant = "Multiple Occupancy"
             er.landmark = landmark
             er.roadwidth = roadwidth
             if hightension is None:
@@ -427,7 +427,7 @@ def update_report(request,repid):
                     sxarea = er.sxarea,
                     propertyage = er.propertyage,
                     landrate = er.landrate,
-                    Occupant = er.Occupant,
+                    Occupant = er.occupant,
                     landmark = er.landmark,
                     roadwidth = er.roadwidth,
                     hightensionline = er.hightensionline,
@@ -567,9 +567,9 @@ def update_report(request,repid):
                     er.propertyage = propertyage
                     er.landrate = landrate
                     if occupancy == 1:
-                        er.Occupant = "Single Occupancy"
+                        er.occupant = "Single Occupancy"
                     else:
-                        er.Occupant = "Multiple Occupancy"
+                        er.occupant = "Multiple Occupancy"
                     er.landmark = landmark
                     er.roadwidth = roadwidth
                     if hightension is None:
@@ -661,8 +661,8 @@ def update_report(request,repid):
         engdynamicvalues = EngDynamicdValue.objects.filter(id__in=Subquery(subquery))
         engdynamiccheckvalues = list(EngDynamicdValue.objects.values_list('value', flat=True).filter(engreportid=repid))    
         # engdynamicvalues=EngDynamicdValue.objects.filter(engreportid=repid).distinct('input_field_id') 
-        for engid in engdynamicvalues:
-            print(engid.input_field_id)
+        # for engid in engdynamicvalues:
+        #     print(engid.input_field_id)
         optvalues = EngFormOptionValues.objects.select_related('eng_dynamic_field').all()
         suboptions = EngFormsubOptionValues.objects.select_related('main_option').all()
         occupants = Occupants.objects.filter(engreportid_id=repid)
