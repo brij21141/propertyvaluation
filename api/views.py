@@ -1004,6 +1004,12 @@ class ReceptionViewSet(viewsets.ModelViewSet):
           reception_serializer=ReceptionSerializer(engineerjob,many=True,context={'request':request})
           print("getting reception report for a particular engineer" , pk, "engineer")
           return Response(reception_serializer.data)
+     @action(detail=True,methods=['get'])
+     def totalengineerjob(self, request,pk=None):
+          engineerjob=ReceptionReport.objects.filter(visitingperson=pk)
+          reception_serializer=ReceptionSerializer(engineerjob,many=True,context={'request':request})
+          print("getting reception report for a particular engineer" , pk, "engineer")
+          return Response(reception_serializer.data)
      @action(detail=False,methods=['get'])
      def reporterunassigned(self, request,pk=None):
           reporterunassigned=ReceptionReport.objects.filter(reportperson=0)
