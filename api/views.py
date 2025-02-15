@@ -77,9 +77,10 @@ class LoginAPI(APIView):
           user = authenticate(request, username=username,password=password)
           if user is not None:
             token , _ = Token.objects.get_or_create(user=user)
+            userName = UserDetails.objects.get(user_id=user.id).first_name+" "+UserDetails.objects.get(user_id=user.id).last_name
             login(request , user)
             # return JsonResponse({'success': True, 'data':str(token), 'message': 'User Authenticated successfully'})
-            return JsonResponse({'success': True, 'message': 'User Authenticated successfully','token':str(token),'userid':user.id})
+            return JsonResponse({'success': True, 'message': 'User Authenticated successfully','token':str(token),'userid':user.id,'name':userName})
           else:
             return JsonResponse({'success': False,'message': 'User name or password is wrong'}) 
       #     return JsonResponse(data)
