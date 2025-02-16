@@ -568,7 +568,7 @@ def impdocdelete(request,uid,):
     impdoc=Impdoc.objects.get(pk=uid)
     impdoc.delete()
 def engdynamicfielddelete(request,uid,):
-    # print (uid,udid)
+    print (uid)
     engdynamicfield=EngDynamicField.objects.get(pk=uid)
     # engdynamicfield.delete()
     engdynamicfield.active=False

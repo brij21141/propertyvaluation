@@ -678,7 +678,8 @@ function clearsearch() {
 }
 
 $(document).ready(function() {
-  $('.impdocdelete').click(function(event) {
+  // $('.impdocdelete').click(function(event) {
+    $(document).on('click', '.impdocdelete', function(event) { 
     console.log("impdocdelete clicked");
       event.preventDefault();
       var button = $(this);
