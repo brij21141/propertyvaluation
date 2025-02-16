@@ -835,8 +835,10 @@ class EngineerViewSet(viewsets.ModelViewSet):
      @action(detail=True,methods=['get'])
      def engineercomjobapi(self, request,pk=None):
       #     engineercompjob=EngineerReport.objects.filter(receptionid__engineer='Submitted').select_related('receptionid').values('receptionid__visitingpersonname', 'receptionid__phonenumber')
-          engineercompjob=ReceptionReport.objects.filter(engineer='Submitted',visitingperson=pk )  
-          engineercompjob_serializer=ReceptionSerializer(engineercompjob,many=True,context={'request':request})
+      #     engineercompjob=ReceptionReport.objects.filter(engineer='Submitted',visitingperson=pk )  
+      #     engineercompjob_serializer=ReceptionSerializer(engineercompjob,many=True,context={'request':request})
+          engineercompjob=EngineerReport.objects.filter(receptionid__engineer='Submitted',userdetailsid_id=pk )  
+          engineercompjob_serializer=EngineerCreateSerializer(engineercompjob,many=True,context={'request':request})
       #     return Response(engineercompjob_serializer.data)
           return Response({
             'success': True,

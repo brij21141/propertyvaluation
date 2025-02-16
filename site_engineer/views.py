@@ -238,6 +238,7 @@ def add_report(request,repid):
 
 
             rr=ReceptionReport.objects.get(applicationnumber=app_number,pk=repid)
+            print(newrecid)
             rr.engineer='Submitted'
             rr.engid=newrecid
             rr.save()
