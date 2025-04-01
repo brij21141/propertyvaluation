@@ -1,0 +1,303 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>Engineer Completed report</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    {% include 'bootstrap_link.html' %}
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'css/sidebarstyle.css' %}">
+    <link rel="stylesheet" href="{% static 'css/formstyle.css' %}">
+<!-- 
+    <style>  
+      @media print {  
+          body {  
+            margin-top: 0.0in; 
+        margin-right: 0in !important;
+        margin-bottom: 0.0in;  
+        margin-left: 0.0in;  
+          }  
+          #mn {  
+              margin: 0; 
+          }  
+          .page-break {  
+              page-break-after: always; 
+          }  
+      }  
+  </style>  -->
+  <style>  
+    @media print {  
+        body {  
+            margin: 0; /* Reset body margin */  
+        }  
+        .row {  
+            display: flex; /* Maintain flexbox layout */  
+            flex-wrap: wrap; /* Allow wrapping */  
+        }  
+        .col-md-6 {  
+            flex: 0 0 50%; /* Set columns to take up 50% width */  
+            max-width: 50%; /* Ensure max width stays at 50% */  
+        } 
+        .col-md-4 {  
+                flex: 0 0 33%; /* Set columns to take up 33.33% width for three columns */  
+                max-width: 33%; 
+    }  
+    .col-md-1 {  
+                flex: 0 0 10%; /* Set columns to take up 33.33% width for three columns */  
+                max-width: 10%;
+    }
+    .col-md-3 {  
+                flex: 0 0 24%; /* Set columns to take up 33.33% width for three columns */  
+                max-width: 24%;
+    }
+  }
+</style>  
+</head>
+<body>
+
+  <div class="testbox col-md-8 offset-md-2">
+    <form action="">{% csrf_token %}
+      <div class="row d-flex align-items-baseline">
+        <div class="col-md-6">
+          <a data-mdb-ripple-init class="btn btn-light text-capitalize" style="text-align: center;" data-mdb-ripple-color="dark" href="{% url 'reporterhome' %}">
+            <i class="fa-solid fa-arrow-left"></i> Back</a>
+        </div>
+        <div class="col-md-6 d-flex justify-content-end">
+          <a data-mdb-ripple-init class="btn btn-light text-capitalize border-0" data-mdb-ripple-color="dark" onclick="printbill()"><i
+              class="fas fa-print text-primary"></i> Print</a>
+          <!-- <a data-mdb-ripple-init class="btn btn-light text-capitalize" data-mdb-ripple-color="dark" href="{% url 'billinpdf' %}"><i
+              class="far fa-file-pdf text-danger"></i> Export</a>-->
+          <a data-mdb-ripple-init class="btn btn-light text-capitalize" data-mdb-ripple-color="dark" href="{% url 'download_rep_eng_images' recptreport.id %}"><i
+              class="fa fa-download text-primary"></i> Download</a> 
+        </div>
+        <hr>
+      </div>
+  <div id="mn" mr-2 ml-2>
+      <div class="banner">
+          <h1>Engineer Completed Report</h1>
+      </div>
+    <div class="row my-2">
+      <div class="col-md-6">
+        <b> Application Number:</b> {{recptreport.applicationnumber}} 
+      </div>
+      <div class="col-md-6">
+        <b> Report Submit date:</b> {{appdd}} 
+      </div>
+    </div>
+    <div class="row my-2">
+      <div class="col-md-6">
+        <b> Name : </b> {{recptreport.name}}
+      </div>
+      <div class="col-md-6">
+        <b> Visit Done in Presence of : </b> {{recptreport.visitinpresence}}
+      </div>
+        
+    </div>
+    <div class="row my-2">
+      <div class="col-md-6">
+        <b> Bank Name : </b> {{recptreport.bankname}}
+      </div>
+      <div class="col-md-6">
+        <b> Case type : </b> {{recptreport.casetype}}
+      </div>
+        
+    </div>
+    
+    <!-- <div class="item">
+        <label for="bankname">Bank</label>
+      <div class="name-item">
+        <input id="bankname" name="bankname" type="text" class="form-control" placeholder="Enter bank name"
+        value="{{bk.name}} {{bk.branch}} {{bk.city}}"
+        />
+      </div>    
+    </div> -->
+
+    <div class="row">    
+        <div class="col-md-6">
+          <b>Property Address:  </b>{{recptreport.add1}}
+        </div>
+          <div class="col-md-6">
+            <b>City:  </b>{{recptreport.city}}
+        </div>
+    </div>
+    <p class="my-2"><b>BOUNDARIES AS PER SITE</b></p>
+    <div class="row my-2">
+      <div class="col-md-6">
+        <b>East : </b>{{recptreport.east}}
+      </div>
+      <div class="col-md-6">
+        <b>West : </b>{{recptreport.west}}
+      </div>
+    </div>
+    <div class="row my-2">
+      <div class="col-md-6">
+        <b>North : </b>{{recptreport.north}}
+      </div>
+      <div class="col-md-6">
+        <b>South : </b>{{recptreport.south}}
+      </div>
+    </div>
+    <div class="item">
+          <label for="occupancy">Occupant details :</label><br>
+          <label for="">Occupancy : </label>{{ recptreport.occupant }}
+            <div id="occupantContainer" class="item">
+              {% for occupant in occupants %}
+              <div class="row" id="">  
+                <div class="">
+                <b>{{ forloop.counter }}. </b> {{ occupant.occupantname }}  
+                </div>
+              
+              </div> 
+              {% endfor %}
+            </div> 
+    </div>  
+    <div id="floorContainer">  
+      
+        <div class="d-flex justify-content-between">
+          <label for="floor">FLOOR DETAILS : </label> 
+        </div>
+      {% if floors %}
+      <div id="" class="row">
+        <div class="col-md-1">
+          #
+        </div>
+        <div class="col-md-4">
+         Floor Name
+        </div>
+        <div class="col-md-4">
+          Floor Details
+        </div>
+        <div class="col-md-3">
+          Area
+        </div>
+        
+      </div>
+      {% for floor in floors %}
+      <div id="floorgroup{{forloop.counter}}" class="row">
+        <div class="col-md-1">
+          {{forloop.counter}}.
+        </div>
+        <div class="col-md-4">
+         {{floor.floorname}}
+        </div>
+        <div class="col-md-4">
+          {{floor.floordetail}}
+        </div>
+        <div class="col-md-3">
+          {{floor.floorarea}}
+        </div>
+        
+      </div>
+      {% endfor %}
+      {%endif%}
+    </div>
+    
+    <div class="item">
+      <b>Age of the property :</b>{{recptreport.propertyage}}
+      
+    </div>
+
+    <div class="item">
+      <b>Land Rate : </b>{{recptreport.landrate}}
+      </div>
+    <div class="item">
+      <b>Landmark : </b>{{recptreport.landmark}}
+    </div>
+
+  <div class="item">
+    <b>Road Width : </b>{{recptreport.roadwidth}}
+  </div>
+            
+        {% if engdynamicvalues %}
+          {% for field in engdynamicvalues %}
+            {% if field.input_field.input_type == 'select' %}
+            <div class="item">
+              <b>{{ field.input_field.label }} :</b>
+              <div class="city-item">
+                  {% for optvalue in optvalues %}
+                    {% if optvalue.eng_dynamic_field.label == field.input_field.label %}
+                    {% if optvalue.opt_value == field.value %}
+                    {{ optvalue.opt_value }}
+                    {% endif %}
+                    {% endif %}
+                  {% endfor %}
+                  {% for subopt in suboptions %}
+                  {% if subopt.main_option.opt_value == field.value %}
+                  {% if subopt.name == field.subvalue %}
+                  {{ subopt.name }}
+                  {% endif %}
+                  {%endif%}
+                  {% endfor %}
+                </div>
+            </div>
+            {% elif field.input_field.input_type == 'checkbox' %}
+            <div style="page-break-before: always;">
+              <label for="{{ field.input_field.label }}"> {{ field.input_field.label }}:</label>
+            </div>
+              {% for optvalue in optvalues %}
+                {% if optvalue.eng_dynamic_field.label == field.input_field.label %}
+                  <div class="form-check" >
+                  <input type="checkbox" class="form-check-input" id="{{ optvalue.opt_value }}" name="{{ field.input_field.label|slugify }}" value="{{ optvalue.opt_value }}" {% if optvalue.opt_value in engdynamiccheckvalues %} checked {% endif %}>
+                  <label class="form-check-label" for="{{ optvalue.opt_value }}">{{ optvalue.opt_value }}</label>
+                  </div>
+                  <!-- engdynamiccheckvalues -->
+                {% endif %}
+              {% endfor %}
+            {% else %}
+            <div class="item col-sm-6">
+                <b>{{ field.input_field.label }}</b>
+                {{field.value}}
+                <!-- {% if field.input_field.input_type == 'date' %}<i class="fas fa-calendar-alt"></i> {% endif %} -->
+              </div>
+              
+              {%endif%}
+              <!-- <br> -->
+          {% endfor %}
+        {% endif %}
+        <div class="item" style="page-break-after: always;">
+            <b>Remarks : </b>{{recptreport.casetype}}
+            
+            
+          
+        </div>
+        {% for document in documents %} 
+         <div class="row" style="page-break-after: always;">
+          <!-- {{document.file_path}} -->
+          <img src="{{MEDIA_URL}}{{document.file_path}}" alt="">
+          
+         </div>
+         {% endfor %} 
+    
+        
+        
+      
+      </div>
+    </form>
+    </div>
+     
+  </div>
+
+<Script type="text/javascript" src="{% static 'js/reporter.js' %}" > </Script>
+<Script type="text/javascript" src="{% static 'js/sidebartoggle.js' %}"> </Script>
+<script src='https://code.jquery.com/jquery-3.7.0.js'></script>
+<!-- Data Table JS -->
+<script src='https://cdn.datatables.net/1.13.5/js/jquery.dataTables.min.js'></script>
+<script src='https://cdn.datatables.net/responsive/2.1.0/js/dataTables.responsive.min.js'></script>
+<script src='https://cdn.datatables.net/1.13.5/js/dataTables.bootstrap5.min.js'></script>   
+</body>
+<Script type="text/javascript" src="{% static 'js/sidebartoggle.js' %}"> </Script>
+
+<Script type="text/javascript" src="{% static 'js/tableattribute.js' %}"> </Script>
+
+  <script type="text/javascript" >
+    function printbill(){
+        var b=document.body.innerHTML;
+        var d=document.getElementById('mn').innerHTML;
+        document.body.innerHTML=d;
+        window.print();
+        document.body.innerHTML=b;
+    }
+  </script>
+  
+
+</html>

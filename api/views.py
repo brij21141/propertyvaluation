@@ -193,7 +193,7 @@ def engcompletedreportexport(request):
                         #    reception.add1, reception.add2, reception.city, reception.region, reception.zip, reception.country,reception.receptionid.visitingpersonname
                         #  ]) 
                         worksheet.append([ reception.applicationnumber, reception.name, reception.bankname, reception.casetype,
-                        reception.add1, reception.add2, reception.city, reception.region, reception.zip, reception.country,reception.receptionid.visitingpersonname,reception.receptionid.reportpersonname, reception.east, reception.west, reception.north, reception.south, reception.gfarea, reception.ffarea, reception.sfarea, reception.tfarea, reception.propertyage, reception.landrate, reception.Occupant, reception.rented, reception.landmark, reception.roadwidth
+                        reception.add1, reception.add2, reception.city, reception.region, reception.zip, reception.country,reception.receptionid.visitingpersonname,reception.receptionid.reportpersonname, reception.east, reception.west, reception.north, reception.south, reception.gfarea, reception.ffarea, reception.sfarea, reception.tfarea, reception.propertyage, reception.landrate, reception.occupant, reception.rented, reception.landmark, reception.roadwidth
                         , reception.hightensionline, reception.railwayline, reception.nala, reception.river,reception.pahad, reception.roadcomesunderroadbinding, reception.propertyaccessissue,reception.othercheck, reception.others, reception.remark,reception.priority])
                         
                        
@@ -205,7 +205,7 @@ def engcompletedreportexport(request):
                         #    reception.add1, reception.add2, reception.city, reception.region, reception.zip, reception.country,reception.receptionid.visitingpersonname
                         #  ]) 
                         worksheet.append([ reception.applicationnumber, reception.name, reception.bankname, reception.casetype,
-                        reception.add1, reception.add2, reception.city, reception.region, reception.zip, reception.country,reception.receptionid.visitingpersonname,reception.receptionid.reportpersonname, reception.east, reception.west, reception.north, reception.south, reception.gfarea, reception.ffarea, reception.sfarea, reception.tfarea, reception.propertyage, reception.landrate, reception.Occupant, reception.rented, reception.landmark, reception.roadwidth
+                        reception.add1, reception.add2, reception.city, reception.region, reception.zip, reception.country,reception.receptionid.visitingpersonname,reception.receptionid.reportpersonname, reception.east, reception.west, reception.north, reception.south, reception.gfarea, reception.ffarea, reception.sfarea, reception.tfarea, reception.propertyage, reception.landrate, reception.occupant, reception.rented, reception.landmark, reception.roadwidth
                         , reception.hightensionline, reception.railwayline, reception.nala, reception.river,reception.pahad, reception.roadcomesunderroadbinding, reception.propertyaccessissue,reception.othercheck, reception.others, reception.remark,reception.priority])
                   
     # Create response  
@@ -701,6 +701,7 @@ class EngineerViewSet(viewsets.ModelViewSet):
             queryset=ReceptionReport.objects.get(id=request.data.get('receptionid').split('/')[-2])
             # print(queryset)
             queryset.engineer='Submitted'
+            queryset.engid=newid.id
             queryset.save()
             # rr=ReceptionReport.objects.get(applicationnumber=app_number,pk=repid)  
             dynamicValues =json.loads(request.data.get('dynamicValues'))
@@ -1006,6 +1007,7 @@ class ReceptionViewSet(viewsets.ModelViewSet):
           engineerjob=ReceptionReport.objects.filter(visitingperson=pk).exclude(engineer ='Submitted')
           reception_serializer=ReceptionSerializer(engineerjob,many=True,context={'request':request})
           print("getting reception report for a particular engineer" , pk, "engineer")
+          print(reception_serializer.data)
           return Response(reception_serializer.data)
      @action(detail=True,methods=['get'])
      def totalengineerjob(self, request,pk=None):

@@ -1,6 +1,6 @@
-from django.shortcuts import render,redirect
+from django.shortcuts import render,redirect,get_object_or_404
 import googlemaps.client
-from site_engineer.models import EngineerReport,EngDynamicdValue
+from site_engineer.models import EngineerReport,EngDynamicdValue,Floordetails,Occupants
 from site_engineer.views import load_json_data
 from reception.models import ReceptionReport, Document
 from reporter.models import ReporterReport,RepDynamicdValue
@@ -13,13 +13,14 @@ import googlemaps
 from django.conf import settings
 from django.core.files.storage import default_storage
 from propval.models import Banks,EngDynamicField,EngFormOptionValues,EngFormsubOptionValues
-import os,requests,time
+import os, requests, zipfile, time
 from django.utils import timezone
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from rest_framework.authtoken.models import Token
 from django.utils.text import slugify
 from django.db.models import OuterRef, Subquery  
+from django.http import HttpResponse
 
 # Create your views here.
 
@@ -715,3 +716,68 @@ class Geomapview(View):
             messages.success(request, "No location available to display on map!") 
             return redirect('/reporter/reporterhome/')
         
+def rep_engreport(request,repid):
+    if request.user.is_authenticated:
+        useremail = request.user.email
+        if(UserDetails.objects.filter(user_email=useremail).exists()):
+            username = UserDetails.objects.get(user_email=useremail).first_name+" "+UserDetails.objects.get(user_email=useremail).last_name
+            userrole = UserDetails.objects.get(user_email=useremail).role
+            uid = UserDetails.objects.get(user_email=useremail).id
+    rr=EngineerReport.objects.get(pk=repid)
+    recid=rr.receptionid_id
+    # print(recid)
+    # appdate=rr.applicationdate.strftime("%Y-%m-%d")
+    documents = Document.objects.filter(application_number=rr.applicationnumber,reception_idno=recid, platform = 'engineer')
+    banks= Banks.objects.all().values('id','name','branch','city')
+    floors = Floordetails.objects.filter(engreportid_id=repid)
+    # EngDynamicdValue table contain duplicate label id for check boxes so unique records fetching
+    subquery = EngDynamicdValue.objects.filter(
+        engreportid=repid,
+        input_field_id=OuterRef('input_field_id')
+        ).order_by('id').values('id')[:1]
+    engdynamicvalues = EngDynamicdValue.objects.filter(id__in=Subquery(subquery))
+    engdynamiccheckvalues = list(EngDynamicdValue.objects.values_list('value', flat=True).filter(engreportid=repid))    
+    # engdynamicvalues=EngDynamicdValue.objects.filter(engreportid=repid).distinct('input_field_id') 
+    # for engid in engdynamicvalues:
+    #     print(engid.input_field_id)
+    optvalues = EngFormOptionValues.objects.select_related('eng_dynamic_field').all()
+    suboptions = EngFormsubOptionValues.objects.select_related('main_option').all()
+    occupants = Occupants.objects.filter(engreportid_id=repid)
+    if(rr.datecreated != None):
+        appdate=rr.datecreated.strftime("%d-%m-%Y")
+    else:
+        appdate=None
+    return render(request,'engineer/engineer_report.html',{'recptreport':rr,'appdd':appdate,'engdynamicvalues':engdynamicvalues, 'documents':documents,'banks':banks,'floors':floors,'optvalues':optvalues,'engdynamiccheckvalues':engdynamiccheckvalues,'suboptions':suboptions,'occupants':occupants,"MEDIA_URL":settings.MEDIA_URL})
+
+def download_rep_eng_images(request,repid):
+    rr=EngineerReport.objects.get(pk=repid)
+    recid=rr.receptionid_id
+    print(recid)
+    documents = Document.objects.filter(application_number=rr.applicationnumber,reception_idno=recid, platform = 'engineer')
+    file_ids = ','.join(str(id) for id in documents.values_list('id', flat=True))
+    ids = file_ids.split(',') 
+    print(ids[0]) 
+    if ids[0]=='':
+        return HttpResponse(  
+            "<script>alert('No files to download.');window.history.back();</script>"  
+        )  
+    # Prepare a ZIP file  
+    zip_filename = 'downloaded_files.zip'  
+    zip_filepath = os.path.join('media', zip_filename)  # Adjust path as needed  
+    with zipfile.ZipFile(zip_filepath, 'w') as zip_file:  
+        for file_id in ids:  
+            file_instance = get_object_or_404(Document, id=file_id)  
+            file_path = os.path.join(settings.MEDIA_ROOT,file_instance.file_path )   
+            zip_file.write(file_path, os.path.basename(file_path))  # Add file to the zip  
+
+    # Create a response with the ZIP file  
+    response = HttpResponse(content_type='application/zip')  
+    response['Content-Disposition'] = f'attachment; filename="{zip_filename}"'  
+    
+    # Open the ZIP file in binary read mode and write to the response  
+    with open(zip_filepath, 'rb') as zip_file:  
+        response.write(zip_file.read())  
+    # Optionally, you can delete the zip file after downloading  
+    os.remove(zip_filepath)  
+    
+    return response  

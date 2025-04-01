@@ -351,11 +351,15 @@ def update_report(request,repid):
             
             with transaction.atomic():  # Start the transaction  if transactions fails it will rollback data
                 if request.method == "POST":
+                    try:
+                        bnkname=Banks.objects.get(pk=request.POST.get("bankid")).name
+                    except Banks.DoesNotExist:
+                        bnkname='N/A'
                     app_number = request.POST.get("appno")
                     app_name = request.POST.get("name")
                     visitinpresence = request.POST.get("presence")
                     # app_bankname = request.POST.get("bankname")
-                    app_bankname = Banks.objects.get(pk=request.POST.get("bankid")).name
+                    app_bankname = bnkname
                     app_bankid = request.POST.get("bankid")
                     casetype = request.POST.get("case")
                     # app_add1 = request.POST.get("add1")
@@ -428,7 +432,7 @@ def update_report(request,repid):
                     sxarea = er.sxarea,
                     propertyage = er.propertyage,
                     landrate = er.landrate,
-                    Occupant = er.occupant,
+                    occupant = er.occupant,
                     landmark = er.landmark,
                     roadwidth = er.roadwidth,
                     hightensionline = er.hightensionline,

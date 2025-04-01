@@ -399,6 +399,7 @@ def engcompreportpdf(request, doc_id):
         response = requests.get(url)
         response.raise_for_status()  # Raise an exception for HTTP errors
         data1 = response.json()
+        print(data1)
         data = data1['data'][0]
         print(data['receptionid'])
         # print(data['data'][0]['updated_at'])
@@ -476,7 +477,7 @@ def engcompreportpdf(request, doc_id):
         "<b>Floor details(Area Sq.ft.):</b>",f'',
         f'<b>Ground floor :</b> {data["gfarea"]}{"   " * 40}<b>First floor:</b> {data["ffarea"]}{"   " * 20}<b>Second floor:</b> {data["sfarea"]}{"   " * 20}<b>Third floor:</b> {data["tfarea"]}',
         f'',
-        f'<b>Age of the property:</b> {data["propertyage"]}{" " * 10}<b>Land Rate:</b> {data["landrate"]}{" " * 10}<b>Occupant:</b> {data["Occupant"]}',
+        f'<b>Age of the property:</b> {data["propertyage"]}{" " * 10}<b>Land Rate:</b> {data["landrate"]}{" " * 10}<b>Occupant:</b> {data["occupant"]}',
         f'',
         f'<b>Land Mark:</b> {data["landmark"]}{" " * 10}<b>Rented:</b> {data["rented"]}{" " * 10}<b>Road width:</b> {data["roadwidth"]}','',
         "<b>Hazards:</b>",

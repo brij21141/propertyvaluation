@@ -166,7 +166,7 @@
       <div class="col-md-12">
         <div class="card">
           <div class="card-body">
-            <a class="btn btn-success btn-sm float-end" href="/api/engcompletedreportexport">Export to Excel</a><br>
+            <!-- <a class="btn btn-success btn-sm float-end" href="/api/engcompletedreportexport">Export to Excel</a><br> -->
               <hr>
             
             <table id="engineertable" class="table table-hover table-striped table-bordered" style="font-size: 90%;">
@@ -184,7 +184,7 @@
                   <th scope="col">Reason for hold</th>
                   <th scope="col">Engineer Status</th>
                   <th scope="col">Reporter Status</th>
-                  <th scope="col">Action</th>
+                  <th scope="col" style="width: 80px;">Action</th>
                 </tr>
               </thead>
               <tbody>
@@ -220,9 +220,9 @@
                   <td >Pending</td>
                   {% endif %}
                   {% if recrep.engid is not null %}
-                    <td><a class="btn-sm"  href="/reporter/reporter/{{recrep.engid}}"><i class="fa-solid fa-circle-plus fa-2x"></i></a>&nbsp;&nbsp;
+                    <td><a class="btn-sm"  href="/reporter/reporter/{{recrep.engid}}"><i class="fa-solid fa-circle-plus fa-2x"></i></a>&nbsp;
                   {% else %}
-                    <td><a class="btn-sm"  href="/reporter/reporter/{{recrep.engid}}" style="pointer-events: none; color: grey;"><i class="fa-solid fa-circle-plus fa-2x"></i></a>&nbsp;&nbsp;
+                    <td><a class="btn-sm"  href="/reporter/reporter/{{recrep.engid}}" style="pointer-events: none; color: grey;"><i class="fa-solid fa-circle-plus fa-2x"></i></a>&nbsp;
                   {% endif %}
                         <a class="reporterstatusupdate" id="p{{recrep.id}}" data-url="{% url 'reporterreportstatus' recrep.id %}" href="#"  title="Set Status">
                           {% if recrep.reporter == 'InProgress' %}
@@ -232,7 +232,10 @@
                          {%else%} 
                          <i class="fa-regular fa-clock fa-2x" style="color: blue;"></i>
                          {% endif %}
-                        </a>
+                        </a>&nbsp;
+                  {% if recrep.engid is not null %}
+                      <a class="" data-url="" href="{% url 'rep_engreport' recrep.engid %}" title="View/download Engineer report"><i class="fas fa-eye fa-2x" style="color: green;"></i></a>
+                  {% endif %}
                         <!-- {% if recrep.receptionid.reportperson == 0  %}
                         &nbsp;&nbsp;<a class="reportassign1" data-url="{% url 'reportassign' recrep.id %}" href="#" title="Assign yourself"><i class="fas fa-tasks fa-2x" style="color: gray;"></i></a>
                         {% endif %} -->
@@ -286,7 +289,7 @@
         <div class="col-md-12">
           <div class="card">
             <div class="card-body">
-              <a class="btn btn-success btn-sm float-end" href="/api/reportercompletedexport">Export to Excel</a><br>
+              <!-- <a class="btn btn-success btn-sm float-end" href="/api/reportercompletedexport">Export to Excel</a><br> -->
               <hr>
               <table id="reportertable" class="table table-hover table-striped tavle-bordered" style="font-size: 90%;">
                 <thead>
